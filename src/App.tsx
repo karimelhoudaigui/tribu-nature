@@ -2,11 +2,9 @@ import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from
 import {
   BadgeCheck,
   CalendarDays,
-  Check,
   Compass,
   HeartHandshake,
   Home,
-  Map,
   Menu,
   MessageCircle,
   Mountain,
@@ -20,7 +18,7 @@ import {
 import { activities, destination, itinerary, members, providers, reviews, trips } from "./data";
 import type { Activity, Trip, UserProfile } from "./types";
 
-type Page = "landing" | "onboarding" | "dashboard" | "trip" | "conversation" | "graph" | "communaute" | "profil" | "prestataires" | "securite";
+type Page = "landing" | "onboarding" | "dashboard" | "trip" | "conversation" | "communaute" | "profil" | "prestataires" | "securite";
 
 type Conversation = {
   id: string;
@@ -38,7 +36,6 @@ type Conversation = {
 
 const navItems: { page: Page; label: string }[] = [
   { page: "dashboard", label: "Trips" },
-  { page: "graph", label: "Local Graph" },
   { page: "communaute", label: "Tribu" },
   { page: "prestataires", label: "Prestataires" },
   { page: "securite", label: "Sécurité" }
@@ -207,7 +204,6 @@ function App() {
         {page === "dashboard" && <Dashboard openTrip={openTrip} />}
         {page === "trip" && <TripDetail trip={selectedTrip} validatedMembers={validatedMembers} go={go} joinTrip={joinTrip} />}
         {page === "conversation" && <ConversationPage conversation={conversation} go={go} />}
-        {page === "graph" && <LocalActivityGraph />}
         {page === "communaute" && <Community />}
         {page === "profil" && <Profile />}
         {page === "prestataires" && <Providers />}
@@ -304,7 +300,7 @@ function Landing({ go, openTrip }: { go: (page: Page) => void; openTrip: (id: st
         <InfoBlock
           eyebrow="La solution"
           title="On trouve le groupe, la destination, les activités et le planning."
-          text="Tu exprimes ton envie, le matching social identifie des compagnons d'aventure, puis le Local Activity Graph compose une expérience modulable."
+          text="Tu choisis tes dates, ton ambiance et tes préférences. L'app sélectionne une zone adaptée, puis compose une aventure réaliste avec des activités locales, des alternatives météo et un rythme compatible avec le groupe."
         />
       </section>
 
@@ -797,7 +793,7 @@ function TripDetail({
       <section className="container-page grid gap-8 py-10 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-8">
           <Panel title="Pourquoi cette Trip te correspond">
-            <p className="leading-8 text-forest-700">Cette Trip correspond à ton envie de nature calme, ton budget, ton niveau facile/intermédiaire et ton souhait de partir avec un petit groupe rassurant.</p>
+            <p className="leading-8 text-forest-700">Cette Trip correspond à ton envie de nature calme, ton budget, ton niveau facile/intermédiaire et ton souhait de partir avec un petit groupe rassurant. Les activités proposées tiennent compte de la météo, du rythme du groupe, des distances, du risque et des options locales vraiment disponibles.</p>
           </Panel>
           <Panel title="Destination proposée">
             <p className="font-semibold">{destination.name}, {destination.region}</p>
@@ -871,7 +867,8 @@ function TripDetail({
 
 function ActivitiesSection() {
   return (
-    <Panel title="Ce qu'on peut vivre sur place">
+    <Panel title="Activités proposées pour cette Trip">
+      <p className="mb-5 text-forest-700">Une sélection réaliste pour le groupe : outdoor, producteurs locaux, repas, alternatives météo et expériences faciles à organiser sur place.</p>
       <div className="mb-5 flex flex-wrap gap-2">
         {["Randonnées", "Fermes et producteurs", "Activités eau vive", "Cheval", "Artisanat", "Repas local", "Villages", "Points de vue", "Refuges", "Marchés locaux", "Activités météo"].map((tag) => (
           <span className="pill" key={tag}>{tag}</span>
@@ -994,77 +991,6 @@ function ConversationPage({ conversation, go }: { conversation: Conversation | n
             </div>
             <p className="mt-3 text-xs text-forest-700">Tu peux confirmer le transport, poser une question sécurité ou proposer une autre activité avant de réserver quoi que ce soit.</p>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function LocalActivityGraph() {
-  const [generated, setGenerated] = useState(false);
-  const nodes = ["Randonnée", "Ferme", "Rafting", "Poterie", "Dîner local", "Refuge", "Village", "Point de vue"];
-
-  return (
-    <section className="container-page py-10">
-      <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-        <div>
-          <p className="pill">Moteur local</p>
-          <h1 className="mt-4 text-4xl font-semibold">Local Activity Graph</h1>
-          <p className="mt-4 leading-8 text-forest-700">
-            Le moteur qui scanne une zone, comprend ce qu'on peut y vivre, puis compose une aventure adaptée au groupe.
-          </p>
-          <p className="mt-4 leading-8 text-forest-700">
-            Un moteur de connaissance géolocalisé qui agrège automatiquement des données issues d'APIs, d'open data touristique, de bases cartographiques et de sources locales afin d'identifier les activités, prestataires, lieux, hébergements et expériences disponibles dans une zone donnée. Ces données sont nettoyées, dédupliquées, enrichies par IA, puis reliées dans un graphe permettant de générer des propositions d'aventures personnalisées selon le profil du groupe, les dates, le budget, la météo, le niveau physique et l'ambiance recherchée.
-          </p>
-          <TagList tags={["Google Places API officielle", "OpenStreetMap / Overpass API", "DATAtourisme", "Wikidata", "Offices de tourisme", "Prestataires partenaires"]} />
-        </div>
-        <div className="card p-5">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              ["Zone géographique", "Vallée d'Aspe"],
-              ["Rayon", "30 km"],
-              ["Durée", "week-end"],
-              ["Budget", "250 à 350 €"],
-              ["Niveau physique", "facile/intermédiaire"],
-              ["Ambiance", "calme, nature, découverte locale"]
-            ].map(([label, value]) => (
-              <label className="grid gap-2 text-sm font-semibold" key={label}>
-                {label}
-                <input className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal outline-none" defaultValue={value} />
-              </label>
-            ))}
-          </div>
-          <button className="btn-primary mt-5 w-full" onClick={() => setGenerated(true)}>Générer le graphe local</button>
-        </div>
-      </div>
-      <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_1fr]">
-        <div className="card p-6">
-          <h2 className="text-2xl font-semibold">Visualisation du graphe</h2>
-          <div className="relative mt-6 grid min-h-[430px] place-items-center rounded-lg bg-forest-50 p-5">
-            <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-forest-800 px-6 py-5 text-center font-semibold text-white shadow-soft">Vallée<br />d'Aspe</div>
-            <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-4">
-              {nodes.map((node, index) => (
-                <div className="rounded-lg border border-forest-100 bg-white p-4 text-center text-sm font-semibold shadow-sm" key={node}>
-                  {node}
-                  <p className="mt-2 text-xs font-normal text-forest-700">{["compatible groupe calme", "bon en cas de pluie", "nécessite prestataire", "accessible débutant"][index % 4]}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="card p-6">
-          <h2 className="text-2xl font-semibold">Résultats simulés</h2>
-          {!generated && <p className="mt-4 text-forest-700">Clique sur générer pour voir la composition proposée.</p>}
-          {generated && (
-            <div className="mt-5 grid gap-3">
-              {["20 activités locales classées", "5 restaurants ou repas locaux", "5 hébergements simples", "5 randonnées ou points de vue", "3 activités sortie de zone de confort", "1 planning recommandé", "2 alternatives météo", "1 budget estimé", "1 niveau de sécurité"].map((item) => (
-                <div className="flex items-center gap-3 rounded-lg bg-forest-50 p-4" key={item}>
-                  <Check className="text-forest-700" />
-                  <span className="font-medium">{item}</span>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </section>
@@ -1227,13 +1153,13 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
 
 function ActivityCard({ activity }: { activity: Activity }) {
   return (
-    <div className="rounded-lg border border-forest-100 bg-white p-4">
+    <div className="rounded-[1.25rem] border border-forest-100 bg-white p-4">
       <div className="flex flex-col justify-between gap-3 sm:flex-row">
         <div>
           <h3 className="text-lg font-semibold">{activity.name}</h3>
           <p className="text-sm text-forest-700">{activity.category} · {activity.duration_estimate} · {activity.price_min === 0 ? "gratuit" : `${activity.price_min} à ${activity.price_max} €`}</p>
         </div>
-        <span className="pill w-fit">{activity.source}</span>
+        <span className="pill w-fit">{activity.confidence_score}% adapté au groupe</span>
       </div>
       <div className="mt-4 grid gap-2 text-sm text-forest-700 sm:grid-cols-2">
         <span>Niveau : {activity.physical_level}</span>
@@ -1315,7 +1241,6 @@ function Footer({ go }: { go: (page: Page) => void }) {
           {[
             ["Accueil", "landing", Home],
             ["Trips", "dashboard", Compass],
-            ["Graph", "graph", Map],
             ["Tribu", "communaute", Users],
             ["Sécurité", "securite", HeartHandshake]
           ].map(([label, target, Icon]) => {
