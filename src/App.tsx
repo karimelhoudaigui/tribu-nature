@@ -16,7 +16,7 @@ import {
   X
 } from "lucide-react";
 import { activities, destination, itinerary, members, mockLocalActivities, mockMembers, providers, reviews, trips } from "./data";
-import { generateTripFromProfile } from "./generator";
+import { generateTripsFromProfile } from "./generator";
 import type { Activity, MockLocalActivity, OnboardingProfile, Trip, UserProfile } from "./types";
 
 type Page = "landing" | "onboarding" | "dashboard" | "trip" | "conversation" | "communaute" | "profil" | "prestataires" | "securite";
@@ -185,9 +185,9 @@ function App() {
   const [selectedTripId, setSelectedTripId] = useState("aspe");
   const [menuOpen, setMenuOpen] = useState(false);
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [generatedTrip, setGeneratedTrip] = useState<Trip | null>(null);
+  const [generatedTrips, setGeneratedTrips] = useState<Trip[]>([]);
 
-  const availableTrips = generatedTrip ? [generatedTrip, ...trips] : trips;
+  const availableTrips = generatedTrips.length ? [...generatedTrips, ...trips] : trips;
   const selectedTrip = availableTrips.find((trip) => trip.id === selectedTripId) ?? availableTrips[0];
   const currentUser = members[0];
   const validatedMembers = useMemo(() => getTripMembers(selectedTrip), [selectedTrip]);
@@ -201,10 +201,10 @@ function App() {
     go("trip");
   };
   const handleGeneratedTrip = (profile: OnboardingProfile) => {
-    const trip = generateTripFromProfile(profile);
-    setGeneratedTrip(trip);
-    setSelectedTripId(trip.id);
-    go("trip");
+    const generated = generateTripsFromProfile(profile);
+    setGeneratedTrips(generated);
+    setSelectedTripId(generated[0]?.id ?? "aspe");
+    go("dashboard");
   };
   const joinTrip = (trip: Trip) => {
     const confirmedMembers = getTripMembers(trip);
@@ -704,9 +704,9 @@ function AdventureProfileCard({
       <p className="mt-4 rounded-lg bg-forest-50 p-5 text-lg leading-8">
         {availability}. {answers.nature ?? "Montagne"}, niveau {answers.level ?? "facile"}, budget {answers.budget ?? "200 à 350 €"}, ambiance {ambience.toLowerCase()}, confort {answers.comfort ?? "gîte"}, groupe rassurant avec {safety.toLowerCase()}.
       </p>
-      <p className="mt-4 text-forest-700">On a trouvé une Trip qui te correspond. Tu peux rejoindre le groupe avant de confirmer.</p>
+      <p className="mt-4 text-forest-700">On peut générer plusieurs Trips possibles, classées selon ton profil, les membres compatibles et les activités disponibles.</p>
       <button className="btn-primary mt-8" onClick={() => onGeneratedTrip(toOnboardingProfile(answers))}>
-        Générer ma Trip personnalisée
+        Voir toutes les Trips possibles
       </button>
     </div>
   );
@@ -738,8 +738,8 @@ function Dashboard({ trips: dashboardTrips, openTrip }: { trips: Trip[]; openTri
       <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
         <div>
           <p className="pill">Trips compatibles</p>
-          <h1 className="mt-4 text-4xl font-semibold">On a trouvé des Trips qui te correspondent.</h1>
-          <p className="mt-4 leading-8 text-forest-700">Choisis l'ambiance, le budget et le niveau. Le reste reste simple.</p>
+          <h1 className="mt-4 text-4xl font-semibold">Voici toutes les Trips possibles pour ton profil.</h1>
+          <p className="mt-4 leading-8 text-forest-700">Les propositions sont classées par compatibilité : destination, budget, niveau, ambiance, membres disponibles et activités locales.</p>
         </div>
         <div className="card grid gap-3 p-5 sm:grid-cols-3">
           <Metric label="Compatibilité max" value="94 %" />

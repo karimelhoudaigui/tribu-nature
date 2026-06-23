@@ -14,36 +14,48 @@ type ScoredDestination = {
 };
 
 export function generateTripFromProfile(profile: OnboardingProfile): Trip {
+  return generateTripsFromProfile(profile)[0];
+}
+
+export function generateTripsFromProfile(profile: OnboardingProfile): Trip[] {
   const scoredDestinations = mockDestinations
     .map((destination) => scoreDestination(destination, profile))
     .sort((a, b) => b.score - a.score);
 
-  const best = scoredDestinations[0];
-  const selectedActivities = selectActivities(best.destination.id, profile);
-  const selectedMembers = selectMembers(profile, best.destination);
+  return scoredDestinations.map((scored) => buildTripFromScoredDestination(scored, profile));
+}
+
+function buildTripFromScoredDestination(scored: ScoredDestination, profile: OnboardingProfile): Trip {
+  const selectedActivities = selectActivities(scored.destination.id, profile);
+  const selectedMembers = selectMembers(profile, scored.destination);
   const generatedItinerary = buildItinerary(selectedActivities);
 
   return {
-    id: `generated-${best.destination.id}`,
-    title: buildTripTitle(best.destination, profile),
-    destination: `${best.destination.name}, ${best.destination.region}`,
-    image_url: best.destination.image,
+    id: `generated-${scored.destination.id}`,
+    title: buildTripTitle(scored.destination, profile),
+    destination: `${scored.destination.name}, ${scored.destination.region}`,
+    image_url: scored.destination.image,
     dates: getDurationLabel(profile.availability),
     duration: getDurationLabel(profile.availability),
-    budget_min: Math.max(60, best.destination.average_budget - 60),
-    budget_max: best.destination.average_budget + 70,
+    budget_min: Math.max(60, scored.destination.average_budget - 60),
+    budget_max: scored.destination.average_budget + 70,
     physical_level: profile.physical_level,
-    ambience_tags: profile.ambience.slice(0, 3),
-    compatibility_score: Math.min(98, Math.round(best.score)),
-    interested_count: selectedMembers.length + getCollectiveCount(best.destination, profile),
+    ambience_tags: buildAmbienceTags(scored.destination, profile),
+    compatibility_score: Math.min(98, Math.round(scored.score)),
+    interested_count: selectedMembers.length + getCollectiveCount(scored.destination, profile),
     status: "Trip générée pour ton profil",
-    description: `${best.destination.description} La proposition combine des membres compatibles, des activités locales adaptées et un planning réaliste.`,
+    description: `${scored.destination.description} La proposition combine des membres compatibles, des activités locales adaptées et un planning réaliste.`,
     activities: selectedActivities.map((activity) => activity.name),
-    generation_reasons: best.reasons,
+    generation_reasons: scored.reasons,
     matched_member_ids: selectedMembers.map((member) => member.id),
     generated_activity_ids: selectedActivities.map((activity) => activity.id),
     generated_itinerary: generatedItinerary
   };
+}
+
+function buildAmbienceTags(destination: MockDestination, profile: OnboardingProfile) {
+  const tags = [...profile.ambience, ...destination.nature_type];
+  return Array.from(new Set(tags)).slice(0, 3);
 }
 
 function scoreDestination(destination: MockDestination, profile: OnboardingProfile): ScoredDestination {
