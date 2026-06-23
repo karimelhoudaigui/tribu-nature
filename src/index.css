@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color: #0c2b22;
+    background: #f8f4ec;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .card {
+    @apply rounded-[1.5rem] border border-forest-100 bg-white/90 shadow-soft;
+  }
+
+  .pill {
+    @apply inline-flex items-center rounded-full border border-forest-100 bg-forest-50 px-3 py-1 text-sm font-medium text-forest-800;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-forest-800 px-5 py-3 font-semibold text-white transition hover:bg-forest-900;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border border-forest-200 bg-white px-5 py-3 font-semibold text-forest-900 transition hover:bg-forest-50;
+  }
+
+  .section-title {
+    @apply text-3xl font-semibold text-forest-900 sm:text-4xl;
+  }
+}
