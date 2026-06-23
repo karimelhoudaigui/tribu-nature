@@ -107,15 +107,18 @@ const ambienceCards = [
   }
 ];
 
-const calendarDays = [
-  { day: "Ven", date: "28", month: "juin" },
-  { day: "Sam", date: "29", month: "juin" },
-  { day: "Dim", date: "30", month: "juin" },
-  { day: "Lun", date: "01", month: "juil." },
-  { day: "Mar", date: "02", month: "juil." },
-  { day: "Mer", date: "03", month: "juil." },
-  { day: "Jeu", date: "04", month: "juil." }
-];
+const calendarMonth = {
+  label: "Juin 2026",
+  weekdays: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+  days: Array.from({ length: 30 }, (_, index) => {
+    const day = index + 1;
+    return {
+      date: `2026-06-${String(day).padStart(2, "0")}`,
+      day,
+      disabled: day < 23
+    };
+  })
+};
 
 const filterGroups = [
   {
@@ -362,7 +365,7 @@ function Landing({ go, openTrip }: { go: (page: Page) => void; openTrip: (id: st
 function Onboarding({ go }: { go: (page: Page) => void }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({
-    availability: ["Ven 28 juin", "Dim 30 juin", "Week-end"],
+    availability: ["2026-06-26", "2026-06-28", "Week-end"],
     filters: ["Petit groupe", "Budget max 350 €", "Montagne", "Week-end", "Ambiance calme"],
     budget: "200 à 350 €",
     level: "Facile",
@@ -442,50 +445,82 @@ function AvailabilityPicker({
   setAnswers: Dispatch<SetStateAction<Record<string, string | string[]>>>;
 }) {
   const selected = Array.isArray(answers.availability) ? answers.availability : [];
-  const toggleDate = (value: string) => {
+  const selectedDates = selected.filter(isIsoDate).sort();
+  const duration = selected.find((item) => ["Journée", "Week-end", "2-3 jours", "Semaine"].includes(item)) ?? "Week-end";
+  const startDate = selectedDates[0];
+  const endDate = selectedDates[1];
+
+  const selectDate = (value: string) => {
     setAnswers((prev) => {
       const list = Array.isArray(prev.availability) ? prev.availability : [];
-      const base = list.filter((item) => !item.includes("juin") && !item.includes("juil."));
-      const dates = list.filter((item) => item.includes("juin") || item.includes("juil."));
-      const nextDates = dates.includes(value) ? dates.filter((item) => item !== value) : [...dates, value].slice(-2);
+      const base = list.filter((item) => !isIsoDate(item));
+      const dates = list.filter(isIsoDate).sort();
+      let nextDates: string[];
+
+      if (dates.length === 0 || dates.length === 2 || value < dates[0]) {
+        nextDates = [value];
+      } else if (value === dates[0]) {
+        nextDates = [];
+      } else {
+        nextDates = [dates[0], value];
+      }
+
       return { ...prev, availability: [...nextDates, ...base] };
     });
   };
+
   const setDuration = (value: string) => {
     setAnswers((prev) => {
       const list = Array.isArray(prev.availability) ? prev.availability : [];
-      const dates = list.filter((item) => item.includes("juin") || item.includes("juil."));
+      const dates = list.filter(isIsoDate);
       return { ...prev, availability: [...dates, value] };
     });
   };
 
-  const selectedDates = selected.filter((item) => item.includes("juin") || item.includes("juil."));
-  const duration = selected.find((item) => ["Journée", "Week-end", "2-3 jours", "Semaine"].includes(item)) ?? "Week-end";
+  const selectedNights = startDate && endDate ? Math.max(1, daysBetween(startDate, endDate)) : 0;
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
       <div>
-        <div className="flex items-center gap-2 text-sm font-semibold text-forest-700">
-          <CalendarDays size={18} />
-          Départ et retour
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm font-semibold text-forest-700">
+            <CalendarDays size={18} />
+            Sélectionne une date de départ puis une date de retour
+          </div>
+          <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-forest-800 shadow-sm">{calendarMonth.label}</span>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-          {calendarDays.map((day) => {
-            const value = `${day.day} ${day.date} ${day.month}`;
-            const active = selectedDates.includes(value);
+
+        <div className="mt-4 rounded-[1.5rem] bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-forest-600">
+            {calendarMonth.weekdays.map((weekday) => (
+              <span className="py-2" key={weekday}>{weekday}</span>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {calendarMonth.days.map((day) => {
+            const selectedStart = day.date === startDate;
+            const selectedEnd = day.date === endDate;
+            const inRange = Boolean(startDate && endDate && day.date > startDate && day.date < endDate);
             return (
               <button
-                className={`rounded-[1.35rem] border p-4 text-center transition ${active ? "border-forest-800 bg-forest-800 text-white shadow-soft" : "border-forest-100 bg-white hover:border-forest-700"}`}
-                key={value}
-                onClick={() => toggleDate(value)}
+                className={[
+                  "aspect-square rounded-2xl text-sm font-semibold transition",
+                  day.disabled ? "cursor-not-allowed text-forest-200" : "hover:bg-forest-100",
+                  inRange ? "bg-forest-100 text-forest-900" : "",
+                  selectedStart || selectedEnd ? "bg-forest-800 text-white shadow-soft hover:bg-forest-800" : "",
+                  !day.disabled && !inRange && !selectedStart && !selectedEnd ? "bg-forest-50 text-forest-900" : ""
+                ].join(" ")}
+                disabled={day.disabled}
+                key={day.date}
+                onClick={() => selectDate(day.date)}
               >
-                <span className="block text-sm opacity-75">{day.day}</span>
-                <span className="mt-1 block text-2xl font-semibold">{day.date}</span>
-                <span className="block text-xs opacity-75">{day.month}</span>
+                {day.day}
               </button>
             );
           })}
+          </div>
         </div>
+
         <div className="mt-5 flex flex-wrap gap-2">
           {["Journée", "Week-end", "2-3 jours", "Semaine"].map((item) => (
             <button
@@ -499,13 +534,35 @@ function AvailabilityPicker({
         </div>
       </div>
       <div className="rounded-[1.5rem] bg-forest-50 p-5">
-        <p className="text-sm font-semibold text-forest-700">Durée sélectionnée</p>
+        <p className="text-sm font-semibold text-forest-700">Disponibilités sélectionnées</p>
         <h3 className="mt-2 text-2xl font-semibold">{duration}</h3>
-        <p className="mt-3 text-forest-700">{selectedDates[0] ?? "Date de départ"} → {selectedDates[1] ?? "date de retour"}</p>
+        <div className="mt-5 grid gap-3">
+          <MiniFact label="Départ" value={startDate ? formatFrenchDate(startDate) : "À choisir"} />
+          <MiniFact label="Retour" value={endDate ? formatFrenchDate(endDate) : "À choisir"} />
+          <MiniFact label="Durée" value={selectedNights ? `${selectedNights} nuit${selectedNights > 1 ? "s" : ""}` : "Sélectionne 2 dates"} />
+        </div>
         <p className="mt-5 text-sm text-forest-700">Simple comme réserver un trajet ou un logement : tu poses tes dates, on te propose le groupe.</p>
       </div>
     </div>
   );
+}
+
+function isIsoDate(value: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function formatFrenchDate(value: string) {
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "short",
+    day: "numeric",
+    month: "long"
+  }).format(new Date(`${value}T12:00:00`));
+}
+
+function daysBetween(start: string, end: string) {
+  const startTime = new Date(`${start}T12:00:00`).getTime();
+  const endTime = new Date(`${end}T12:00:00`).getTime();
+  return Math.round((endTime - startTime) / 86_400_000);
 }
 
 function AmbiencePicker({
@@ -594,7 +651,9 @@ function FiltersPicker({
 function AdventureProfileCard({ answers, go }: { answers: Record<string, string | string[]>; go: (page: Page) => void }) {
   const ambience = Array.isArray(answers.ambience) ? answers.ambience.join(", ") : "Calme & déconnexion";
   const safety = Array.isArray(answers.safety) ? answers.safety.join(", ") : "profils vérifiés";
-  const availability = Array.isArray(answers.availability) ? answers.availability.join(" · ") : "week-end";
+  const availability = Array.isArray(answers.availability)
+    ? answers.availability.map((item) => (isIsoDate(item) ? formatFrenchDate(item) : item)).join(" · ")
+    : "week-end";
   return (
     <div>
       <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-sun text-white">
