@@ -1,4 +1,18 @@
-import type { Activity, Destination, ItineraryItem, Provider, Review, Trip, UserProfile, Vote } from "./types";
+import type {
+  Activity,
+  CollectiveIntent,
+  Destination,
+  DestinationSeed,
+  ItineraryItem,
+  MockDestination,
+  MockLocalActivity,
+  MockMember,
+  Provider,
+  Review,
+  Trip,
+  UserProfile,
+  Vote
+} from "./types";
 
 export const trips: Trip[] = [
   {
@@ -85,6 +99,329 @@ export const trips: Trip[] = [
     status: "Nouveau",
     description: "Montagne douce, marché local et ferme partenaire pour une aventure humaine, gourmande et très ancrée dans le territoire.",
     activities: ["Randonnée", "Ferme", "Marché", "Village"]
+  }
+];
+
+export const mockDestinations: MockDestination[] = [
+  {
+    id: "vallee-aspe",
+    name: "Vallée d'Aspe",
+    nature_type: ["Montagne", "Vallée"],
+    compatible_departure_cities: ["Bordeaux", "Toulouse"],
+    approximate_distance: "3h depuis Bordeaux",
+    average_budget: 290,
+    recommended_physical_level: ["Facile", "Intermédiaire", "facile/intermédiaire"],
+    compatible_ambiences: ["Calme & déconnexion", "Découverte locale", "Fun & aventure douce"],
+    accessibility: "Train jusqu'à Pau ou Oloron, puis covoiturage de groupe",
+    image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+    safety_score: 92,
+    ideal_season: "Printemps à automne",
+    region: "Pyrénées-Atlantiques",
+    description: "Une vallée de montagne authentique, parfaite pour un week-end nature, local et rassurant."
+  },
+  {
+    id: "pays-basque-interieur",
+    name: "Pays basque intérieur",
+    nature_type: ["Montagne", "Campagne", "Vallée"],
+    compatible_departure_cities: ["Bordeaux", "Toulouse"],
+    approximate_distance: "2h30 depuis Bordeaux",
+    average_budget: 260,
+    recommended_physical_level: ["Facile", "Intermédiaire"],
+    compatible_ambiences: ["Découverte locale", "Calme & déconnexion", "Premium & confort"],
+    accessibility: "Train vers Bayonne puis navette ou covoiturage",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+    safety_score: 90,
+    ideal_season: "Toute l'année",
+    region: "Pays basque",
+    description: "Montagnes douces, villages, marchés et fermes pour un week-end très ancré localement."
+  },
+  {
+    id: "dordogne",
+    name: "Dordogne",
+    nature_type: ["Rivière", "Campagne"],
+    compatible_departure_cities: ["Bordeaux", "Toulouse"],
+    approximate_distance: "2h depuis Bordeaux",
+    average_budget: 230,
+    recommended_physical_level: ["Très facile", "Facile"],
+    compatible_ambiences: ["Fun & aventure douce", "Découverte locale"],
+    accessibility: "Train régional et covoiturage court",
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+    safety_score: 88,
+    ideal_season: "Avril à octobre",
+    region: "Nouvelle-Aquitaine",
+    description: "Rivière, villages, marchés et canoë accessible pour un groupe qui veut du fun doux."
+  },
+  {
+    id: "bassin-arcachon-nature",
+    name: "Bassin d'Arcachon nature",
+    nature_type: ["Mer", "Forêt"],
+    compatible_departure_cities: ["Bordeaux"],
+    approximate_distance: "1h depuis Bordeaux",
+    average_budget: 180,
+    recommended_physical_level: ["Très facile", "Facile"],
+    compatible_ambiences: ["Calme & déconnexion", "Premium & confort"],
+    accessibility: "Train direct depuis Bordeaux",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+    safety_score: 94,
+    ideal_season: "Mars à octobre",
+    region: "Gironde",
+    description: "Mer, pinède, cabanes ostréicoles et marche douce pour une échappée facile."
+  },
+  {
+    id: "fontainebleau",
+    name: "Fontainebleau",
+    nature_type: ["Forêt"],
+    compatible_departure_cities: ["Paris"],
+    approximate_distance: "50 min depuis Paris",
+    average_budget: 70,
+    recommended_physical_level: ["Très facile", "Facile"],
+    compatible_ambiences: ["Calme & déconnexion", "Découverte locale"],
+    accessibility: "Train direct puis marche courte",
+    image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1600&q=80",
+    safety_score: 91,
+    ideal_season: "Toute l'année",
+    region: "Île-de-France",
+    description: "Forêt, rochers, pique-nique et retour simple depuis Paris."
+  },
+  {
+    id: "vercors",
+    name: "Vercors",
+    nature_type: ["Montagne", "Forêt"],
+    compatible_departure_cities: ["Lyon"],
+    approximate_distance: "2h depuis Lyon",
+    average_budget: 310,
+    recommended_physical_level: ["Intermédiaire"],
+    compatible_ambiences: ["Sport & dépassement", "Découverte locale", "Calme & déconnexion"],
+    accessibility: "Train vers Grenoble puis covoiturage",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80",
+    safety_score: 87,
+    ideal_season: "Mai à octobre",
+    region: "Auvergne-Rhône-Alpes",
+    description: "Plateaux, gîtes, fromageries et randonnée pour une aventure plus montagne."
+  }
+];
+
+export const mockDestinationSeeds: DestinationSeed[] = [
+  {
+    userId: "jonathan",
+    destinationId: "vallee-aspe",
+    dates: "Week-end prochain",
+    budget: "200 à 350 €",
+    physical_level: "Intermédiaire",
+    ambience: ["Calme & déconnexion", "Découverte locale"],
+    people_wanted: 6
+  },
+  {
+    userId: "lea",
+    destinationId: "pays-basque-interieur",
+    dates: "Week-end",
+    budget: "200 à 350 €",
+    physical_level: "Facile",
+    ambience: ["Découverte locale"],
+    people_wanted: 5
+  }
+];
+
+export const mockCollectiveIntents: CollectiveIntent[] = [
+  {
+    nature_type: "Montagne",
+    departure_city: "Bordeaux",
+    dates: "Week-end",
+    budget: "200 à 350 €",
+    physical_level: "Facile",
+    ambience: ["Calme & déconnexion", "Découverte locale"],
+    interested_count: 12
+  },
+  {
+    nature_type: "Forêt",
+    departure_city: "Paris",
+    dates: "Journée",
+    budget: "Moins de 100 €",
+    physical_level: "Facile",
+    ambience: ["Calme & déconnexion"],
+    interested_count: 18
+  },
+  {
+    nature_type: "Rivière",
+    departure_city: "Bordeaux",
+    dates: "2-3 jours",
+    budget: "200 à 350 €",
+    physical_level: "Facile",
+    ambience: ["Fun & aventure douce"],
+    interested_count: 9
+  }
+];
+
+export const mockLocalActivities: MockLocalActivity[] = [
+  {
+    id: "aspe-rando",
+    destinationId: "vallee-aspe",
+    name: "Randonnée douce avec point de vue",
+    category: "Randonnée",
+    duration: "2h30",
+    estimated_price: 0,
+    physical_level: "Facile",
+    ambience: ["Calme & déconnexion", "Découverte locale"],
+    weather_compatible: ["soleil", "nuageux"],
+    risk: "faible",
+    booking_required: false,
+    group_friendly: true,
+    description: "Une boucle accessible pour respirer et découvrir la vallée sans pression sportive.",
+    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    id: "aspe-ferme",
+    destinationId: "vallee-aspe",
+    name: "Ferme locale et dégustation",
+    category: "Producteur local",
+    duration: "1h30",
+    estimated_price: 18,
+    physical_level: "Très facile",
+    ambience: ["Découverte locale", "Calme & déconnexion"],
+    weather_compatible: ["soleil", "nuageux", "pluie"],
+    risk: "faible",
+    booking_required: true,
+    group_friendly: true,
+    description: "Rencontre avec un producteur et dégustation de fromage local.",
+    image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    id: "aspe-diner",
+    destinationId: "vallee-aspe",
+    name: "Dîner béarnais collectif",
+    category: "Repas local",
+    duration: "2h",
+    estimated_price: 32,
+    physical_level: "Très facile",
+    ambience: ["Découverte locale", "Premium & confort"],
+    weather_compatible: ["soleil", "nuageux", "pluie"],
+    risk: "faible",
+    booking_required: true,
+    group_friendly: true,
+    description: "Un dîner simple et chaleureux pour créer du lien dans le groupe.",
+    image: "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    id: "aspe-rafting",
+    destinationId: "vallee-aspe",
+    name: "Rafting doux encadré",
+    category: "Eau vive",
+    duration: "2h",
+    estimated_price: 55,
+    physical_level: "Intermédiaire",
+    ambience: ["Fun & aventure douce"],
+    weather_compatible: ["soleil", "nuageux"],
+    risk: "moyen",
+    booking_required: true,
+    group_friendly: true,
+    description: "Une sortie dynamique mais accessible, encadrée par un professionnel.",
+    image: "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    id: "aspe-cheval",
+    destinationId: "vallee-aspe",
+    name: "Balade à cheval en vallée",
+    category: "Cheval",
+    duration: "1h30",
+    estimated_price: 45,
+    physical_level: "Facile",
+    ambience: ["Calme & déconnexion"],
+    weather_compatible: ["soleil", "nuageux"],
+    risk: "faible",
+    booking_required: true,
+    group_friendly: true,
+    description: "Un plan B doux si le groupe préfère éviter l'eau vive.",
+    image: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    id: "pb-marche",
+    destinationId: "pays-basque-interieur",
+    name: "Marché local et village",
+    category: "Culture locale",
+    duration: "2h",
+    estimated_price: 10,
+    physical_level: "Très facile",
+    ambience: ["Découverte locale", "Calme & déconnexion"],
+    weather_compatible: ["soleil", "nuageux", "pluie"],
+    risk: "faible",
+    booking_required: false,
+    group_friendly: true,
+    description: "Village, produits locaux et rythme doux.",
+    image: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    id: "dordogne-canoe",
+    destinationId: "dordogne",
+    name: "Canoë facile sur la rivière",
+    category: "Rivière",
+    duration: "2h",
+    estimated_price: 35,
+    physical_level: "Facile",
+    ambience: ["Fun & aventure douce"],
+    weather_compatible: ["soleil", "nuageux"],
+    risk: "moyen",
+    booking_required: true,
+    group_friendly: true,
+    description: "Une activité accessible pour donner de l'énergie au week-end.",
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    id: "fontainebleau-rochers",
+    destinationId: "fontainebleau",
+    name: "Balade forêt et rochers",
+    category: "Forêt",
+    duration: "3h",
+    estimated_price: 0,
+    physical_level: "Facile",
+    ambience: ["Calme & déconnexion"],
+    weather_compatible: ["soleil", "nuageux"],
+    risk: "faible",
+    booking_required: false,
+    group_friendly: true,
+    description: "Une sortie simple depuis Paris, parfaite pour une première rencontre.",
+    image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80"
+  }
+];
+
+export const mockMembers: MockMember[] = [
+  {
+    id: "jonathan",
+    name: "Jonathan",
+    age: "32 ans",
+    city: "Bordeaux",
+    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+    physical_level: "Intermédiaire",
+    preferred_ambience: ["Calme & déconnexion", "Découverte locale"],
+    budget: "200 à 350 €",
+    availability: ["Week-end"],
+    preferred_nature: ["Montagne"],
+    trust_badges: ["profil vérifié", "organise la seed Vallée d'Aspe"]
+  },
+  {
+    id: "sofia",
+    name: "Sofia",
+    age: "28 ans",
+    city: "Bordeaux",
+    photo: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
+    physical_level: "Facile",
+    preferred_ambience: ["Calme & déconnexion"],
+    budget: "200 à 350 €",
+    availability: ["Week-end"],
+    preferred_nature: ["Montagne", "Forêt"],
+    trust_badges: ["profil vérifié", "petits groupes"]
+  },
+  {
+    id: "mehdi",
+    name: "Mehdi",
+    age: "30 ans",
+    city: "Bordeaux",
+    photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80",
+    physical_level: "Intermédiaire",
+    preferred_ambience: ["Fun & aventure douce", "Découverte locale"],
+    budget: "200 à 350 €",
+    availability: ["Week-end", "2-3 jours"],
+    preferred_nature: ["Montagne", "Rivière"],
+    trust_badges: ["fiable", "3 Trips"]
   }
 ];
 

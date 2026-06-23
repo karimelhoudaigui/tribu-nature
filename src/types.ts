@@ -45,6 +45,90 @@ export type Trip = {
   status: string;
   description: string;
   activities: string[];
+  generation_reasons?: string[];
+  matched_member_ids?: string[];
+  generated_activity_ids?: string[];
+  generated_itinerary?: ItineraryItem[];
+};
+
+export type OnboardingProfile = {
+  availability: string[];
+  filters: string[];
+  budget: string;
+  physical_level: string;
+  preferred_nature: string;
+  ambience: string[];
+  comfort_level: string;
+  safety_needs: string[];
+  departure_city: string;
+};
+
+export type MockDestination = {
+  id: string;
+  name: string;
+  nature_type: string[];
+  compatible_departure_cities: string[];
+  approximate_distance: string;
+  average_budget: number;
+  recommended_physical_level: string[];
+  compatible_ambiences: string[];
+  accessibility: string;
+  image: string;
+  safety_score: number;
+  ideal_season: string;
+  region: string;
+  description: string;
+};
+
+export type DestinationSeed = {
+  userId: string;
+  destinationId: string;
+  dates: string;
+  budget: string;
+  physical_level: string;
+  ambience: string[];
+  people_wanted: number;
+};
+
+export type CollectiveIntent = {
+  nature_type: string;
+  departure_city: string;
+  dates: string;
+  budget: string;
+  physical_level: string;
+  ambience: string[];
+  interested_count: number;
+};
+
+export type MockLocalActivity = {
+  id: string;
+  destinationId: string;
+  name: string;
+  category: string;
+  duration: string;
+  estimated_price: number;
+  physical_level: string;
+  ambience: string[];
+  weather_compatible: string[];
+  risk: string;
+  booking_required: boolean;
+  group_friendly: boolean;
+  description: string;
+  image: string;
+};
+
+export type MockMember = {
+  id: string;
+  name: string;
+  age: string;
+  city: string;
+  photo: string;
+  physical_level: string;
+  preferred_ambience: string[];
+  budget: string;
+  availability: string[];
+  preferred_nature: string[];
+  trust_badges: string[];
 };
 
 export type Destination = {

@@ -15,8 +15,9 @@ import {
   Users,
   X
 } from "lucide-react";
-import { activities, destination, itinerary, members, providers, reviews, trips } from "./data";
-import type { Activity, Trip, UserProfile } from "./types";
+import { activities, destination, itinerary, members, mockLocalActivities, mockMembers, providers, reviews, trips } from "./data";
+import { generateTripFromProfile } from "./generator";
+import type { Activity, MockLocalActivity, OnboardingProfile, Trip, UserProfile } from "./types";
 
 type Page = "landing" | "onboarding" | "dashboard" | "trip" | "conversation" | "communaute" | "profil" | "prestataires" | "securite";
 
@@ -149,15 +150,47 @@ function getValidatedTripMembers(tripId: string) {
   return members.filter((member) => ids.includes(member.id));
 }
 
+function getTripMembers(trip: Trip) {
+  if (trip.matched_member_ids?.length) {
+    return trip.matched_member_ids
+      .map((id) => mockMembers.find((member) => member.id === id))
+      .filter(Boolean)
+      .map((member) => mockMemberToUserProfile(member!));
+  }
+
+  return getValidatedTripMembers(trip.id);
+}
+
+function mockMemberToUserProfile(member: (typeof mockMembers)[number]): UserProfile {
+  return {
+    id: member.id,
+    name: member.name,
+    age_range: member.age,
+    city: member.city,
+    photo_url: member.photo,
+    bio: `Envie de ${member.preferred_nature.join(", ").toLowerCase()} dans une ambiance ${member.preferred_ambience.join(", ").toLowerCase()}.`,
+    verified: member.trust_badges.some((badge) => badge.includes("vérifié")),
+    physical_level: member.physical_level,
+    budget_range: member.budget,
+    adventure_style: member.preferred_ambience[0] ?? "Nature",
+    preferred_ambiences: member.preferred_ambience,
+    safety_preferences: member.trust_badges,
+    past_trips: member.trust_badges.some((badge) => badge.includes("3 Trips")) ? 3 : 1,
+    badges: member.trust_badges
+  };
+}
+
 function App() {
   const [page, setPage] = useState<Page>("landing");
   const [selectedTripId, setSelectedTripId] = useState("aspe");
   const [menuOpen, setMenuOpen] = useState(false);
   const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [generatedTrip, setGeneratedTrip] = useState<Trip | null>(null);
 
-  const selectedTrip = trips.find((trip) => trip.id === selectedTripId) ?? trips[0];
+  const availableTrips = generatedTrip ? [generatedTrip, ...trips] : trips;
+  const selectedTrip = availableTrips.find((trip) => trip.id === selectedTripId) ?? availableTrips[0];
   const currentUser = members[0];
-  const validatedMembers = useMemo(() => getValidatedTripMembers(selectedTrip.id), [selectedTrip.id]);
+  const validatedMembers = useMemo(() => getTripMembers(selectedTrip), [selectedTrip]);
   const go = (next: Page) => {
     setPage(next);
     setMenuOpen(false);
@@ -167,8 +200,14 @@ function App() {
     setSelectedTripId(id);
     go("trip");
   };
+  const handleGeneratedTrip = (profile: OnboardingProfile) => {
+    const trip = generateTripFromProfile(profile);
+    setGeneratedTrip(trip);
+    setSelectedTripId(trip.id);
+    go("trip");
+  };
   const joinTrip = (trip: Trip) => {
-    const confirmedMembers = getValidatedTripMembers(trip.id);
+    const confirmedMembers = getTripMembers(trip);
     const participants = [currentUser, ...confirmedMembers.filter((member) => member.id !== currentUser.id)];
     setConversation({
       id: `conversation-${trip.id}`,
@@ -200,8 +239,8 @@ function App() {
       <Header page={page} go={go} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       <main>
         {page === "landing" && <Landing go={go} openTrip={openTrip} />}
-        {page === "onboarding" && <Onboarding go={go} />}
-        {page === "dashboard" && <Dashboard openTrip={openTrip} />}
+        {page === "onboarding" && <Onboarding onGeneratedTrip={handleGeneratedTrip} />}
+        {page === "dashboard" && <Dashboard trips={availableTrips} openTrip={openTrip} />}
         {page === "trip" && <TripDetail trip={selectedTrip} validatedMembers={validatedMembers} go={go} joinTrip={joinTrip} />}
         {page === "conversation" && <ConversationPage conversation={conversation} go={go} />}
         {page === "communaute" && <Community />}
@@ -358,7 +397,7 @@ function Landing({ go, openTrip }: { go: (page: Page) => void; openTrip: (id: st
   );
 }
 
-function Onboarding({ go }: { go: (page: Page) => void }) {
+function Onboarding({ onGeneratedTrip }: { onGeneratedTrip: (profile: OnboardingProfile) => void }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({
     availability: ["2026-06-26", "2026-06-28", "Week-end"],
@@ -425,7 +464,7 @@ function Onboarding({ go }: { go: (page: Page) => void }) {
               </div>
             </>
           ) : (
-            <AdventureProfileCard answers={answers} go={go} />
+            <AdventureProfileCard answers={answers} onGeneratedTrip={onGeneratedTrip} />
           )}
         </div>
       </div>
@@ -644,7 +683,13 @@ function FiltersPicker({
   );
 }
 
-function AdventureProfileCard({ answers, go }: { answers: Record<string, string | string[]>; go: (page: Page) => void }) {
+function AdventureProfileCard({
+  answers,
+  onGeneratedTrip
+}: {
+  answers: Record<string, string | string[]>;
+  onGeneratedTrip: (profile: OnboardingProfile) => void;
+}) {
   const ambience = Array.isArray(answers.ambience) ? answers.ambience.join(", ") : "Calme & déconnexion";
   const safety = Array.isArray(answers.safety) ? answers.safety.join(", ") : "profils vérifiés";
   const availability = Array.isArray(answers.availability)
@@ -660,12 +705,34 @@ function AdventureProfileCard({ answers, go }: { answers: Record<string, string 
         {availability}. {answers.nature ?? "Montagne"}, niveau {answers.level ?? "facile"}, budget {answers.budget ?? "200 à 350 €"}, ambiance {ambience.toLowerCase()}, confort {answers.comfort ?? "gîte"}, groupe rassurant avec {safety.toLowerCase()}.
       </p>
       <p className="mt-4 text-forest-700">On a trouvé une Trip qui te correspond. Tu peux rejoindre le groupe avant de confirmer.</p>
-      <button className="btn-primary mt-8" onClick={() => go("dashboard")}>Voir mes Trips compatibles</button>
+      <button className="btn-primary mt-8" onClick={() => onGeneratedTrip(toOnboardingProfile(answers))}>
+        Générer ma Trip personnalisée
+      </button>
     </div>
   );
 }
 
-function Dashboard({ openTrip }: { openTrip: (id: string) => void }) {
+function toOnboardingProfile(answers: Record<string, string | string[]>): OnboardingProfile {
+  return {
+    availability: Array.isArray(answers.availability) ? answers.availability : ["Week-end"],
+    filters: Array.isArray(answers.filters) ? answers.filters : [],
+    budget: typeof answers.budget === "string" ? answers.budget : "200 à 350 €",
+    physical_level: typeof answers.level === "string" ? answers.level : "Facile",
+    preferred_nature: typeof answers.nature === "string" ? answers.nature : "Montagne",
+    ambience: Array.isArray(answers.ambience) ? answers.ambience : ["Calme & déconnexion"],
+    comfort_level: typeof answers.comfort === "string" ? answers.comfort : "Gîte",
+    safety_needs: Array.isArray(answers.safety) ? answers.safety : ["Profils vérifiés"],
+    departure_city: inferDepartureCity(answers)
+  };
+}
+
+function inferDepartureCity(answers: Record<string, string | string[]>) {
+  const filters = Array.isArray(answers.filters) ? answers.filters : [];
+  const departure = filters.find((filter) => filter.startsWith("Départ "));
+  return departure?.replace("Départ ", "") ?? "Bordeaux";
+}
+
+function Dashboard({ trips: dashboardTrips, openTrip }: { trips: Trip[]; openTrip: (id: string) => void }) {
   return (
     <section className="container-page py-10">
       <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
@@ -681,7 +748,7 @@ function Dashboard({ openTrip }: { openTrip: (id: string) => void }) {
         </div>
       </div>
       <DashboardFilters />
-      <TripGrid trips={trips} openTrip={openTrip} />
+      <TripGrid trips={dashboardTrips} openTrip={openTrip} />
     </section>
   );
 }
@@ -721,7 +788,7 @@ function TripGrid({ trips: tripList, openTrip }: { trips: Trip[]; openTrip: (id:
             </div>
             <div className="mt-4 flex items-center justify-between gap-3">
               <div className="flex -space-x-3">
-                {getValidatedTripMembers(trip.id).slice(0, 3).map((member) => (
+                {getTripMembers(trip).slice(0, 3).map((member) => (
                   <img className="h-9 w-9 rounded-full border-2 border-white object-cover" src={member.photo_url} alt={member.name} key={member.id} />
                 ))}
               </div>
@@ -766,6 +833,13 @@ function TripDetail({
     ["Balade à cheval", 58],
     ["Dîner local", 95]
   ];
+  const tripItinerary = trip.generated_itinerary ?? itinerary;
+  const tripActivities = getTripActivities(trip);
+  const generationReasons = trip.generation_reasons ?? [
+    "Cette destination correspond à ton envie de nature calme.",
+    "Le budget, le niveau et le format sont compatibles avec ton profil.",
+    "Les activités locales sont adaptées au rythme du groupe."
+  ];
 
   return (
     <>
@@ -793,17 +867,24 @@ function TripDetail({
       <section className="container-page grid gap-8 py-10 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-8">
           <Panel title="Pourquoi cette Trip te correspond">
-            <p className="leading-8 text-forest-700">Cette Trip correspond à ton envie de nature calme, ton budget, ton niveau facile/intermédiaire et ton souhait de partir avec un petit groupe rassurant. Les activités proposées tiennent compte de la météo, du rythme du groupe, des distances, du risque et des options locales vraiment disponibles.</p>
+            <div className="grid gap-3">
+              {generationReasons.map((reason) => (
+                <div className="flex items-start gap-3 rounded-2xl bg-forest-50 p-4" key={reason}>
+                  <Sparkles className="mt-0.5 shrink-0 text-forest-700" size={18} />
+                  <p className="text-forest-700">{reason}</p>
+                </div>
+              ))}
+            </div>
           </Panel>
           <Panel title="Destination proposée">
             <p className="font-semibold">{destination.name}, {destination.region}</p>
             <p className="mt-3 leading-8 text-forest-700">{destination.description}</p>
             <p className="mt-3 text-sm text-forest-700">{destination.access_info}</p>
           </Panel>
-          <ActivitiesSection />
+          <ActivitiesSection activities={tripActivities} />
           <Panel title="Planning généré">
             <div className="grid gap-4">
-              {itinerary.map((item) => (
+              {tripItinerary.map((item) => (
                 <div className="rounded-lg bg-forest-50 p-4" key={item.id}>
                   <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-forest-700">
                     <span>{item.day}</span>
@@ -865,7 +946,7 @@ function TripDetail({
   );
 }
 
-function ActivitiesSection() {
+function ActivitiesSection({ activities: tripActivities }: { activities: Array<Activity | MockLocalActivity> }) {
   return (
     <Panel title="Activités proposées pour cette Trip">
       <p className="mb-5 text-forest-700">Une sélection réaliste pour le groupe : outdoor, producteurs locaux, repas, alternatives météo et expériences faciles à organiser sur place.</p>
@@ -875,10 +956,18 @@ function ActivitiesSection() {
         ))}
       </div>
       <div className="grid gap-4">
-        {activities.map((activity) => <ActivityCard activity={activity} key={activity.id} />)}
+        {tripActivities.map((activity) => <ActivityCard activity={activity} key={activity.id} />)}
       </div>
     </Panel>
   );
+}
+
+function getTripActivities(trip: Trip): Array<Activity | MockLocalActivity> {
+  if (trip.generated_activity_ids?.length) {
+    return mockLocalActivities.filter((activity) => trip.generated_activity_ids?.includes(activity.id));
+  }
+
+  return activities;
 }
 
 function ConversationPage({ conversation, go }: { conversation: Conversation | null; go: (page: Page) => void }) {
@@ -1151,25 +1240,58 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function ActivityCard({ activity }: { activity: Activity }) {
+function ActivityCard({ activity }: { activity: Activity | MockLocalActivity }) {
+  const display = "duration" in activity
+    ? {
+        name: activity.name,
+        category: activity.category,
+        duration: activity.duration,
+        price: activity.estimated_price === 0 ? "gratuit" : `${activity.estimated_price} €`,
+        score: activity.group_friendly ? "Adapté au groupe" : "À vérifier",
+        physicalLevel: activity.physical_level,
+        risk: activity.risk,
+        weather: activity.weather_compatible.includes("pluie") ? "oui" : "selon météo",
+        group: activity.group_friendly ? "oui" : "non",
+        booking: activity.booking_required ? "oui" : "non",
+        supervision: activity.risk === "moyen" ? "recommandé" : "non requis",
+        tags: activity.ambience,
+        description: activity.description
+      }
+    : {
+        name: activity.name,
+        category: activity.category,
+        duration: activity.duration_estimate,
+        price: activity.price_min === 0 ? "gratuit" : `${activity.price_min} à ${activity.price_max} €`,
+        score: `${activity.confidence_score}% adapté au groupe`,
+        physicalLevel: activity.physical_level,
+        risk: activity.risk_level,
+        weather: activity.weather_dependency ? "oui" : "non",
+        group: `${activity.group_size_min}-${activity.group_size_max} personnes`,
+        booking: activity.booking_required ? "oui" : "non",
+        supervision: activity.professional_supervision_required ? "obligatoire" : "non requis",
+        tags: activity.ambience_tags,
+        description: ""
+      };
+
   return (
     <div className="rounded-[1.25rem] border border-forest-100 bg-white p-4">
       <div className="flex flex-col justify-between gap-3 sm:flex-row">
         <div>
-          <h3 className="text-lg font-semibold">{activity.name}</h3>
-          <p className="text-sm text-forest-700">{activity.category} · {activity.duration_estimate} · {activity.price_min === 0 ? "gratuit" : `${activity.price_min} à ${activity.price_max} €`}</p>
+          <h3 className="text-lg font-semibold">{display.name}</h3>
+          <p className="text-sm text-forest-700">{display.category} · {display.duration} · {display.price}</p>
+          {display.description && <p className="mt-2 text-sm leading-6 text-forest-700">{display.description}</p>}
         </div>
-        <span className="pill w-fit">{activity.confidence_score}% adapté au groupe</span>
+        <span className="pill w-fit">{display.score}</span>
       </div>
       <div className="mt-4 grid gap-2 text-sm text-forest-700 sm:grid-cols-2">
-        <span>Niveau : {activity.physical_level}</span>
-        <span>Risque : {activity.risk_level}</span>
-        <span>Météo-dépendant : {activity.weather_dependency ? "oui" : "non"}</span>
-        <span>Adapté groupe : {activity.group_size_min}-{activity.group_size_max} personnes</span>
-        <span>Réservation : {activity.booking_required ? "oui" : "non"}</span>
-        <span>Encadrement pro : {activity.professional_supervision_required ? "obligatoire" : "non requis"}</span>
+        <span>Niveau : {display.physicalLevel}</span>
+        <span>Risque : {display.risk}</span>
+        <span>Météo-compatible : {display.weather}</span>
+        <span>Adapté groupe : {display.group}</span>
+        <span>Réservation : {display.booking}</span>
+        <span>Encadrement pro : {display.supervision}</span>
       </div>
-      <TagList tags={activity.ambience_tags} />
+      <TagList tags={display.tags} />
     </div>
   );
 }
