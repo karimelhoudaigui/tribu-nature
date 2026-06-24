@@ -17,16 +17,18 @@ export function generateTripFromProfile(profile: OnboardingProfile): Trip {
   return generateTripsFromProfile(profile)[0];
 }
 
-export function generateTripsFromProfile(profile: OnboardingProfile): Trip[] {
+export function generateTripsFromProfile(profile: OnboardingProfile, apiActivities: MockLocalActivity[] = []): Trip[] {
+  const activityPool = mergeActivities(mockLocalActivities, apiActivities);
   const scoredDestinations = mockDestinations
-    .map((destination) => scoreDestination(destination, profile))
+    .filter((destination) => destinationMatchesFilters(destination, profile, activityPool))
+    .map((destination) => scoreDestination(destination, profile, activityPool))
     .sort((a, b) => b.score - a.score);
 
-  return scoredDestinations.map((scored) => buildTripFromScoredDestination(scored, profile));
+  return scoredDestinations.map((scored) => buildTripFromScoredDestination(scored, profile, activityPool));
 }
 
-function buildTripFromScoredDestination(scored: ScoredDestination, profile: OnboardingProfile): Trip {
-  const selectedActivities = selectActivities(scored.destination.id, profile);
+function buildTripFromScoredDestination(scored: ScoredDestination, profile: OnboardingProfile, activityPool: MockLocalActivity[]): Trip {
+  const selectedActivities = selectActivities(scored.destination.id, profile, activityPool);
   const selectedMembers = selectMembers(profile, scored.destination);
   const generatedItinerary = buildItinerary(selectedActivities);
 
@@ -58,7 +60,48 @@ function buildAmbienceTags(destination: MockDestination, profile: OnboardingProf
   return Array.from(new Set(tags)).slice(0, 3);
 }
 
-function scoreDestination(destination: MockDestination, profile: OnboardingProfile): ScoredDestination {
+function destinationMatchesFilters(destination: MockDestination, profile: OnboardingProfile, activityPool: MockLocalActivity[]) {
+  const filters = profile.filters.map(normalize);
+  const selectedNatureFilters = ["montagne", "foret", "mer", "campagne", "riviere", "lac", "parc naturel", "village / patrimoine local", "destination depaysante"]
+    .filter((nature) => filters.includes(nature));
+  const selectedDeparture = getDepartureFilter(profile);
+  const selectedBudgetMax = getBudgetMaxFilter(profile);
+  const selectedDuration = getDurationFilter(profile);
+  const destinationNature = destination.nature_type.map(normalize);
+  const compatibleActivities = selectActivities(destination.id, profile, activityPool);
+
+  if (hasSpecificDestinationZones(profile) && !destinationMatchesSelectedZones(destination, profile.destination_zones)) {
+    return false;
+  }
+
+  if (selectedNatureFilters.length > 0 && !selectedNatureFilters.some((nature) => natureMatchesDestination(nature, destinationNature, destination))) {
+    return false;
+  }
+
+  if (selectedDeparture && !destination.compatible_departure_cities.map(normalize).includes(normalize(selectedDeparture))) {
+    return false;
+  }
+
+  if (selectedBudgetMax && destination.average_budget > selectedBudgetMax) {
+    return false;
+  }
+
+  if (!destination.recommended_physical_level.some((level) => normalize(level) === normalize(profile.physical_level)) && profile.physical_level !== "Je ne sais pas") {
+    return false;
+  }
+
+  if (selectedDuration === "journee" && destination.average_budget > 120) {
+    return false;
+  }
+
+  if (compatibleActivities.length === 0) {
+    return false;
+  }
+
+  return true;
+}
+
+function scoreDestination(destination: MockDestination, profile: OnboardingProfile, activityPool: MockLocalActivity[]): ScoredDestination {
   let score = 35;
   const reasons: string[] = [];
   const profileNature = normalize(profile.preferred_nature);
@@ -89,7 +132,12 @@ function scoreDestination(destination: MockDestination, profile: OnboardingProfi
     reasons.push("L'ambiance colle avec ce que tu recherches.");
   }
 
-  const destinationActivities = mockLocalActivities.filter((activity) => activity.destinationId === destination.id);
+  if (destinationMatchesSelectedZones(destination, profile.destination_zones)) {
+    score += 20;
+    reasons.push("Elle se trouve dans une zone que tu as sélectionnée.");
+  }
+
+  const destinationActivities = activityPool.filter((activity) => activity.destinationId === destination.id);
   const compatibleActivities = destinationActivities.filter((activity) => activityMatches(activity, profile));
   if (compatibleActivities.length >= 3) {
     score += 12;
@@ -119,9 +167,9 @@ function scoreDestination(destination: MockDestination, profile: OnboardingProfi
   return { destination, score, reasons: reasons.slice(0, 5) };
 }
 
-function selectActivities(destinationId: string, profile: OnboardingProfile) {
+function selectActivities(destinationId: string, profile: OnboardingProfile, activityPool: MockLocalActivity[] = mockLocalActivities) {
   const weather = "nuageux";
-  return mockLocalActivities
+  return activityPool
     .filter((activity) => activity.destinationId === destinationId)
     .filter((activity) => activityMatches(activity, profile))
     .filter((activity) => activity.weather_compatible.includes(weather) || activity.weather_compatible.includes("pluie"))
@@ -226,6 +274,128 @@ function getDurationLabel(availability: string[]) {
   return duration ?? "Week-end";
 }
 
+function getDurationFilter(profile: OnboardingProfile) {
+  const source = [...profile.filters, ...profile.availability].map(normalize);
+  if (source.includes("journee")) return "journee";
+  if (source.includes("week-end")) return "week-end";
+  if (source.includes("2-3 jours")) return "2-3 jours";
+  if (source.includes("semaine")) return "semaine";
+  return "";
+}
+
+function getDepartureFilter(profile: OnboardingProfile) {
+  const departureFilter = profile.filters.find((filter) => normalize(filter).startsWith("depart "));
+  return departureFilter?.replace(/^Départ\s+/i, "") ?? profile.departure_city;
+}
+
+function getBudgetMaxFilter(profile: OnboardingProfile) {
+  const budgetFilter = profile.filters.find((filter) => normalize(filter).startsWith("budget max"));
+  const match = budgetFilter?.match(/(\d+)/);
+  return match ? Number(match[1]) : budgetMax(profile.budget);
+}
+
+function hasSpecificDestinationZones(profile: OnboardingProfile) {
+  return profile.destination_zones.some((zone) => normalize(zone) !== "peu m'importe");
+}
+
+function destinationMatchesSelectedZones(destination: MockDestination, zones: string[]) {
+  const specificZones = zones.map(normalize).filter((zone) => zone !== "peu m'importe");
+  if (specificZones.length === 0) return false;
+
+  const searchable = normalize([
+    destination.id,
+    destination.name,
+    destination.region,
+    destination.description,
+    ...destination.nature_type
+  ].join(" "));
+
+  const zoneAliases: Record<string, string[]> = {
+    pyrenees: ["pyrenees", "aspe", "basque"],
+    "pays basque": ["basque"],
+    alpes: ["alpes", "vercors"],
+    bretagne: ["bretagne"],
+    "vallee d'aspe": ["aspe"],
+    suisse: ["suisse"],
+    espagne: ["espagne"],
+    "nouvelle-aquitaine": ["nouvelle-aquitaine", "pyrenees-atlantiques", "aspe", "basque", "dordogne", "gironde", "arcachon"],
+    occitanie: ["occitanie", "pyrenees", "cevennes"],
+    "auvergne-rhone-alpes": ["auvergne-rhone-alpes", "vercors", "alpes"],
+    "provence-alpes-cote d'azur": ["provence-alpes-cote d'azur", "provence", "azur", "alpes du sud"],
+    "ile-de-france": ["ile-de-france", "fontainebleau"],
+    normandie: ["normandie"],
+    corse: ["corse"],
+    "pays de la loire": ["pays de la loire", "loire"],
+    "centre-val de loire": ["centre-val de loire", "loire"],
+    "bourgogne-franche-comte": ["bourgogne-franche-comte", "bourgogne", "franche-comte"],
+    "grand est": ["grand est", "vosges", "alsace"],
+    "hauts-de-france": ["hauts-de-france", "opale"],
+    "espagne du nord": ["pyrenees", "aspe", "basque", "montagne"],
+    catalogne: ["pyrenees", "montagne", "mer"],
+    aragon: ["pyrenees", "montagne", "riviere"],
+    navarre: ["pyrenees", "basque", "foret"],
+    "pays basque espagnol": ["basque", "montagne", "mer"],
+    andalousie: ["campagne", "village", "destination depaysante"],
+    "italie du nord": ["alpes", "vercors", "montagne"],
+    piemont: ["alpes", "montagne"],
+    lombardie: ["alpes", "lac", "montagne"],
+    toscane: ["campagne", "village", "dordogne"],
+    "trentin-haut-adige": ["alpes", "montagne", "lac"],
+    ligurie: ["mer", "arcachon"],
+    "suisse romande": ["alpes", "vercors", "montagne"],
+    valais: ["alpes", "montagne"],
+    vaud: ["lac", "alpes", "montagne"],
+    grisons: ["alpes", "montagne"],
+    tessin: ["alpes", "lac", "montagne"],
+    berne: ["alpes", "montagne", "lac"],
+    baviere: ["alpes", "montagne", "lac"],
+    "bade-wurtemberg": ["foret", "campagne"],
+    "foret-noire": ["foret", "fontainebleau"],
+    rhenanie: ["riviere", "campagne", "dordogne"],
+    saxe: ["foret", "campagne"],
+    "berlin-brandenburg": ["foret", "lac", "fontainebleau"],
+    "nord du portugal": ["montagne", "riviere", "campagne"],
+    "centre du portugal": ["foret", "riviere", "campagne"],
+    "lisbonne et cote": ["mer", "arcachon"],
+    alentejo: ["campagne", "village"],
+    algarve: ["mer", "arcachon"],
+    "ardennes belges": ["foret", "riviere"],
+    wallonie: ["campagne", "foret"],
+    flandre: ["mer", "campagne"],
+    "bruxelles et alentours": ["foret", "fontainebleau"],
+    zelande: ["mer", "arcachon"],
+    frise: ["lac", "mer"],
+    "hollande du nord": ["mer", "arcachon"],
+    gueldre: ["foret", "fontainebleau"],
+    "wild atlantic way": ["mer", "campagne"],
+    connemara: ["lac", "montagne", "campagne"],
+    "dublin et wicklow": ["montagne", "foret"],
+    "cork et kerry": ["mer", "montagne"],
+    ecosse: ["montagne", "lac", "destination depaysante"],
+    "pays de galles": ["montagne", "mer"],
+    "lake district": ["lac", "montagne"],
+    "angleterre du sud-ouest": ["mer", "campagne"],
+    crete: ["mer", "montagne", "destination depaysante"],
+    cyclades: ["mer", "destination depaysante"],
+    peloponnese: ["mer", "montagne", "village"],
+    epire: ["montagne", "riviere"]
+  };
+
+  return specificZones.some((zone) => {
+    const aliases = zoneAliases[zone] ?? [zone];
+    return aliases.some((alias) => searchable.includes(alias));
+  });
+}
+
+function natureMatchesDestination(nature: string, destinationNature: string[], destination: MockDestination) {
+  const searchable = normalize(`${destination.name} ${destination.region} ${destination.description} ${destination.nature_type.join(" ")}`);
+  if (destinationNature.includes(nature)) return true;
+  if (nature === "parc naturel") return searchable.includes("parc") || searchable.includes("vercors");
+  if (nature === "village / patrimoine local") return searchable.includes("village") || searchable.includes("patrimoine") || searchable.includes("basque") || searchable.includes("dordogne");
+  if (nature === "destination depaysante") return destination.safety_score >= 85;
+  return false;
+}
+
 function getCollectiveCount(destination: MockDestination, profile: OnboardingProfile) {
   return getCollectiveIntent(destination, profile)?.interested_count ?? 0;
 }
@@ -261,6 +431,15 @@ function budgetMidpoint(budget: string) {
   if (budget.includes("350 à 500")) return 425;
   if (budget.includes("Moins")) return 80;
   return 300;
+}
+
+function mergeActivities(mocked: MockLocalActivity[], fromApis: MockLocalActivity[]) {
+  const byKey = new Map<string, MockLocalActivity>();
+  [...fromApis, ...mocked].forEach((activity) => {
+    const key = normalize(`${activity.destinationId}-${activity.name}`);
+    if (!byKey.has(key)) byKey.set(key, activity);
+  });
+  return Array.from(byKey.values());
 }
 
 function normalize(value: string) {

@@ -106,6 +106,8 @@ export const mockDestinations: MockDestination[] = [
   {
     id: "vallee-aspe",
     name: "Vallée d'Aspe",
+    lat: 42.978,
+    lng: -0.596,
     nature_type: ["Montagne", "Vallée"],
     compatible_departure_cities: ["Bordeaux", "Toulouse"],
     approximate_distance: "3h depuis Bordeaux",
@@ -122,6 +124,8 @@ export const mockDestinations: MockDestination[] = [
   {
     id: "pays-basque-interieur",
     name: "Pays basque intérieur",
+    lat: 43.164,
+    lng: -1.237,
     nature_type: ["Montagne", "Campagne", "Vallée"],
     compatible_departure_cities: ["Bordeaux", "Toulouse"],
     approximate_distance: "2h30 depuis Bordeaux",
@@ -138,6 +142,8 @@ export const mockDestinations: MockDestination[] = [
   {
     id: "dordogne",
     name: "Dordogne",
+    lat: 44.837,
+    lng: 1.214,
     nature_type: ["Rivière", "Campagne"],
     compatible_departure_cities: ["Bordeaux", "Toulouse"],
     approximate_distance: "2h depuis Bordeaux",
@@ -154,6 +160,8 @@ export const mockDestinations: MockDestination[] = [
   {
     id: "bassin-arcachon-nature",
     name: "Bassin d'Arcachon nature",
+    lat: 44.661,
+    lng: -1.168,
     nature_type: ["Mer", "Forêt"],
     compatible_departure_cities: ["Bordeaux"],
     approximate_distance: "1h depuis Bordeaux",
@@ -170,6 +178,8 @@ export const mockDestinations: MockDestination[] = [
   {
     id: "fontainebleau",
     name: "Fontainebleau",
+    lat: 48.404,
+    lng: 2.701,
     nature_type: ["Forêt"],
     compatible_departure_cities: ["Paris"],
     approximate_distance: "50 min depuis Paris",
@@ -186,6 +196,8 @@ export const mockDestinations: MockDestination[] = [
   {
     id: "vercors",
     name: "Vercors",
+    lat: 45.07,
+    lng: 5.45,
     nature_type: ["Montagne", "Forêt"],
     compatible_departure_cities: ["Lyon"],
     approximate_distance: "2h depuis Lyon",
@@ -256,6 +268,8 @@ export const mockLocalActivities: MockLocalActivity[] = [
   {
     id: "aspe-rando",
     destinationId: "vallee-aspe",
+    lat: 42.979,
+    lng: -0.59,
     name: "Randonnée douce avec point de vue",
     category: "Randonnée",
     duration: "2h30",
@@ -267,11 +281,15 @@ export const mockLocalActivities: MockLocalActivity[] = [
     booking_required: false,
     group_friendly: true,
     description: "Une boucle accessible pour respirer et découvrir la vallée sans pression sportive.",
-    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80"
+    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+    source: "mock",
+    external_url: "https://www.openstreetmap.org/#map=14/42.979/-0.590"
   },
   {
     id: "aspe-ferme",
     destinationId: "vallee-aspe",
+    lat: 42.984,
+    lng: -0.61,
     name: "Ferme locale et dégustation",
     category: "Producteur local",
     duration: "1h30",
@@ -283,11 +301,15 @@ export const mockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Rencontre avec un producteur et dégustation de fromage local.",
-    image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80"
+    image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80",
+    source: "mock",
+    external_url: "https://www.google.com/search?q=fromagerie+vall%C3%A9e+d%27aspe"
   },
   {
     id: "aspe-diner",
     destinationId: "vallee-aspe",
+    lat: 42.982,
+    lng: -0.602,
     name: "Dîner béarnais collectif",
     category: "Repas local",
     duration: "2h",
@@ -299,11 +321,15 @@ export const mockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Un dîner simple et chaleureux pour créer du lien dans le groupe.",
-    image: "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80"
+    image: "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80",
+    source: "mock",
+    external_url: "https://www.google.com/search?q=restaurant+b%C3%A9arnais+vall%C3%A9e+d%27aspe"
   },
   {
     id: "aspe-rafting",
     destinationId: "vallee-aspe",
+    lat: 42.974,
+    lng: -0.58,
     name: "Rafting doux encadré",
     category: "Eau vive",
     duration: "2h",
@@ -315,11 +341,15 @@ export const mockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Une sortie dynamique mais accessible, encadrée par un professionnel.",
-    image: "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=900&q=80"
+    image: "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=900&q=80",
+    source: "mock",
+    external_url: "https://www.google.com/search?q=rafting+vall%C3%A9e+d%27aspe"
   },
   {
     id: "aspe-cheval",
     destinationId: "vallee-aspe",
+    lat: 42.99,
+    lng: -0.604,
     name: "Balade à cheval en vallée",
     category: "Cheval",
     duration: "1h30",
@@ -331,11 +361,15 @@ export const mockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Un plan B doux si le groupe préfère éviter l'eau vive.",
-    image: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&w=900&q=80"
+    image: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&w=900&q=80",
+    source: "mock",
+    external_url: "https://www.google.com/search?q=balade+%C3%A0+cheval+vall%C3%A9e+d%27aspe"
   },
   {
     id: "pb-marche",
     destinationId: "pays-basque-interieur",
+    lat: 43.164,
+    lng: -1.237,
     name: "Marché local et village",
     category: "Culture locale",
     duration: "2h",
@@ -347,11 +381,15 @@ export const mockLocalActivities: MockLocalActivity[] = [
     booking_required: false,
     group_friendly: true,
     description: "Village, produits locaux et rythme doux.",
-    image: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80"
+    image: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+    source: "mock",
+    external_url: "https://www.google.com/search?q=march%C3%A9+local+pays+basque+int%C3%A9rieur"
   },
   {
     id: "dordogne-canoe",
     destinationId: "dordogne",
+    lat: 44.837,
+    lng: 1.214,
     name: "Canoë facile sur la rivière",
     category: "Rivière",
     duration: "2h",
@@ -363,11 +401,15 @@ export const mockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Une activité accessible pour donner de l'énergie au week-end.",
-    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
+    source: "mock",
+    external_url: "https://www.google.com/search?q=cano%C3%AB+dordogne"
   },
   {
     id: "fontainebleau-rochers",
     destinationId: "fontainebleau",
+    lat: 48.404,
+    lng: 2.701,
     name: "Balade forêt et rochers",
     category: "Forêt",
     duration: "3h",
@@ -379,7 +421,9 @@ export const mockLocalActivities: MockLocalActivity[] = [
     booking_required: false,
     group_friendly: true,
     description: "Une sortie simple depuis Paris, parfaite pour une première rencontre.",
-    image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80"
+    image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80",
+    source: "mock",
+    external_url: "https://www.openstreetmap.org/#map=13/48.404/2.701"
   }
 ];
 

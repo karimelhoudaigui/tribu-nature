@@ -15,6 +15,22 @@ npm run dev
 npm run build
 ```
 
+## APIs locales
+
+Le générateur interroge maintenant des providers réels quand ils sont disponibles :
+
+- OpenStreetMap / Overpass API : actif sans clé API
+- Google Places : optionnel avec `VITE_GOOGLE_PLACES_API_KEY`
+- DATAtourisme : optionnel avec `VITE_DATATOURISME_API_URL` et `VITE_DATATOURISME_API_TOKEN`
+
+Copier `.env.example` vers `.env.local` pour configurer les clés :
+
+```bash
+cp .env.example .env.local
+```
+
+Sans clé, l'application garde les données mockées comme fallback.
+
 ## Fonctionnalités principales
 
 - Landing page moderne

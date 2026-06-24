@@ -49,6 +49,9 @@ export type Trip = {
   matched_member_ids?: string[];
   generated_activity_ids?: string[];
   generated_itinerary?: ItineraryItem[];
+  community?: boolean;
+  created_by?: string;
+  brief?: string;
 };
 
 export type OnboardingProfile = {
@@ -61,11 +64,14 @@ export type OnboardingProfile = {
   comfort_level: string;
   safety_needs: string[];
   departure_city: string;
+  destination_zones: string[];
 };
 
 export type MockDestination = {
   id: string;
   name: string;
+  lat: number;
+  lng: number;
   nature_type: string[];
   compatible_departure_cities: string[];
   approximate_distance: string;
@@ -103,6 +109,8 @@ export type CollectiveIntent = {
 export type MockLocalActivity = {
   id: string;
   destinationId: string;
+  lat?: number;
+  lng?: number;
   name: string;
   category: string;
   duration: string;
@@ -115,6 +123,8 @@ export type MockLocalActivity = {
   group_friendly: boolean;
   description: string;
   image: string;
+  source?: "mock" | "openstreetmap" | "google_places" | "datatourisme";
+  external_url?: string;
 };
 
 export type MockMember = {
