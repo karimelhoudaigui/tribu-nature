@@ -45,6 +45,14 @@ export type TripConversationMember = {
   joined_at?: string;
 };
 
+export type ConversationMessage = {
+  id: string;
+  conversation_id: string;
+  user_id: string;
+  body: string;
+  created_at?: string;
+};
+
 export type UserTripActions = {
   interests: TripInterest[];
   joinRequests: TripJoinRequest[];
@@ -207,6 +215,40 @@ export async function addConversationMember(conversationId: string, userId: stri
   });
 
   return rows[0] ?? { id: `${conversationId}-${userId}`, conversation_id: conversationId, user_id: userId };
+}
+
+export async function getConversationMembers(conversationId: string, accessToken: string): Promise<TripConversationMember[]> {
+  return requestRest<TripConversationMember[]>(
+    `conversation_members?conversation_id=eq.${encodeURIComponent(conversationId)}&select=*&order=joined_at.asc`,
+    { accessToken }
+  );
+}
+
+export async function getConversationMessages(conversationId: string, accessToken: string): Promise<ConversationMessage[]> {
+  return requestRest<ConversationMessage[]>(
+    `conversation_messages?conversation_id=eq.${encodeURIComponent(conversationId)}&select=*&order=created_at.asc`,
+    { accessToken }
+  );
+}
+
+export async function sendConversationMessage(
+  conversationId: string,
+  userId: string,
+  body: string,
+  accessToken: string
+): Promise<ConversationMessage> {
+  const rows = await requestRest<ConversationMessage[]>("conversation_messages?select=*", {
+    method: "POST",
+    accessToken,
+    prefer: "return=representation",
+    body: {
+      conversation_id: conversationId,
+      user_id: userId,
+      body
+    }
+  });
+
+  return rows[0];
 }
 
 async function updateJoinRequestStatus(requestId: string, status: TripJoinRequestStatus, accessToken: string): Promise<TripJoinRequest> {

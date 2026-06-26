@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test": "node --test tests/*.test.mjs",
+    "test:flows": "node --test tests/supabase-social-flows.test.mjs",
     "seed:supabase": "node scripts/seedSupabaseCatalog.mjs",
     "preview": "vite preview"
   },

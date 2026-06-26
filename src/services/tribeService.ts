@@ -17,6 +17,14 @@ export type TribeRequestBundle = {
   accepted: TribeConnection[];
 };
 
+export type TribeMessage = {
+  id: string;
+  connection_id: string;
+  sender_id: string;
+  body: string;
+  created_at?: string;
+};
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -72,6 +80,33 @@ export async function getMyTribeRequests(userId: string, accessToken: string): P
     sent: rows.filter((request) => request.requester_id === userId && request.status === "pending"),
     accepted: rows.filter((request) => request.status === "accepted")
   };
+}
+
+export async function getTribeMessages(connectionId: string, accessToken: string): Promise<TribeMessage[]> {
+  return requestRest<TribeMessage[]>(
+    `tribe_messages?connection_id=eq.${encodeURIComponent(connectionId)}&select=*&order=created_at.asc`,
+    { accessToken }
+  );
+}
+
+export async function sendTribeMessage(
+  connectionId: string,
+  senderId: string,
+  body: string,
+  accessToken: string
+): Promise<TribeMessage> {
+  const rows = await requestRest<TribeMessage[]>("tribe_messages?select=*", {
+    method: "POST",
+    accessToken,
+    prefer: "return=representation",
+    body: {
+      connection_id: connectionId,
+      sender_id: senderId,
+      body
+    }
+  });
+
+  return rows[0];
 }
 
 async function updateTribeRequest(connectionId: string, status: TribeConnectionStatus, accessToken: string): Promise<TribeConnection> {

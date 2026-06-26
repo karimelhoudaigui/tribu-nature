@@ -36,6 +36,22 @@ export type UserProfileRecord = {
   updated_at?: string;
 };
 
+export type UserProfileUpdate = Partial<Pick<
+  UserProfileRecord,
+  | "display_name"
+  | "avatar_url"
+  | "city"
+  | "bio"
+  | "age_range"
+  | "physical_level"
+  | "budget_range"
+  | "adventure_style"
+  | "preferred_ambiences"
+  | "safety_preferences"
+  | "past_trips"
+  | "badges"
+>>;
+
 type AuthApiResponse = {
   access_token?: string;
   refresh_token?: string;
@@ -139,6 +155,60 @@ export async function getCurrentProfile(session: AuthSession): Promise<UserProfi
   if (rows[0]) return rows[0];
 
   return upsertCurrentProfile(session);
+}
+
+export async function getProfileById(profileId: string, accessToken: string): Promise<UserProfileRecord | null> {
+  ensureAuthConfig();
+
+  const response = await fetch(`${getSupabaseUrl()}/rest/v1/profiles?id=eq.${encodeURIComponent(profileId)}&select=*&limit=1`, {
+    headers: getRestHeaders(accessToken)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Profil introuvable: ${await getErrorMessage(response)}`);
+  }
+
+  const rows = (await response.json()) as UserProfileRecord[];
+  return rows[0] ?? null;
+}
+
+export async function getProfilesByIds(profileIds: string[], accessToken: string): Promise<UserProfileRecord[]> {
+  ensureAuthConfig();
+
+  const uniqueIds = [...new Set(profileIds)].filter(Boolean);
+  if (uniqueIds.length === 0) return [];
+
+  const response = await fetch(`${getSupabaseUrl()}/rest/v1/profiles?id=in.(${uniqueIds.map(encodeURIComponent).join(",")})&select=*`, {
+    headers: getRestHeaders(accessToken)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Profils introuvables: ${await getErrorMessage(response)}`);
+  }
+
+  return response.json() as Promise<UserProfileRecord[]>;
+}
+
+export async function updateProfile(profileId: string, updates: UserProfileUpdate, accessToken: string): Promise<UserProfileRecord> {
+  ensureAuthConfig();
+
+  const response = await fetch(`${getSupabaseUrl()}/rest/v1/profiles?id=eq.${encodeURIComponent(profileId)}&select=*`, {
+    method: "PATCH",
+    headers: {
+      ...getRestHeaders(accessToken),
+      "Content-Type": "application/json",
+      Prefer: "return=representation"
+    },
+    body: JSON.stringify(updates)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Profil impossible à modifier: ${await getErrorMessage(response)}`);
+  }
+
+  const rows = (await response.json()) as UserProfileRecord[];
+  if (!rows[0]) throw new Error("Profil modifié, mais aucune donnée n'a été renvoyée.");
+  return rows[0];
 }
 
 export async function upsertCurrentProfile(session: AuthSession, displayName?: string): Promise<UserProfileRecord> {

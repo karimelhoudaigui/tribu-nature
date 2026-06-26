@@ -3,6 +3,8 @@ export type NotificationType =
   | "join_request_accepted"
   | "join_request_rejected"
   | "trip_invitation_received"
+  | "trip_invitation_accepted"
+  | "trip_invitation_rejected"
   | "friend_request_received"
   | "friend_request_accepted"
   | "conversation_new_member";
@@ -33,11 +35,11 @@ export type NotificationPayload = {
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export async function createNotification(payload: NotificationPayload, accessToken: string): Promise<NotificationRecord> {
-  const rows = await requestRest<NotificationRecord[]>("notifications?select=*", {
+export async function createNotification(payload: NotificationPayload, accessToken: string): Promise<void> {
+  await requestRest<void>("notifications", {
     method: "POST",
     accessToken,
-    prefer: "return=representation",
+    prefer: "return=minimal",
     body: {
       user_id: payload.user_id,
       type: payload.type,
@@ -48,8 +50,6 @@ export async function createNotification(payload: NotificationPayload, accessTok
       related_request_id: payload.related_request_id ?? null
     }
   });
-
-  return rows[0];
 }
 
 export async function getMyNotifications(userId: string, accessToken: string): Promise<NotificationRecord[]> {
@@ -103,8 +103,9 @@ async function requestRest<T>(
     throw new Error(await getErrorMessage(response));
   }
 
-  if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+  const text = await response.text();
+  if (!text) return undefined as T;
+  return JSON.parse(text) as T;
 }
 
 async function getErrorMessage(response: Response) {
