@@ -82,6 +82,6 @@ La commande importe 72 Trips + 265 activités au total. Ensuite, l'app lit autom
 - Onboarding avec calendrier, ambiances visuelles et filtres avancés
 - Dashboard de Trips compatibles
 - Page détail Trip
-- Conversation créée quand l'utilisateur rejoint une Trip
+- Conversation créée quand l'utilisateur rejoint un Trip
 - Local Activity Graph simulé
 - Communauté, profil, prestataires et sécurité

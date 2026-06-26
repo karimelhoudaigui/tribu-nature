@@ -20,6 +20,7 @@ export type UserProfileRecord = {
   email: string | null;
   display_name: string;
   avatar_url: string | null;
+  avatar_path?: string | null;
   city: string | null;
   bio: string | null;
   age_range?: string | null;
@@ -40,6 +41,7 @@ export type UserProfileUpdate = Partial<Pick<
   UserProfileRecord,
   | "display_name"
   | "avatar_url"
+  | "avatar_path"
   | "city"
   | "bio"
   | "age_range"

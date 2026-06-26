@@ -20,7 +20,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 76,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end simple pour découvrir l’Aspe entre lac, village et repas local.",
     "activities": [
       "Randonnée au lac d’Estaens",
@@ -59,7 +59,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 77,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Séjour lent au pied du cirque de Lescun avec randonnée et patrimoine.",
     "activities": [
       "Randonnée dans le cirque de Lescun",
@@ -98,7 +98,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 78,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Trip local entre Laruns, pastoralisme et paysages d’Ossau.",
     "activities": [
       "Randonnée des lacs d’Ayous",
@@ -137,7 +137,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 79,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Découverte accessible de Cauterets, Lac de Gaube et bains.",
     "activities": [
       "Randonnée au Lac de Gaube",
@@ -176,7 +176,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 80,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Trip photo et marche douce autour du cirque de Gavarnie.",
     "activities": [
       "Marche classique vers le Cirque de Gavarnie",
@@ -215,7 +215,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 81,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end plus dynamique avec rafting encadré et repas local.",
     "activities": [
       "Randonnée au lac d’Estaens",
@@ -254,7 +254,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 82,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end villages et collines pour découvrir le Pays basque intérieur.",
     "activities": [
       "Villages Ainhoa et Sare",
@@ -293,7 +293,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 83,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Séjour confort autour du lac de Génos et bains chauds.",
     "activities": [
       "Balade autour du lac de Génos",
@@ -332,7 +332,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 84,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Trip pensé pour débutants, sans pression sportive.",
     "activities": [
       "Balade au lac d’Estaing",
@@ -371,7 +371,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 85,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Itinérance courte avec nuit refuge pour profils entraînés.",
     "activities": [
       "Observation faune et flore",
@@ -410,7 +410,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 86,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Séjour lent entre village, vallée d’Aure, bains et balade.",
     "activities": [
       "Randonnée lacs du Néouvielle",
@@ -449,7 +449,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 87,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end centré sur le Lac de Gaube et les cascades du Pont d’Espagne.",
     "activities": [
       "Marche vers le Lac de Gaube",
@@ -488,7 +488,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 88,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Séjour Ariège plus sauvage, entre villages et randonnées.",
     "activities": [
       "Étape douce du Sentier Cathare",
@@ -527,7 +527,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 89,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Séjour altitude en Cerdagne pour respirer, marcher et bouger.",
     "activities": [
       "Trail doux en altitude",
@@ -566,7 +566,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 90,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Trip transfrontalier doux entre vallée d’Aspe et Canfranc.",
     "activities": [
       "Visite de la gare de Canfranc",
@@ -605,7 +605,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 91,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Expérience sommet et ciel étoilé pour petit groupe.",
     "activities": [
       "Téléphérique et visite du sommet",
@@ -644,7 +644,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 92,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Journée douce dans un grand cirque glaciaire.",
     "activities": [
       "Petit train de Troumouse",
@@ -683,7 +683,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 93,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Journée lacs, pins et photo nature dans le Néouvielle.",
     "activities": [
       "Boucle des lacs du Néouvielle",
@@ -722,7 +722,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 76,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end détente au bord du lac et bains chauds.",
     "activities": [
       "Balade autour du lac de Génos",
@@ -761,7 +761,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 77,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Mix Ariège: bains, activité encadrée et balade.",
     "activities": [
       "Bains chauds à Ax-les-Thermes",
@@ -800,7 +800,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 78,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end neige et glisse en vallée d’Ossau.",
     "activities": [
       "Ski à Gourette",
@@ -839,7 +839,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 79,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end hivernal avec raquettes encadrées et pause thermale.",
     "activities": [
       "Ski domaine Tourmalet",
@@ -878,7 +878,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 80,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Séjour hiver en Cerdagne avec glisse et découverte douce.",
     "activities": [
       "Trail doux en altitude",
@@ -917,7 +917,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 81,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end doux entre sentier littoral, village et photo.",
     "activities": [
       "Sentier littoral Collioure - Port-Vendres",
@@ -956,7 +956,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 82,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end local en vallée d’Ossau autour de Laruns.",
     "activities": [
       "Balade au lac de Bious-Artigues",
@@ -995,7 +995,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 83,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Journée train de montagne et panoramas d’altitude.",
     "activities": [
       "Train d’Artouste",
@@ -1034,7 +1034,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 84,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Séjour plus sportif côté espagnol autour d’Ordesa.",
     "activities": [
       "Randonnée Cola de Caballo",
@@ -1073,7 +1073,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 85,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Trip réservé aux profils sportifs avec encadrement conseillé.",
     "activities": [
       "Randonnée Forau d’Aigualluts",
@@ -1112,7 +1112,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 86,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Séjour catalan entre villages romans et nature.",
     "activities": [
       "Villages et églises romanes",
@@ -1151,7 +1151,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 87,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Séjour doux en Cerdagne entre train, bains et villages.",
     "activities": [
       "Randonnée des Bouillouses",
@@ -1190,7 +1190,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 88,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end simple pour découvrir Arreau et les vallées autour.",
     "activities": [
       "Marché et produits locaux à Arreau",
@@ -1229,7 +1229,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 89,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Base pratique entre détente, patrimoine et activité encadrée selon saison.",
     "activities": [
       "Pont Napoléon et vallée",
@@ -1268,7 +1268,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 90,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end confort à Cauterets avec bains et balades accessibles.",
     "activities": [
       "Randonnée au Lac de Gaube",
@@ -1307,7 +1307,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 91,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end rassurant en petit groupe féminin, nature et repas local.",
     "activities": [
       "Randonnée au lac d’Estaens",
@@ -1346,7 +1346,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 92,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Trip calme avec organisation attentive aux préférences personnelles.",
     "activities": [
       "Randonnée dans le cirque de Lescun",
@@ -1385,7 +1385,7 @@ export const excelTrips: Trip[] = [
     ],
     "compatibility_score": 93,
     "interested_count": 6,
-    "status": "Trip publiée",
+    "status": "Trip publié",
     "description": "Week-end accessible depuis Toulouse avec thermes et panoramas.",
     "activities": [
       "Panorama à Luchon-Superbagnères",

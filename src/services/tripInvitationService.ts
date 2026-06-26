@@ -19,7 +19,7 @@ export async function inviteUserToFavoriteTrip(
   invitedUserId: string,
   inviterId: string,
   accessToken: string,
-  message = "Je pense que cette Trip pourrait te plaire."
+  message = "Je pense que ce Trip pourrait te plaire."
 ): Promise<TripInvitation> {
   const rows = await requestRest<TripInvitation[]>("trip_invitations?on_conflict=trip_id,inviter_id,invited_user_id&select=*", {
     method: "POST",

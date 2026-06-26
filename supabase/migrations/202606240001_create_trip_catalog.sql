@@ -11,7 +11,7 @@ create table if not exists public.trips (
   ambience_tags text[] not null default '{}',
   compatibility_score integer not null default 0,
   interested_count integer not null default 0,
-  status text not null default 'Trip publiée',
+  status text not null default 'Trip publié',
   description text not null default '',
   activities text[] not null default '{}',
   generation_reasons text[] not null default '{}',

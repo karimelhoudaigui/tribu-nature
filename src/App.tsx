@@ -1,9 +1,10 @@
-import { type Dispatch, type SetStateAction, type TouchEvent, useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import {
   BadgeCheck,
   Bell,
   CalendarDays,
+  Camera,
   Compass,
   Copy,
   ExternalLink,
@@ -85,6 +86,7 @@ import {
   type TribeMessage,
   type TribeRequestBundle
 } from "./services/tribeService";
+import { uploadProfileAvatar, validateProfileAvatarFile } from "./services/profileService";
 import type { Activity, MockLocalActivity, OnboardingProfile, Trip, UserProfile } from "./types";
 
 type Page = "landing" | "dashboard" | "create-trip" | "trip" | "conversation" | "communaute" | "profil" | "prestataires" | "securite";
@@ -106,7 +108,7 @@ type Conversation = {
 };
 
 const navItems: { page: Page; label: string }[] = [
-  { page: "dashboard", label: "Trips compatibles" },
+  { page: "dashboard", label: "Explorer" },
   { page: "communaute", label: "Tribu" },
   { page: "profil", label: "Profil" }
 ];
@@ -944,7 +946,7 @@ function App() {
 
       setTripMemberProfiles((prev) => ({ ...prev, [trip.id]: nextMembers }));
     } catch (error) {
-      console.warn("Membres de la Trip indisponibles.", error);
+      console.warn("Membres du Trip indisponibles.", error);
     }
   };
   const openAuthModal = (prompt = "Connecte-toi pour continuer.") => {
@@ -990,17 +992,32 @@ function App() {
 
     const nextProfile = await updateProfile(currentProfile.id, updates, session.access_token);
     setCurrentProfile(nextProfile);
+    setTribeProfiles((prev) => prev.map((profile) => profile.id === nextProfile.id ? nextProfile : profile));
     if (!selectedProfileId || selectedProfileId === nextProfile.id) {
       setViewedProfile(nextProfile);
     }
     setSocialNotice("Profil mis à jour.");
     return nextProfile;
   };
+  const uploadProfileAvatarFlow = async (file: File) => {
+    const session = requireAuth("Connecte-toi pour modifier ta photo de profil.");
+    if (!session || !currentProfile) throw new Error("Connexion nécessaire pour modifier la photo.");
+
+    const uploadedAvatar = await uploadProfileAvatar(currentProfile.id, file, session.access_token);
+    const nextProfile = await updateProfile(currentProfile.id, uploadedAvatar, session.access_token);
+    setCurrentProfile(nextProfile);
+    setTribeProfiles((prev) => prev.map((profile) => profile.id === nextProfile.id ? nextProfile : profile));
+    if (!selectedProfileId || selectedProfileId === nextProfile.id) {
+      setViewedProfile(nextProfile);
+    }
+    setSocialNotice("Photo de profil mise à jour.");
+    return nextProfile;
+  };
   const refreshUserTripActions = async (session: AuthSession) => {
     await refreshSocialData(session);
   };
   const toggleTripFavorite = async (trip: Trip) => {
-    const session = requireAuth("Connecte-toi pour sauvegarder une Trip dans tes favoris.");
+    const session = requireAuth("Connecte-toi pour sauvegarder un Trip dans tes favoris.");
     if (!session) return;
 
     const alreadyFavorite = favoriteTripIds.includes(trip.id);
@@ -1008,11 +1025,11 @@ function App() {
       if (alreadyFavorite) {
         await removeTripFromFavorites(trip.id, session.user.id, session.access_token);
         setFavoriteTripIds((prev) => prev.filter((id) => id !== trip.id));
-        setSocialNotice("Trip retirée de tes favoris.");
+        setSocialNotice("Trip retiré de tes favoris.");
       } else {
         await addTripToFavorites(trip.id, session.user.id, session.access_token);
         setFavoriteTripIds((prev) => Array.from(new Set([...prev, trip.id])));
-        setSocialNotice("Trip ajoutée à tes favoris.");
+        setSocialNotice("Trip ajouté à tes favoris.");
       }
     } catch (error) {
       console.error("Favori impossible.", error);
@@ -1020,7 +1037,7 @@ function App() {
     }
   };
   const sendFavoriteTripInvitation = async (trip: Trip, member: UserProfile) => {
-    const session = requireAuth("Connecte-toi pour inviter un membre à une Trip favorite.");
+    const session = requireAuth("Connecte-toi pour inviter un membre à un Trip favori.");
     if (!session || !currentProfile) return;
 
     try {
@@ -1028,7 +1045,7 @@ function App() {
       await createNotification({
         user_id: member.id,
         type: "trip_invitation_received",
-        title: `${currentProfile.display_name} t'a invité à rejoindre une Trip`,
+        title: `${currentProfile.display_name} t'a invité à rejoindre un Trip`,
         body: `${currentProfile.display_name} t'a invité à rejoindre "${trip.title}".`,
         related_trip_id: trip.id,
         related_user_id: session.user.id
@@ -1228,7 +1245,7 @@ function App() {
     }
   };
   const shareTripWithTribeMember = async (trip: Trip, member: UserProfile) => {
-    const session = requireAuth("Connecte-toi pour partager une Trip avec ta tribu.");
+    const session = requireAuth("Connecte-toi pour partager un Trip avec ta tribu.");
     if (!session || !currentProfile) return;
 
     const connection = getAcceptedTribeConnection(member.id);
@@ -1240,10 +1257,10 @@ function App() {
     try {
       await sendTribeMessage(connection.id, currentProfile.id, buildTripShareMessage(trip), session.access_token);
       setShareTrip(null);
-      setSocialNotice(`Trip partagée à ${member.name} dans votre conversation.`);
+      setSocialNotice(`Trip partagé à ${member.name} dans votre conversation.`);
     } catch (error) {
       console.error("Partage Tribu impossible.", error);
-      setSocialNotice(error instanceof Error ? error.message : "Impossible de partager cette Trip dans ta tribu.");
+      setSocialNotice(error instanceof Error ? error.message : "Impossible de partager ce Trip dans ta tribu.");
     }
   };
   const formalizeCatalogTrip = (trip: Trip) => {
@@ -1252,9 +1269,9 @@ function App() {
     go("create-trip");
   };
   const publishCommunityTrip = async (trip: Trip) => {
-    const session = requireAuth("Connecte-toi pour publier une Trip avec ton vrai profil.");
+    const session = requireAuth("Connecte-toi pour publier un Trip avec ton vrai profil.");
     if (!session || !currentProfile) {
-      throw new Error("Connecte-toi pour publier une Trip.");
+      throw new Error("Connecte-toi pour publier un Trip.");
     }
 
     const authenticatedTrip: Trip = {
@@ -1289,7 +1306,7 @@ function App() {
       await refreshUserTripActions(session);
       await loadTripMembers(publishedTrip, session);
     } catch (error) {
-      console.error("Impossible de publier la Trip.", error);
+      console.error("Impossible de publier le Trip.", error);
       throw error;
     }
     go("dashboard");
@@ -1388,7 +1405,7 @@ function App() {
           related_user_id: session.user.id,
           related_request_id: request.id
         }, session.access_token);
-        setSocialNotice("Demande envoyée au créateur de la Trip.");
+        setSocialNotice("Demande envoyée au créateur du Trip.");
         await refreshUserTripActions(session);
       } else {
         setSocialNotice("Projet ouvert en conversation locale. Le créateur devra être rattaché à un compte pour valider les demandes.");
@@ -1488,6 +1505,7 @@ function App() {
             onAuthClick={() => openAuthModal("Connecte-toi pour voir ton profil.")}
             onShowOwnProfile={() => openProfile(null)}
             onUpdateProfile={updateProfileFlow}
+            onUploadAvatar={uploadProfileAvatarFlow}
             onOpenTrip={openTripFromProfile}
             trips={availableTrips}
             userTripActions={userTripActions}
@@ -1560,7 +1578,7 @@ function Header({
           ))}
         </nav>
         <div className="hidden items-center gap-3 lg:flex">
-          <button className="btn-primary py-2" onClick={() => go("create-trip")}>Créer une Trip</button>
+          <button className="btn-primary py-2" onClick={() => go("create-trip")}>Créer un Trip</button>
           {currentProfile ? (
             <div className="flex items-center gap-2">
               <button className="relative rounded-full bg-white p-2 text-forest-800 shadow-sm transition hover:bg-forest-50" onClick={onMessagesClick} aria-label="Messages">
@@ -1597,7 +1615,7 @@ function Header({
       {menuOpen && (
         <div className="container-page border-t border-forest-100 py-3 lg:hidden">
           <div className="grid gap-2">
-            {[...visibleNavItems, { page: "create-trip" as Page, label: "Créer une Trip" }].map((item) => (
+            {[...visibleNavItems, { page: "create-trip" as Page, label: "Créer un Trip" }].map((item) => (
               <button key={item.page} className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={() => go(item.page)}>
                 {item.label}
               </button>
@@ -1877,8 +1895,6 @@ function SwipeToDeleteNotification({
   onDelete: () => void | Promise<void>;
   children: React.ReactNode;
 }) {
-  const [touchStartX, setTouchStartX] = useState<number | null>(null);
-  const [offsetX, setOffsetX] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const deleteCurrent = async () => {
@@ -1887,40 +1903,11 @@ function SwipeToDeleteNotification({
     await onDelete();
   };
 
-  const handleTouchStart = (event: TouchEvent<HTMLElement>) => {
-    setTouchStartX(event.touches[0]?.clientX ?? null);
-  };
-
-  const handleTouchMove = (event: TouchEvent<HTMLElement>) => {
-    if (touchStartX === null) return;
-    const nextOffset = Math.min(0, event.touches[0].clientX - touchStartX);
-    setOffsetX(Math.max(nextOffset, -104));
-  };
-
-  const handleTouchEnd = () => {
-    if (offsetX <= -72) {
-      deleteCurrent();
-      return;
-    }
-
-    setTouchStartX(null);
-    setOffsetX(0);
-  };
-
   return (
     <div className="relative overflow-hidden rounded-[1rem]">
-      <div className="absolute inset-y-0 right-0 flex w-28 items-center justify-center bg-red-500 text-sm font-bold text-white">
-        Supprimer
-      </div>
-      <article
-        className={`relative border p-4 pr-12 transition ${notification.read_at ? "border-forest-100 bg-white" : "border-sun/40 bg-sun/10"}`}
-        style={{ transform: `translateX(${offsetX}px)` }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
+      <article className={`relative border p-4 pr-12 transition ${notification.read_at ? "border-forest-100 bg-white" : "border-sun/40 bg-sun/10"}`}>
         <button
-          className="absolute right-3 top-3 rounded-full bg-white/85 p-2 text-forest-700 shadow-sm transition hover:bg-red-50 hover:text-red-600"
+          className="absolute right-3 top-3 rounded-full bg-white/90 p-2 text-forest-700 shadow-sm transition hover:bg-forest-100 hover:text-red-600 disabled:opacity-50"
           onClick={deleteCurrent}
           disabled={isDeleting}
           aria-label="Supprimer cette notification"
@@ -1989,7 +1976,7 @@ function Landing({
         <div className="container-page">
           <h2 className="section-title text-white">Comment ça marche</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-5">
-            {["Exprime ton envie", "Découvre des personnes compatibles", "Rejoins une Trip", "Vote pour les activités", "Pars en sécurité"].map((step, index) => (
+            {["Exprime ton envie", "Découvre des personnes compatibles", "Rejoins un Trip", "Vote pour les activités", "Pars en sécurité"].map((step, index) => (
               <div className="rounded-lg bg-white/10 p-5 backdrop-blur" key={step}>
                 <span className="text-3xl font-semibold text-sun">0{index + 1}</span>
                 <p className="mt-4 font-semibold">{step}</p>
@@ -2070,7 +2057,7 @@ function Onboarding({ isGenerating, onGeneratedTrip }: { isGenerating: boolean; 
       <div className="mx-auto max-w-5xl">
         <p className="pill">Profil d'aventure</p>
         <h1 className="mt-4 text-4xl font-semibold">Choisis tes dates, ton ambiance, tes préférences.</h1>
-        <p className="mt-3 max-w-2xl text-forest-700">Quelques choix simples suffisent. L'app s'occupe ensuite de proposer une Trip et des personnes compatibles.</p>
+        <p className="mt-3 max-w-2xl text-forest-700">Quelques choix simples suffisent. L'app s'occupe ensuite de proposer un Trip et des personnes compatibles.</p>
         <div className="mt-6 h-2 rounded-full bg-forest-100">
           <div className="h-full rounded-full bg-forest-700 transition-all" style={{ width: `${Math.min((step / onboardingSteps.length) * 100, 100)}%` }} />
         </div>
@@ -2821,7 +2808,7 @@ function CreateTripPage({
     try {
       await onPublish(previewTrip);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "La Trip n'a pas pu être publiée. Réessaie dans un instant.";
+      const message = error instanceof Error ? error.message : "Le Trip n'a pas pu être publié. Réessaie dans un instant.";
       setPublishError(message);
     } finally {
       setIsPublishing(false);
@@ -2832,7 +2819,7 @@ function CreateTripPage({
     <section className="container-page py-10">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="pill">Créer une Trip</p>
+          <p className="pill">Créer un Trip</p>
           <h1 className="mt-4 text-4xl font-semibold">Propose ton aventure à la tribu.</h1>
           <p className="mt-3 max-w-2xl text-forest-700">Tu sais déjà où tu veux aller ? Crée une proposition simple, publie-la, et laisse les personnes compatibles te rejoindre.</p>
         </div>
@@ -2848,7 +2835,7 @@ function CreateTripPage({
             <h2 className="text-2xl font-semibold">L'essentiel</h2>
             <div className="mt-5 grid gap-4">
               <label className="grid gap-2">
-                <span className="text-sm font-semibold text-forest-700">Titre de la Trip</span>
+                <span className="text-sm font-semibold text-forest-700">Titre du Trip</span>
                 <input className="rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Donne un nom à ton aventure" />
               </label>
               <label className="grid gap-2">
@@ -2856,12 +2843,12 @@ function CreateTripPage({
                 <input className="rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600" value={destinationText} onChange={(event) => setDestinationText(event.target.value)} placeholder="Ex : Vallée d'Aspe, Bali, Bretagne..." />
               </label>
               <label className="grid gap-2">
-                <span className="text-sm font-semibold text-forest-700">Nom affiché sur la Trip</span>
+                <span className="text-sm font-semibold text-forest-700">Nom affiché sur le Trip</span>
                 <input className="rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600" value={creatorName} onChange={(event) => setCreatorName(event.target.value)} placeholder="Ton prénom" />
               </label>
               <label className="grid gap-2">
-                <span className="text-sm font-semibold text-forest-700">Décris l'esprit de la Trip</span>
-                <textarea className="min-h-32 rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600" value={brief} onChange={(event) => setBrief(event.target.value)} placeholder="Décris l'esprit de la Trip" />
+                <span className="text-sm font-semibold text-forest-700">Décris l'esprit du Trip</span>
+                <textarea className="min-h-32 rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600" value={brief} onChange={(event) => setBrief(event.target.value)} placeholder="Décris l'esprit du Trip" />
               </label>
               <label className="grid gap-2">
                 <span className="text-sm font-semibold text-forest-700">Image de couverture</span>
@@ -2928,9 +2915,9 @@ function CreateTripPage({
 
           <div className="sticky bottom-4 grid gap-3 rounded-[1.5rem] bg-white/92 p-4 shadow-soft backdrop-blur sm:grid-cols-2">
             {publishError && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 sm:col-span-2">{publishError}</p>}
-            <button className="btn-secondary" onClick={() => setShowPreview((value) => !value)}>Prévisualiser la Trip</button>
+            <button className="btn-secondary" onClick={() => setShowPreview((value) => !value)}>Prévisualiser le Trip</button>
             <button className="btn-primary disabled:cursor-wait disabled:opacity-70" disabled={isPublishing} onClick={publishTrip}>
-              {isPublishing ? "Publication..." : "Publier la Trip"}
+              {isPublishing ? "Publication..." : "Publier le Trip"}
             </button>
           </div>
         </aside>
@@ -3023,7 +3010,7 @@ function buildCommunityTrip({
   const maxParticipants = maxParticipantsFromGroupSize(groupSize);
   return {
     id: `community-${Date.now()}`,
-    title: title.trim() || "Nouvelle Trip communautaire",
+    title: title.trim() || "Nouveau Trip communautaire",
     destination: destinationLabel,
     image_url: coverUrl.trim() || inferCommunityTripImage(destinationLabel, activitiesWanted, ambiences),
     dates: duration,
@@ -3133,7 +3120,7 @@ function Dashboard({
   const filteredTrips = useMemo(() => filterTripsByResultFilters(sectionTrips, activeFilterTags), [activeFilterTags, sectionTrips]);
   const sectionSubtitle = activeSection === "trips"
     ? "Les voyages créés par les membres, avec un créateur, une intention et un groupe à rejoindre."
-    : "Des idées de voyage catalogue à liker, rejoindre avec les intéressés ou transformer en vraie Trip.";
+    : "Des idées de voyage catalogue à liker, rejoindre avec les intéressés ou transformer en vrai Trip.";
   const toggleResultFilter = (filter: string) => {
     setActiveFilters((prev) => (prev.includes(filter) ? prev.filter((item) => item !== filter) : [...prev, filter]));
   };
@@ -3156,15 +3143,41 @@ function Dashboard({
 
   return (
     <section className="container-page py-10">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="overflow-hidden rounded-[2rem] bg-forest-900 text-white shadow-soft">
+        <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div>
+            <p className="inline-flex rounded-full bg-white/12 px-4 py-2 text-sm font-bold text-sun">Explorer les Trips</p>
+            <h1 className="mt-5 max-w-3xl text-4xl font-semibold sm:text-5xl">Découvre des idées de voyage et des projets proposés par les membres.</h1>
+            <p className="mt-4 max-w-2xl text-white/75">
+              {generatedMode ? "Des aventures adaptées à ton profil, avec un score de match sur chaque card." : "Explore, filtre, sauvegarde, rejoins les intéressés ou crée ton propre Trip."}
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+            {[
+              { icon: Compass, title: "Explorer", text: "Idées catalogue à co-construire" },
+              { icon: Users, title: "Rejoindre", text: "Projets concrets de membres" },
+              { icon: Heart, title: "Sauvegarder", text: "Favoris et match visibles" }
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <article className="rounded-[1.15rem] bg-white/10 p-4 backdrop-blur" key={item.title}>
+                  <Icon className="text-sun" size={20} />
+                  <h3 className="mt-3 font-semibold">{item.title}</h3>
+                  <p className="mt-1 text-sm text-white/70">{item.text}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="pill">Trips compatibles</p>
-          <h1 className="mt-4 text-4xl font-semibold">Trips compatibles</h1>
-          <p className="mt-2 text-forest-700">{generatedMode ? "Des aventures adaptées à ton profil." : "Choisis entre les Trips des membres et les idées à explorer."}</p>
+          <h2 className="text-2xl font-semibold">Résultats</h2>
+          <p className="mt-1 text-sm font-semibold text-forest-700">Affinez avec les filtres, puis ouvrez le Trip qui vous attire.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <span className="w-fit rounded-full bg-white px-4 py-2 text-sm font-semibold text-forest-700 shadow-sm">{filteredTrips.length} proposition{filteredTrips.length > 1 ? "s" : ""}</span>
-          <button className="btn-primary py-2" onClick={onCreateTrip}>Créer une Trip</button>
+          <button className="btn-primary py-2" onClick={onCreateTrip}>Créer un Trip</button>
         </div>
       </div>
       <div className="mt-6 grid gap-3 rounded-[1.5rem] bg-white p-3 shadow-sm sm:grid-cols-2">
@@ -3206,10 +3219,10 @@ function Dashboard({
       ) : (
         filteredTrips.length === 0 && activeSection === "trips" ? (
           <div className="mt-8 rounded-[1.5rem] bg-white p-8 text-center shadow-soft">
-            <h2 className="text-2xl font-semibold">Aucune Trip membre pour ces filtres.</h2>
-            <p className="mx-auto mt-3 max-w-xl text-forest-700">Tu peux créer la première Trip ou passer dans Explore pour partir d'une idée de voyage.</p>
+            <h2 className="text-2xl font-semibold">Aucun Trip membre pour ces filtres.</h2>
+            <p className="mx-auto mt-3 max-w-xl text-forest-700">Tu peux créer le premier Trip ou passer dans Explore pour partir d'une idée de voyage.</p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-              <button className="btn-primary" onClick={onCreateTrip}>Créer une Trip</button>
+              <button className="btn-primary" onClick={onCreateTrip}>Créer un Trip</button>
               <button className="btn-secondary" onClick={() => switchSection("explore")}>Voir Explore</button>
             </div>
           </div>
@@ -3500,7 +3513,7 @@ function TripGrid({
   if (tripList.length === 0) {
     return (
       <div className="mt-8 rounded-[1.5rem] bg-white p-8 text-center shadow-soft">
-        <h2 className="text-2xl font-semibold">Aucune Trip ne correspond exactement à ces filtres.</h2>
+        <h2 className="text-2xl font-semibold">Aucun Trip ne correspond exactement à ces filtres.</h2>
         <p className="mx-auto mt-3 max-w-xl text-forest-700">Élargis une préférence et on te proposera plus d'options.</p>
       </div>
     );
@@ -3635,7 +3648,7 @@ function TripDetail({
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="pill">Proposée par {trip.created_by ?? "un membre"}</p>
-                <h2 className="mt-3 text-3xl font-semibold">L'esprit de la Trip</h2>
+                <h2 className="mt-3 text-3xl font-semibold">L'esprit du Trip</h2>
                 <p className="mt-3 max-w-3xl leading-7 text-forest-700">{trip.brief ?? trip.description}</p>
               </div>
               <div className="grid gap-2 text-sm font-semibold text-forest-700 sm:text-right">
@@ -3717,7 +3730,7 @@ function ActivitiesSection({ activities: tripActivities }: { activities: Array<A
       <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="pill">Expériences</p>
-          <h2 className="mt-3 text-3xl font-semibold">Activités proposées pour cette Trip</h2>
+          <h2 className="mt-3 text-3xl font-semibold">Activités proposées pour ce Trip</h2>
         </div>
         <span className="text-sm font-semibold text-forest-700">{tripActivities.length} idées sur place</span>
       </div>
@@ -3733,7 +3746,7 @@ function TripMembersSection({ members: tripMembers }: { members: UserProfile[] }
     <section>
       <div className="mb-5">
         <p className="pill">La tribu</p>
-        <h2 className="mt-3 text-3xl font-semibold">Membres qui ont validé la Trip</h2>
+        <h2 className="mt-3 text-3xl font-semibold">Membres qui ont validé le Trip</h2>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {tripMembers.map((member) => (
@@ -3882,7 +3895,7 @@ function ConversationPage({
         <div className="card mx-auto max-w-2xl p-6 text-center">
           <MessageCircle className="mx-auto text-forest-700" size={42} />
           <h1 className="mt-4 text-3xl font-semibold">Aucune conversation active</h1>
-          <p className="mt-3 text-forest-700">Rejoins une Trip pour créer automatiquement une conversation avec les membres qui l'ont validée.</p>
+          <p className="mt-3 text-forest-700">Rejoins un Trip pour créer automatiquement une conversation avec les membres qui l'ont validée.</p>
           <button className="btn-primary mt-6" onClick={() => go("dashboard")}>Voir les Trips</button>
         </div>
       </section>
@@ -3940,14 +3953,14 @@ function ConversationPage({
               <h1 className="mt-4 text-3xl font-semibold">{conversation.trip.title}</h1>
               <p className="mt-2 text-forest-700">{conversation.trip.destination}</p>
               <p className="mt-4 text-sm text-forest-700">
-                Créée {conversation.createdAt.toLowerCase()} avec {participants.length} membre{participants.length > 1 ? "s" : ""} ayant validé la Trip.
+                Créée {conversation.createdAt.toLowerCase()} avec {participants.length} membre{participants.length > 1 ? "s" : ""} ayant validé le Trip.
               </p>
               {getTripCardType(conversation.trip) === "catalog" && (
                 <button className="btn-primary mt-5 w-full" onClick={() => onFormalizeTrip(conversation.trip)}>
-                  Créer une Trip à partir de cette idée
+                  Créer un Trip à partir de cette idée
                 </button>
               )}
-              <button className="btn-secondary mt-5 w-full" onClick={() => go("trip")}>Retour à la Trip</button>
+              <button className="btn-secondary mt-5 w-full" onClick={() => go("trip")}>Retour au Trip</button>
             </div>
           </div>
           <Panel title="Participants">
@@ -4163,7 +4176,7 @@ function Community({
           <p className="pill">Tribu</p>
           <h1 className="mt-4 text-4xl font-semibold">Ta communauté d'aventure.</h1>
           <p className="mt-3 max-w-2xl text-forest-700">
-            {activeTab === "compatibles" && "Découvre des profils compatibles, discute avec eux, puis invite-les à rejoindre une Trip favorite."}
+            {activeTab === "compatibles" && "Découvre des profils compatibles, discute avec eux, puis invite-les à rejoindre un Trip favori."}
             {activeTab === "tribe" && "Retrouve ici les personnes qui ont accepté de faire partie de ta tribu."}
             {activeTab === "requests" && "Gère tes demandes reçues et envoyées."}
           </p>
@@ -4253,7 +4266,7 @@ function Community({
               {receivedTripInvitations.map((invitation) => (
                 <InvitationRow
                   key={invitation.id}
-                  title="Invitation à une Trip"
+                  title="Invitation à un Trip"
                   trip={findTrip(invitation.trip_id)}
                   profile={findProfile(invitation.inviter_id)}
                   status={invitation.status}
@@ -4360,12 +4373,12 @@ function TribeProfileGrid({
               {member.badges.slice(0, 3).map((badge) => <span className="rounded-full bg-forest-50 px-3 py-1.5 text-xs font-semibold text-forest-700" key={badge}>{badge}</span>)}
             </div>
             {member.publicTrips.length > 0 && (
-              <p className="mt-4 text-sm font-semibold text-forest-700">Trip publique : {member.publicTrips[0].title}</p>
+              <p className="mt-4 text-sm font-semibold text-forest-700">Trip public : {member.publicTrips[0].title}</p>
             )}
             <div className="mt-5 grid gap-2 sm:grid-cols-3">
               <button className="btn-secondary py-2" onClick={() => onViewProfile(member.id)}>Profil</button>
               <button className="btn-primary py-2" onClick={() => onMessage(member)}>{messageLabel}</button>
-              <button className="btn-secondary py-2" onClick={() => onInvite(member)}>Inviter à une Trip</button>
+              <button className="btn-secondary py-2" onClick={() => onInvite(member)}>Inviter à un Trip</button>
             </div>
             <button className="mt-2 w-full rounded-full bg-forest-50 px-4 py-2 text-sm font-semibold text-forest-800 transition hover:bg-forest-100 disabled:opacity-60" disabled={!onAdd} onClick={() => onAdd?.(member)}>
               {addLabel}
@@ -4566,7 +4579,7 @@ function TribeDirectConversation({
             <div>
               <MessageCircle className="mx-auto text-forest-700" size={34} />
               <h3 className="mt-3 text-xl font-semibold">Aucun message pour le moment</h3>
-              <p className="mt-2 max-w-sm text-sm leading-6 text-forest-700">Écris à {member.name} pour organiser une Trip, proposer une idée ou garder le contact.</p>
+              <p className="mt-2 max-w-sm text-sm leading-6 text-forest-700">Écris à {member.name} pour organiser un Trip, proposer une idée ou garder le contact.</p>
             </div>
           </div>
         )}
@@ -4768,8 +4781,8 @@ function TribeInviteModal({
       <div className="w-full max-w-2xl rounded-[1.5rem] bg-white p-5 shadow-soft">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="pill">Inviter à une Trip</p>
-            <h2 className="mt-3 text-2xl font-semibold">Choisis une Trip pour {member.name}</h2>
+            <p className="pill">Inviter à un Trip</p>
+            <h2 className="mt-3 text-2xl font-semibold">Choisis un Trip pour {member.name}</h2>
           </div>
           <button className="rounded-full bg-forest-50 p-2" onClick={onClose} aria-label="Fermer">
             <X size={18} />
@@ -4778,7 +4791,7 @@ function TribeInviteModal({
         <div className="mt-5 grid gap-3">
           {inviteTrips.length === 0 && (
             <div className="rounded-[1rem] bg-forest-50 p-4 text-sm leading-6 text-forest-700">
-              Ajoute d'abord une Trip en favori avec le petit cœur sur les cards. Tu pourras ensuite inviter {member.name} à l'une de ces Trips.
+              Ajoute d'abord un Trip en favori avec le petit cœur sur les cards. Tu pourras ensuite inviter {member.name} à un de ces Trips.
             </div>
           )}
           {inviteTrips.map((trip) => (
@@ -4843,9 +4856,9 @@ function ShareTripModal({
       <div className="w-full max-w-3xl overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
         <div className="flex items-start justify-between gap-4 border-b border-forest-100 p-5">
           <div>
-            <p className="pill">Partager la Trip</p>
+            <p className="pill">Partager le Trip</p>
             <h2 className="mt-3 text-2xl font-semibold">{trip.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-forest-700">Envoie-la à ta tribu ou copie le lien pour la partager sur une autre app.</p>
+            <p className="mt-2 text-sm leading-6 text-forest-700">Envoie-le à ta tribu ou copie le lien pour le partager sur une autre app.</p>
           </div>
           <button className="rounded-full bg-forest-50 p-2 transition hover:bg-forest-100" onClick={onClose} aria-label="Fermer">
             <X size={18} />
@@ -4890,7 +4903,7 @@ function ShareTripModal({
             <div className="mt-4 grid max-h-[430px] gap-3 overflow-y-auto pr-1">
               {tribeMembers.length === 0 && (
                 <div className="rounded-[1rem] bg-forest-50 p-4 text-sm leading-6 text-forest-700">
-                  Ajoute d'abord des personnes à ta tribu pour pouvoir leur partager une Trip directement en message privé.
+                  Ajoute d'abord des personnes à ta tribu pour pouvoir leur partager un Trip directement en message privé.
                 </div>
               )}
               {tribeMembers.map((member) => (
@@ -4926,7 +4939,7 @@ function getTripShareUrl(trip: Trip) {
 
 function buildTripShareMessage(trip: Trip) {
   return [
-    `Regarde cette Trip : ${trip.title}`,
+    `Regarde ce Trip : ${trip.title}`,
     `${trip.destination} · ${getTripDateLabel(trip)} · ${trip.budget_min}-${trip.budget_max} €`,
     getTripShareUrl(trip)
   ].join("\n");
@@ -5051,6 +5064,7 @@ function Profile({
   onAuthClick,
   onShowOwnProfile,
   onUpdateProfile,
+  onUploadAvatar,
   onOpenTrip,
   trips: availableTrips,
   userTripActions
@@ -5063,6 +5077,7 @@ function Profile({
   onAuthClick: () => void;
   onShowOwnProfile: () => void;
   onUpdateProfile: (updates: UserProfileUpdate) => Promise<UserProfileRecord>;
+  onUploadAvatar: (file: File) => Promise<UserProfileRecord>;
   onOpenTrip: (trip: Trip, shouldOpenConversation: boolean) => void | Promise<void>;
   trips: Trip[];
   userTripActions: UserTripActions | null;
@@ -5091,7 +5106,7 @@ function Profile({
   ]);
   const profileTrips = availableTrips.filter((trip) => profileTripIds.has(trip.id));
   const tripStatusLabel = (trip: Trip) => {
-    if (trip.creator_id === profile.id) return "Créée";
+    if (trip.creator_id === profile.id) return "Créé";
     if (activeTripIds.has(trip.id)) return "Participant";
     if (interestedTripIds.has(trip.id)) return "Intéressé";
     if (requestedTripIds.has(trip.id)) return "Demande envoyée";
@@ -5121,6 +5136,7 @@ function Profile({
         isOwnProfile={isOwnProfile}
         createdTripsCount={createdTrips.length}
         onUpdateProfile={onUpdateProfile}
+        onUploadAvatar={onUploadAvatar}
       />
 
       <section className="mt-8 rounded-[2rem] bg-white p-5 shadow-soft sm:p-8">
@@ -5130,8 +5146,8 @@ function Profile({
             <h2 className="mt-3 text-3xl font-semibold">{isOwnProfile ? "Tes Trips" : `Trips de ${profileUser.name}`}</h2>
             <p className="mt-2 text-forest-700">
               {isOwnProfile
-                ? "Retrouve ici tes Trips créées, rejointes, intéressées ou demandées."
-                : "Les Trips visibles publiées par ce membre apparaissent ici."}
+                ? "Retrouve ici tes Trips créés, rejoints, intéressés ou demandés."
+                : "Les Trips visibles publiés par ce membre apparaissent ici."}
             </p>
           </div>
           <span className="rounded-full bg-forest-50 px-4 py-2 text-sm font-bold text-forest-800">{profileTrips.length} Trip{profileTrips.length > 1 ? "s" : ""}</span>
@@ -5151,10 +5167,10 @@ function Profile({
           </div>
         ) : (
           <div className="mt-6 rounded-[1.5rem] bg-forest-50 p-6 text-center">
-            <h3 className="text-xl font-semibold">{isOwnProfile ? "Aucune Trip liée à ton profil pour le moment." : "Aucune Trip publique pour le moment."}</h3>
+            <h3 className="text-xl font-semibold">{isOwnProfile ? "Aucun Trip lié à ton profil pour le moment." : "Aucun Trip public pour le moment."}</h3>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-forest-700">
               {isOwnProfile
-                ? "Crée une Trip, rejoins une idée de voyage ou envoie une demande pour la voir apparaître ici."
+                ? "Crée un Trip, rejoins une idée de voyage ou envoie une demande pour la voir apparaître ici."
                 : "Ce membre n'a pas encore publié de Trip visible."}
             </p>
           </div>
@@ -5229,25 +5245,87 @@ function ProfilePublicCard({
   profileUser,
   isOwnProfile,
   createdTripsCount,
-  onUpdateProfile
+  onUpdateProfile,
+  onUploadAvatar
 }: {
   profileRecord: UserProfileRecord;
   profileUser: UserProfile;
   isOwnProfile: boolean;
   createdTripsCount: number;
   onUpdateProfile: (updates: UserProfileUpdate) => Promise<UserProfileRecord>;
+  onUploadAvatar: (file: File) => Promise<UserProfileRecord>;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState<ProfileFormState>(() => profileRecordToForm(profileRecord));
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState("");
   const [feedback, setFeedback] = useState("");
   const [saving, setSaving] = useState(false);
+  const [avatarSaving, setAvatarSaving] = useState(false);
 
   useEffect(() => {
     if (!isEditing) setForm(profileRecordToForm(profileRecord));
   }, [isEditing, profileRecord.id, profileRecord.updated_at]);
 
+  useEffect(() => {
+    setAvatarFile(null);
+    setAvatarPreview("");
+  }, [profileRecord.id]);
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreview.startsWith("blob:")) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
+
   const updateField = (field: keyof ProfileFormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const selectAvatar = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    const validationError = validateProfileAvatarFile(file);
+    if (validationError) {
+      setFeedback(validationError);
+      return;
+    }
+
+    if (avatarPreview.startsWith("blob:")) URL.revokeObjectURL(avatarPreview);
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+    setFeedback("Prévisualisation prête. Enregistre la photo pour la publier.");
+  };
+
+  const cancelAvatarSelection = () => {
+    if (avatarPreview.startsWith("blob:")) URL.revokeObjectURL(avatarPreview);
+    setAvatarFile(null);
+    setAvatarPreview("");
+    setFeedback("");
+  };
+
+  const saveAvatar = async () => {
+    if (!avatarFile) {
+      setFeedback("Choisis d'abord une photo.");
+      return;
+    }
+
+    setAvatarSaving(true);
+    setFeedback("");
+
+    try {
+      const nextProfile = await onUploadAvatar(avatarFile);
+      setForm(profileRecordToForm(nextProfile));
+      setAvatarFile(null);
+      setAvatarPreview("");
+      setFeedback("Photo enregistrée.");
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Impossible d'envoyer la photo.");
+    } finally {
+      setAvatarSaving(false);
+    }
   };
 
   const saveProfile = async () => {
@@ -5276,7 +5354,29 @@ function ProfilePublicCard({
       <div className="h-44 bg-[url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80')] bg-cover bg-center sm:h-56" />
       <div className="grid gap-8 p-5 sm:p-8 lg:grid-cols-[0.85fr_1.15fr]">
         <div>
-          <img className="-mt-20 h-28 w-28 rounded-[1.5rem] border-4 border-white object-cover shadow-soft sm:h-32 sm:w-32" src={profileUser.photo_url} alt={profileUser.name} />
+          <img className="-mt-20 h-28 w-28 rounded-[1.5rem] border-4 border-white object-cover shadow-soft sm:h-32 sm:w-32" src={(isOwnProfile && avatarPreview) || profileUser.photo_url} alt={profileUser.name} />
+          {isOwnProfile && (
+            <div className="mt-4 rounded-[1.25rem] bg-forest-50 p-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-forest-800 shadow-sm transition hover:bg-forest-100">
+                  <Camera size={16} />
+                  {profileRecord.avatar_url ? "Modifier ma photo" : "Ajouter une photo"}
+                  <input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" onChange={selectAvatar} />
+                </label>
+                {avatarFile && (
+                  <>
+                    <button className="btn-primary py-2 text-sm disabled:cursor-wait disabled:opacity-60" disabled={avatarSaving} onClick={saveAvatar}>
+                      {avatarSaving ? "Envoi..." : "Enregistrer la photo"}
+                    </button>
+                    <button className="btn-secondary py-2 text-sm" disabled={avatarSaving} onClick={cancelAvatarSelection}>
+                      Annuler
+                    </button>
+                  </>
+                )}
+              </div>
+              <p className="mt-2 text-xs font-semibold text-forest-600">JPG, PNG ou WebP. Maximum 5 Mo.</p>
+            </div>
+          )}
           <div className="mt-5 flex flex-wrap items-center gap-2">
             <h2 className="text-3xl font-semibold sm:text-4xl">{profileUser.name}</h2>
             {profileUser.verified && <BadgeCheck className="text-forest-700" size={24} />}
@@ -5302,7 +5402,6 @@ function ProfilePublicCard({
               <ProfileInput label="Budget" value={form.budget_range} onChange={(value) => updateField("budget_range", value)} />
               <ProfileInput label="Style d'aventure" value={form.adventure_style} onChange={(value) => updateField("adventure_style", value)} />
               <ProfileInput label="Trips passées" value={form.past_trips} type="number" onChange={(value) => updateField("past_trips", value)} />
-              <ProfileInput label="URL photo" value={form.avatar_url} onChange={(value) => updateField("avatar_url", value)} />
             </div>
             <ProfileTextarea label="Bio" value={form.bio} onChange={(value) => updateField("bio", value)} />
             <ProfileTextarea label="Ambiances préférées" hint="Sépare les valeurs par des virgules." value={form.preferred_ambiences} onChange={(value) => updateField("preferred_ambiences", value)} />
@@ -5340,7 +5439,7 @@ function ProfilePublicCard({
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               <Metric label="Trips passées" value={`${profileUser.past_trips}`} />
-              <Metric label="Trips publiées" value={`${createdTripsCount}`} />
+              <Metric label="Trips publiés" value={`${createdTripsCount}`} />
               <Metric label="Badges" value={`${profileUser.badges.length}`} />
             </div>
           </div>

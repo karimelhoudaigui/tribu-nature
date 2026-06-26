@@ -22,15 +22,15 @@ Resultat attendu :
 
 ## 2. Demande pour rejoindre un Trip utilisateur
 
-1. Samy cree une Trip depuis `Creer une Trip`.
-2. Karim ouvre cette Trip et clique sur le bouton pour demander a rejoindre.
+1. Samy cree un Trip depuis `Creer un Trip`.
+2. Karim ouvre ce Trip et clique sur le bouton pour demander a rejoindre.
 3. Samy doit recevoir une notification.
 4. Samy ouvre la notification.
 5. Samy consulte le profil de Karim depuis la notification.
 6. Samy accepte la demande.
 
 Resultat attendu :
-- Karim apparait dans les participants de la Trip.
+- Karim apparait dans les participants du Trip.
 - Karim est ajoute dans la conversation de groupe du Trip.
 - La notification peut etre marquee comme traitee.
 - Apres refresh, le statut reste correct.
@@ -66,9 +66,9 @@ Resultat attendu :
 
 ## 5. Mes Trips
 
-1. Utiliser un compte qui est deja interesse ou participant d'une Trip.
+1. Utiliser un compte qui est deja interesse ou participant d'un Trip.
 2. Aller dans `Mes Trips`.
-3. Cliquer sur la card de cette Trip.
+3. Cliquer sur la card de ce Trip.
 
 Resultat attendu :
 - Si l'utilisateur est deja interesse ou participant, la card ouvre directement la conversation.
