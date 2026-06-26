@@ -1,10 +1,12 @@
-import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react";
+import { type Dispatch, type SetStateAction, type TouchEvent, useEffect, useMemo, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import {
   BadgeCheck,
   Bell,
   CalendarDays,
   Compass,
+  Copy,
+  ExternalLink,
   Heart,
   HeartHandshake,
   Home,
@@ -12,9 +14,11 @@ import {
   MessageCircle,
   Mountain,
   Send,
+  Share2,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
+  Trash2,
   Users,
   X
 } from "lucide-react";
@@ -36,6 +40,7 @@ import {
 import { createTrip, hasSupabaseCatalogConfig, loadTripCatalog, type TripCatalog } from "./services/tripCatalogService";
 import {
   createNotification,
+  deleteNotification,
   getMyNotifications,
   markNotificationAsRead,
   type NotificationRecord
@@ -83,6 +88,7 @@ import {
 import type { Activity, MockLocalActivity, OnboardingProfile, Trip, UserProfile } from "./types";
 
 type Page = "landing" | "dashboard" | "create-trip" | "trip" | "conversation" | "communaute" | "profil" | "prestataires" | "securite";
+type CommunityTab = "compatibles" | "tribe" | "requests";
 
 type Conversation = {
   id: string;
@@ -656,7 +662,12 @@ function App() {
   const [tribeRequests, setTribeRequests] = useState<TribeRequestBundle>({ received: [], sent: [], accepted: [] });
   const [tripInvitations, setTripInvitations] = useState<TripInvitation[]>([]);
   const [createTripSeed, setCreateTripSeed] = useState<Trip | null>(null);
+  const [shareTrip, setShareTrip] = useState<Trip | null>(null);
+  const [communityInitialTab, setCommunityInitialTab] = useState<CommunityTab>("compatibles");
+  const [tribeUnreadMessageCount, setTribeUnreadMessageCount] = useState(0);
+  const [initialTripLinkHandled, setInitialTripLinkHandled] = useState(false);
   const [socialNotice, setSocialNotice] = useState("");
+  const [catalogLoaded, setCatalogLoaded] = useState(!hasSupabaseCatalogConfig());
   const [catalog, setCatalog] = useState<TripCatalog>(() => ({
     trips: localTrips,
     activities: localActivities,
@@ -696,12 +707,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!hasSupabaseCatalogConfig()) return;
+    if (!hasSupabaseCatalogConfig()) {
+      setCatalogLoaded(true);
+      return;
+    }
 
     let mounted = true;
-    loadTripCatalog().then((nextCatalog) => {
-      if (mounted) setCatalog(nextCatalog);
-    });
+    loadTripCatalog()
+      .then((nextCatalog) => {
+        if (mounted) setCatalog(nextCatalog);
+      })
+      .finally(() => {
+        if (mounted) setCatalogLoaded(true);
+      });
 
     return () => {
       mounted = false;
@@ -725,6 +743,13 @@ function App() {
       setTribeProfiles(profiles);
       setTribeRequests(requests);
       setTripInvitations(invitations);
+
+      try {
+        const unreadTribeMessages = await getUnreadTribeMessageCount(session.user.id, requests.accepted, session.access_token);
+        setTribeUnreadMessageCount(unreadTribeMessages);
+      } catch (error) {
+        console.warn("Compteur de messages Tribu indisponible.", error);
+      }
     } catch (error) {
       console.warn("Données sociales indisponibles.", error);
     }
@@ -738,6 +763,7 @@ function App() {
       setTribeProfiles([]);
       setTribeRequests({ received: [], sent: [], accepted: [] });
       setTripInvitations([]);
+      setTribeUnreadMessageCount(0);
       return;
     }
 
@@ -822,6 +848,43 @@ function App() {
   const profilePageUser = profilePageRecord ? profileRecordToUserProfile(profilePageRecord) : currentUser;
   const isOwnProfilePage = !selectedProfileId || selectedProfileId === currentProfile?.id;
   const validatedMembers = tripMemberProfiles[selectedTrip.id] ?? getTripMembers(selectedTrip);
+  const acceptedTribeMemberIds = useMemo(() => new Set(
+    tribeRequests.accepted.map((request) => request.requester_id === currentUser.id ? request.receiver_id : request.requester_id)
+  ), [currentUser.id, tribeRequests.accepted]);
+  const tribeShareMembers = useMemo(
+    () => tribeProfiles
+      .filter((profile) => acceptedTribeMemberIds.has(profile.id))
+      .map(profileRecordToUserProfile),
+    [acceptedTribeMemberIds, tribeProfiles]
+  );
+  const getAcceptedTribeConnection = (memberId: string) => tribeRequests.accepted.find((request) =>
+    (request.requester_id === currentUser.id && request.receiver_id === memberId) ||
+    (request.receiver_id === currentUser.id && request.requester_id === memberId)
+  );
+  const getKnownProfileRecord = (profileId?: string | null) => {
+    if (!profileId) return null;
+    return [currentProfile, ...tribeProfiles].find((profile) => profile?.id === profileId) ?? null;
+  };
+  useEffect(() => {
+    if (initialTripLinkHandled || availableTrips.length === 0 || typeof window === "undefined") return;
+
+    const sharedTripId = new URLSearchParams(window.location.search).get("trip") ?? window.location.hash.match(/trip-([^&]+)/)?.[1] ?? "";
+    if (!sharedTripId) {
+      setInitialTripLinkHandled(true);
+      return;
+    }
+
+    const sharedTrip = availableTrips.find((trip) => trip.id === sharedTripId);
+    if (!sharedTrip && !catalogLoaded) return;
+
+    if (sharedTrip) {
+      setSelectedTripId(sharedTrip.id);
+      setPage("trip");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    setInitialTripLinkHandled(true);
+  }, [availableTrips, catalogLoaded, initialTripLinkHandled]);
   const go = (next: Page, options?: { keepSelectedProfile?: boolean }) => {
     if (next !== "profil" || !options?.keepSelectedProfile) {
       setSelectedProfileId(null);
@@ -846,6 +909,13 @@ function App() {
     setSelectedProfileId(profileId && profileId !== currentProfile?.id ? profileId : null);
     setNotificationsOpen(false);
     go("profil", { keepSelectedProfile: true });
+  };
+  const openTribeInbox = () => {
+    if (currentProfile?.id) markTribeMessagesSeen(currentProfile.id);
+    setCommunityInitialTab("tribe");
+    setTribeUnreadMessageCount(0);
+    setNotificationsOpen(false);
+    go("communaute");
   };
   const loadTripMembers = async (trip: Trip, session = authSession) => {
     if (!session) return;
@@ -906,6 +976,7 @@ function App() {
     setTribeProfiles([]);
     setTribeRequests({ received: [], sent: [], accepted: [] });
     setTripInvitations([]);
+    setTribeUnreadMessageCount(0);
     setSocialNotice("");
   };
   const requireAuth = (prompt: string) => {
@@ -1146,6 +1217,35 @@ function App() {
       console.warn("Notification non marquée comme lue.", error);
     }
   };
+  const deleteNotificationFlow = async (notificationId: string) => {
+    if (!authSession) return;
+    setNotifications((prev) => prev.filter((notification) => notification.id !== notificationId));
+    try {
+      await deleteNotification(notificationId, authSession.access_token);
+    } catch (error) {
+      console.warn("Notification non supprimée.", error);
+      await refreshSocialData(authSession);
+    }
+  };
+  const shareTripWithTribeMember = async (trip: Trip, member: UserProfile) => {
+    const session = requireAuth("Connecte-toi pour partager une Trip avec ta tribu.");
+    if (!session || !currentProfile) return;
+
+    const connection = getAcceptedTribeConnection(member.id);
+    if (!connection) {
+      setSocialNotice(`${member.name} doit faire partie de ta tribu pour recevoir ce partage.`);
+      return;
+    }
+
+    try {
+      await sendTribeMessage(connection.id, currentProfile.id, buildTripShareMessage(trip), session.access_token);
+      setShareTrip(null);
+      setSocialNotice(`Trip partagée à ${member.name} dans votre conversation.`);
+    } catch (error) {
+      console.error("Partage Tribu impossible.", error);
+      setSocialNotice(error instanceof Error ? error.message : "Impossible de partager cette Trip dans ta tribu.");
+    }
+  };
   const formalizeCatalogTrip = (trip: Trip) => {
     setCreateTripSeed(trip);
     setSelectedTripId(trip.id);
@@ -1310,8 +1410,10 @@ function App() {
         authLoading={authLoading}
         currentProfile={currentProfile}
         unreadNotificationCount={unreadNotificationCount}
+        unreadMessageCount={tribeUnreadMessageCount}
         onAuthClick={() => openAuthModal("Connecte-toi pour accéder à ton profil et aux Trips.")}
         onNotificationsClick={() => setNotificationsOpen((value) => !value)}
+        onMessagesClick={openTribeInbox}
         onSignOut={handleSignOut}
       />
       <main>
@@ -1328,6 +1430,8 @@ function App() {
             onUpdateTripInvitation={updateTripInvitation}
             onViewProfile={openProfile}
             onMarkRead={markNotificationRead}
+            onDeleteNotification={deleteNotificationFlow}
+            onClose={() => setNotificationsOpen(false)}
           />
         )}
         {socialNotice && <div className="container-page pt-4"><div className="rounded-[1rem] bg-skysoft px-4 py-3 text-sm font-semibold text-forest-900">{socialNotice}</div></div>}
@@ -1346,7 +1450,7 @@ function App() {
           />
         )}
         {page === "create-trip" && <CreateTripPage proposerName={currentUser.name} initialTrip={createTripSeed} onPublish={publishCommunityTrip} />}
-        {page === "trip" && <TripDetail trip={selectedTrip} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} />}
+        {page === "trip" && <TripDetail trip={selectedTrip} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} onShareTrip={setShareTrip} creatorProfile={getKnownProfileRecord(selectedTrip.creator_id)} onViewProfile={openProfile} />}
         {page === "conversation" && <ConversationPage conversation={conversation} go={go} currentUser={currentUser} accessToken={authSession?.access_token} isAuthenticated={isAuthenticated} onRequireAuth={() => openAuthModal("Connecte-toi pour écrire dans la conversation.")} onFormalizeTrip={formalizeCatalogTrip} />}
         {page === "communaute" && (
           <Community
@@ -1359,7 +1463,12 @@ function App() {
             joinRequests={userTripActions?.joinRequests ?? []}
             accessToken={authSession?.access_token}
             isAuthenticated={isAuthenticated}
+            initialTab={communityInitialTab}
             onRequireAuth={() => openAuthModal("Connecte-toi pour contacter ou inviter des membres.")}
+            onTribeOpened={() => {
+              if (currentProfile?.id) markTribeMessagesSeen(currentProfile.id);
+              setTribeUnreadMessageCount(0);
+            }}
             onSendTribeRequest={sendTribeConnectionRequest}
             onUpdateTribeConnection={updateTribeConnection}
             onAcceptJoinRequest={acceptJoinRequestFlow}
@@ -1389,6 +1498,14 @@ function App() {
       </main>
       <Footer go={go} />
       {authModalOpen && <AuthModal prompt={authPrompt} onClose={() => setAuthModalOpen(false)} onAuthenticated={handleAuthSuccess} />}
+      {shareTrip && (
+        <ShareTripModal
+          trip={shareTrip}
+          tribeMembers={tribeShareMembers}
+          onClose={() => setShareTrip(null)}
+          onShareWithTribeMember={(member) => shareTripWithTribeMember(shareTrip, member)}
+        />
+      )}
     </div>
   );
 }
@@ -1401,8 +1518,10 @@ function Header({
   authLoading,
   currentProfile,
   unreadNotificationCount,
+  unreadMessageCount,
   onAuthClick,
   onNotificationsClick,
+  onMessagesClick,
   onSignOut
 }: {
   page: Page;
@@ -1412,10 +1531,14 @@ function Header({
   authLoading: boolean;
   currentProfile: UserProfileRecord | null;
   unreadNotificationCount: number;
+  unreadMessageCount: number;
   onAuthClick: () => void;
   onNotificationsClick: () => void;
+  onMessagesClick: () => void;
   onSignOut: () => void;
 }) {
+  const visibleNavItems = currentProfile ? navItems.filter((item) => item.page !== "profil") : navItems;
+
   return (
     <header className="sticky top-0 z-50 border-b border-forest-100 bg-cream/90 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between">
@@ -1426,7 +1549,7 @@ function Header({
           <span>Tribu Nature</span>
         </button>
         <nav className="hidden items-center gap-1 lg:flex">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <button
               key={item.page}
               onClick={() => go(item.page)}
@@ -1440,6 +1563,14 @@ function Header({
           <button className="btn-primary py-2" onClick={() => go("create-trip")}>Créer une Trip</button>
           {currentProfile ? (
             <div className="flex items-center gap-2">
+              <button className="relative rounded-full bg-white p-2 text-forest-800 shadow-sm transition hover:bg-forest-50" onClick={onMessagesClick} aria-label="Messages">
+                <MessageCircle size={18} />
+                {unreadMessageCount > 0 && (
+                  <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-forest-800 px-1 text-[10px] font-bold text-white">
+                    {unreadMessageCount}
+                  </span>
+                )}
+              </button>
               <button className="relative rounded-full bg-white p-2 text-forest-800 shadow-sm transition hover:bg-forest-50" onClick={onNotificationsClick} aria-label="Notifications">
                 <Bell size={18} />
                 {unreadNotificationCount > 0 && (
@@ -1466,13 +1597,14 @@ function Header({
       {menuOpen && (
         <div className="container-page border-t border-forest-100 py-3 lg:hidden">
           <div className="grid gap-2">
-            {[...navItems, { page: "create-trip" as Page, label: "Créer une Trip" }].map((item) => (
+            {[...visibleNavItems, { page: "create-trip" as Page, label: "Créer une Trip" }].map((item) => (
               <button key={item.page} className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={() => go(item.page)}>
                 {item.label}
               </button>
             ))}
             {currentProfile ? (
               <>
+                <button className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={onMessagesClick}>Messages ({unreadMessageCount})</button>
                 <button className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={onNotificationsClick}>Notifications ({unreadNotificationCount})</button>
                 <button className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={() => go("profil")}>{currentProfile.display_name}</button>
                 <button className="rounded-lg bg-forest-800 px-4 py-3 text-left font-medium text-white" onClick={onSignOut}>Déconnexion</button>
@@ -1611,7 +1743,9 @@ function NotificationPanel({
   onRejectJoinRequest,
   onUpdateTripInvitation,
   onViewProfile,
-  onMarkRead
+  onMarkRead,
+  onDeleteNotification,
+  onClose
 }: {
   notifications: NotificationRecord[];
   trips: Trip[];
@@ -1624,6 +1758,8 @@ function NotificationPanel({
   onUpdateTripInvitation: (invitationId: string, action: "accept" | "reject") => void | Promise<void>;
   onViewProfile: (profileId: string) => void;
   onMarkRead: (notificationId: string) => void | Promise<void>;
+  onDeleteNotification: (notificationId: string) => void | Promise<void>;
+  onClose: () => void;
 }) {
   const pendingJoinRequests = joinRequests.filter((request) => request.creator_id === currentUserId && request.status === "pending");
   const notifiedJoinRequestIds = new Set(
@@ -1636,16 +1772,21 @@ function NotificationPanel({
   const findProfile = (id: string) => profiles.find((profile) => profile.id === id);
 
   return (
-    <section className="container-page pt-4">
-      <div className="ml-auto w-full max-w-xl rounded-[1.5rem] bg-white p-4 shadow-soft">
+    <section className="fixed right-4 top-20 z-[70] w-[calc(100%-2rem)] max-w-xl">
+      <div className="ml-auto w-full rounded-[1.5rem] bg-white p-4 shadow-soft ring-1 ring-forest-100">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="pill">Notifications</p>
             <h2 className="mt-2 text-2xl font-semibold">Ce qui demande ton attention</h2>
           </div>
-          <span className="rounded-full bg-forest-50 px-3 py-1 text-xs font-bold text-forest-700">{notifications.length + pendingJoinRequestsWithoutNotification.length}</span>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-forest-50 px-3 py-1 text-xs font-bold text-forest-700">{notifications.length + pendingJoinRequestsWithoutNotification.length}</span>
+            <button className="rounded-full bg-forest-50 p-2 transition hover:bg-forest-100" onClick={onClose} aria-label="Fermer les notifications">
+              <X size={16} />
+            </button>
+          </div>
         </div>
-        <div className="mt-4 grid max-h-[520px] gap-3 overflow-y-auto pr-1">
+        <div className="mt-4 grid max-h-[min(620px,calc(100vh-9rem))] gap-3 overflow-y-auto pr-1">
           {pendingJoinRequestsWithoutNotification.map((request) => {
             const trip = findTrip(request.trip_id);
             const profile = findProfile(request.requester_id);
@@ -1682,7 +1823,7 @@ function NotificationPanel({
                 )
               : undefined;
             return (
-              <article className={`rounded-[1rem] border p-4 ${notification.read_at ? "border-forest-100 bg-white" : "border-sun/40 bg-sun/10"}`} key={notification.id}>
+              <SwipeToDeleteNotification key={notification.id} notification={notification} onDelete={() => onDeleteNotification(notification.id)}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold">{notification.title}</p>
@@ -1718,12 +1859,77 @@ function NotificationPanel({
                     <button className="btn-secondary py-2" onClick={() => onUpdateTripInvitation(invitation.id, "reject")}>Refuser</button>
                   </div>
                 )}
-              </article>
+              </SwipeToDeleteNotification>
             );
           })}
         </div>
       </div>
     </section>
+  );
+}
+
+function SwipeToDeleteNotification({
+  notification,
+  onDelete,
+  children
+}: {
+  notification: NotificationRecord;
+  onDelete: () => void | Promise<void>;
+  children: React.ReactNode;
+}) {
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [offsetX, setOffsetX] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const deleteCurrent = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+    await onDelete();
+  };
+
+  const handleTouchStart = (event: TouchEvent<HTMLElement>) => {
+    setTouchStartX(event.touches[0]?.clientX ?? null);
+  };
+
+  const handleTouchMove = (event: TouchEvent<HTMLElement>) => {
+    if (touchStartX === null) return;
+    const nextOffset = Math.min(0, event.touches[0].clientX - touchStartX);
+    setOffsetX(Math.max(nextOffset, -104));
+  };
+
+  const handleTouchEnd = () => {
+    if (offsetX <= -72) {
+      deleteCurrent();
+      return;
+    }
+
+    setTouchStartX(null);
+    setOffsetX(0);
+  };
+
+  return (
+    <div className="relative overflow-hidden rounded-[1rem]">
+      <div className="absolute inset-y-0 right-0 flex w-28 items-center justify-center bg-red-500 text-sm font-bold text-white">
+        Supprimer
+      </div>
+      <article
+        className={`relative border p-4 pr-12 transition ${notification.read_at ? "border-forest-100 bg-white" : "border-sun/40 bg-sun/10"}`}
+        style={{ transform: `translateX(${offsetX}px)` }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <button
+          className="absolute right-3 top-3 rounded-full bg-white/85 p-2 text-forest-700 shadow-sm transition hover:bg-red-50 hover:text-red-600"
+          onClick={deleteCurrent}
+          disabled={isDeleting}
+          aria-label="Supprimer cette notification"
+        >
+          <Trash2 size={15} />
+        </button>
+        {children}
+      </article>
+    </div>
   );
 }
 
@@ -3377,7 +3583,10 @@ function TripDetail({
   joinTrip,
   userTripActions,
   isFavorite,
-  onToggleFavorite
+  onToggleFavorite,
+  onShareTrip,
+  creatorProfile,
+  onViewProfile
 }: {
   trip: Trip;
   catalogActivities: MockLocalActivity[];
@@ -3386,6 +3595,9 @@ function TripDetail({
   userTripActions: UserTripActions | null;
   isFavorite: boolean;
   onToggleFavorite: (trip: Trip) => void | Promise<void>;
+  onShareTrip: (trip: Trip) => void;
+  creatorProfile: UserProfileRecord | null;
+  onViewProfile: (profileId: string) => void;
 }) {
   const tripActivities = getTripActivities(trip, catalogActivities);
   const actionState = getTripActionState(trip, userTripActions);
@@ -3407,14 +3619,17 @@ function TripDetail({
               <button className="rounded-full bg-white/18 px-5 py-3 font-semibold text-white backdrop-blur transition hover:bg-white/25" onClick={() => onToggleFavorite(trip)}>
                 {isFavorite ? "Sauvegardée" : "Sauvegarder"}
               </button>
-              <button className="rounded-full bg-white/18 px-5 py-3 font-semibold text-white backdrop-blur transition hover:bg-white/25">Partager</button>
+              <button className="inline-flex items-center gap-2 rounded-full bg-white/18 px-5 py-3 font-semibold text-white backdrop-blur transition hover:bg-white/25" onClick={() => onShareTrip(trip)}>
+                <Share2 size={18} />
+                Partager
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       <section className="container-page space-y-10 py-10">
-        <TripTypeSection trip={trip} />
+        <TripTypeSection trip={trip} creatorProfile={creatorProfile} onViewProfile={onViewProfile} />
         {trip.community && (
           <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -3441,8 +3656,17 @@ function TripDetail({
   );
 }
 
-function TripTypeSection({ trip }: { trip: Trip }) {
+function TripTypeSection({
+  trip,
+  creatorProfile,
+  onViewProfile
+}: {
+  trip: Trip;
+  creatorProfile: UserProfileRecord | null;
+  onViewProfile: (profileId: string) => void;
+}) {
   const isUserProject = getTripCardType(trip) === "user_project";
+  const creatorUser = creatorProfile ? profileRecordToUserProfile(creatorProfile) : null;
   return (
     <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -3456,7 +3680,23 @@ function TripTypeSection({ trip }: { trip: Trip }) {
           </p>
         </div>
         <div className="grid gap-2 text-sm font-semibold text-forest-700 lg:min-w-64">
-          {isUserProject && <span>Créé par : {trip.creator_name ?? trip.created_by ?? "un membre"}</span>}
+          {isUserProject && (
+            creatorUser ? (
+              <button
+                className="mb-2 flex items-center gap-3 rounded-[1rem] bg-forest-50 p-3 text-left transition hover:bg-forest-100"
+                onClick={() => onViewProfile(creatorUser.id)}
+              >
+                <img className="h-12 w-12 rounded-full object-cover" src={creatorUser.photo_url} alt={creatorUser.name} />
+                <span>
+                  <span className="block text-xs text-forest-500">Créé par</span>
+                  <span className="block text-base text-forest-900">{creatorUser.name}</span>
+                  <span className="block text-xs text-forest-600">{creatorUser.city}</span>
+                </span>
+              </button>
+            ) : (
+              <span>Créé par : {trip.creator_name ?? trip.created_by ?? "un membre"}</span>
+            )
+          )}
           {trip.departure_city && <span>Départ : {trip.departure_city}</span>}
           <span>Statut : {getPlanningStatusLabel(trip.planning_status ?? (isUserProject ? "planned" : "idea"))}</span>
           <span>{getTripDateLabel(trip)}</span>
@@ -3793,7 +4033,9 @@ function Community({
   joinRequests,
   accessToken,
   isAuthenticated,
+  initialTab,
   onRequireAuth,
+  onTribeOpened,
   onSendTribeRequest,
   onUpdateTribeConnection,
   onAcceptJoinRequest,
@@ -3811,7 +4053,9 @@ function Community({
   joinRequests: UserTripActions["joinRequests"];
   accessToken?: string;
   isAuthenticated: boolean;
+  initialTab: CommunityTab;
   onRequireAuth: () => void;
+  onTribeOpened: () => void;
   onSendTribeRequest: (member: UserProfile) => void | Promise<void>;
   onUpdateTribeConnection: (connectionId: string, action: "accept" | "reject" | "cancel") => void | Promise<void>;
   onAcceptJoinRequest: (requestId: string) => void | Promise<void>;
@@ -3820,7 +4064,7 @@ function Community({
   onViewProfile: (profileId: string) => void;
   onInviteToTrip: (trip: Trip, member: UserProfile) => void | Promise<void>;
 }) {
-  const [activeTab, setActiveTab] = useState<"compatibles" | "tribe" | "requests">("compatibles");
+  const [activeTab, setActiveTab] = useState<CommunityTab>(initialTab);
   const [activeTribeMemberId, setActiveTribeMemberId] = useState<string | null>(null);
   const [inviteTarget, setInviteTarget] = useState<CompatibleTribeProfile | null>(null);
   const profileUsers = useMemo(() => {
@@ -3884,7 +4128,12 @@ function Community({
   };
 
   useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
+
+  useEffect(() => {
     if (activeTab !== "tribe") return;
+    onTribeOpened();
     if (myTribePeople.length === 0) {
       setActiveTribeMemberId(null);
       return;
@@ -3935,7 +4184,11 @@ function Community({
           <button
             className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${activeTab === key ? "bg-forest-800 text-white" : "bg-forest-50 text-forest-800 hover:bg-forest-100"}`}
             key={key}
-            onClick={() => setActiveTab(key as typeof activeTab)}
+            onClick={() => {
+              const nextTab = key as CommunityTab;
+              setActiveTab(nextTab);
+              if (nextTab === "tribe") onTribeOpened();
+            }}
           >
             {label}
           </button>
@@ -4544,6 +4797,183 @@ function TribeInviteModal({
       </div>
     </div>
   );
+}
+
+function ShareTripModal({
+  trip,
+  tribeMembers,
+  onClose,
+  onShareWithTribeMember
+}: {
+  trip: Trip;
+  tribeMembers: UserProfile[];
+  onClose: () => void;
+  onShareWithTribeMember: (member: UserProfile) => void | Promise<void>;
+}) {
+  const [feedback, setFeedback] = useState("");
+  const shareUrl = getTripShareUrl(trip);
+  const shareText = buildTripShareMessage(trip);
+
+  const copyLink = async () => {
+    await copyTextToClipboard(shareUrl);
+    setFeedback("Lien copié. Tu peux le coller dans Instagram, WhatsApp, Facebook ou ailleurs.");
+  };
+
+  const nativeShare = async () => {
+    if (!navigator.share) {
+      await copyLink();
+      return;
+    }
+
+    try {
+      await navigator.share({
+        title: trip.title,
+        text: shareText,
+        url: shareUrl
+      });
+      setFeedback("Partage ouvert.");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      await copyLink();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[80] grid place-items-center bg-forest-900/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-3xl overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
+        <div className="flex items-start justify-between gap-4 border-b border-forest-100 p-5">
+          <div>
+            <p className="pill">Partager la Trip</p>
+            <h2 className="mt-3 text-2xl font-semibold">{trip.title}</h2>
+            <p className="mt-2 text-sm leading-6 text-forest-700">Envoie-la à ta tribu ou copie le lien pour la partager sur une autre app.</p>
+          </div>
+          <button className="rounded-full bg-forest-50 p-2 transition hover:bg-forest-100" onClick={onClose} aria-label="Fermer">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="grid gap-5 p-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <section className="rounded-[1.25rem] bg-forest-50 p-4">
+            <img className="h-44 w-full rounded-[1rem] object-cover" src={trip.image_url} alt={trip.title} />
+            <h3 className="mt-4 text-xl font-semibold">{trip.title}</h3>
+            <p className="mt-1 text-sm font-semibold text-forest-700">{trip.destination} · {getTripDateLabel(trip)}</p>
+            <div className="mt-4 grid gap-2">
+              <button className="btn-primary justify-center" onClick={nativeShare}>
+                <Share2 size={18} />
+                Partager via mon téléphone
+              </button>
+              <button className="btn-secondary justify-center" onClick={copyLink}>
+                <Copy size={18} />
+                Copier le lien
+              </button>
+              <a
+                className="btn-secondary justify-center"
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ExternalLink size={18} />
+                Partager sur Facebook
+              </a>
+            </div>
+            {feedback && <p className="mt-3 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-forest-800">{feedback}</p>}
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-forest-700">Ma tribu</p>
+                <h3 className="text-2xl font-semibold">Envoyer en message privé</h3>
+              </div>
+              <span className="rounded-full bg-forest-50 px-3 py-1 text-xs font-bold text-forest-700">{tribeMembers.length}</span>
+            </div>
+            <div className="mt-4 grid max-h-[430px] gap-3 overflow-y-auto pr-1">
+              {tribeMembers.length === 0 && (
+                <div className="rounded-[1rem] bg-forest-50 p-4 text-sm leading-6 text-forest-700">
+                  Ajoute d'abord des personnes à ta tribu pour pouvoir leur partager une Trip directement en message privé.
+                </div>
+              )}
+              {tribeMembers.map((member) => (
+                <button
+                  className="flex items-center gap-3 rounded-[1rem] bg-forest-50 p-3 text-left transition hover:bg-forest-100"
+                  key={member.id}
+                  onClick={() => onShareWithTribeMember(member)}
+                >
+                  <img className="h-12 w-12 rounded-full object-cover" src={member.photo_url} alt={member.name} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">{member.name}</span>
+                    <span className="block truncate text-sm text-forest-700">{member.city} · {member.adventure_style}</span>
+                  </span>
+                  <Send className="text-forest-700" size={18} />
+                </button>
+              ))}
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getTripShareUrl(trip: Trip) {
+  if (typeof window === "undefined") return `?trip=${encodeURIComponent(trip.id)}`;
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("trip", trip.id);
+  url.hash = "";
+  return url.toString();
+}
+
+function buildTripShareMessage(trip: Trip) {
+  return [
+    `Regarde cette Trip : ${trip.title}`,
+    `${trip.destination} · ${getTripDateLabel(trip)} · ${trip.budget_min}-${trip.budget_max} €`,
+    getTripShareUrl(trip)
+  ].join("\n");
+}
+
+async function copyTextToClipboard(value: string) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = value;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
+async function getUnreadTribeMessageCount(userId: string, connections: TribeConnection[], accessToken: string) {
+  const seenAt = getTribeMessagesSeenAt(userId);
+  const messages = await Promise.all(
+    connections.map((connection) => getTribeMessages(connection.id, accessToken).catch(() => [] as TribeMessage[]))
+  );
+
+  return messages.flat().filter((message) => {
+    if (message.sender_id === userId || !message.created_at) return false;
+    return new Date(message.created_at).getTime() > seenAt;
+  }).length;
+}
+
+function getTribeMessagesSeenAt(userId: string) {
+  if (typeof window === "undefined") return 0;
+  const raw = window.localStorage.getItem(getTribeMessagesSeenStorageKey(userId));
+  return raw ? new Date(raw).getTime() || 0 : 0;
+}
+
+function markTribeMessagesSeen(userId: string) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(getTribeMessagesSeenStorageKey(userId), new Date().toISOString());
+}
+
+function getTribeMessagesSeenStorageKey(userId: string) {
+  return `tribu_nature_tribe_messages_seen_at_${userId}`;
 }
 
 function getCompatiblePeople(userProfile: UserProfile, candidates: UserProfile[], availableTrips: Trip[]): CompatibleTribeProfile[] {

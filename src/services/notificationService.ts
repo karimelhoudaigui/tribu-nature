@@ -72,6 +72,14 @@ export async function markNotificationAsRead(notificationId: string, accessToken
   return rows[0];
 }
 
+export async function deleteNotification(notificationId: string, accessToken: string): Promise<void> {
+  await requestRest<void>(`notifications?id=eq.${encodeURIComponent(notificationId)}`, {
+    method: "DELETE",
+    accessToken,
+    prefer: "return=minimal"
+  });
+}
+
 async function requestRest<T>(
   path: string,
   options: {
