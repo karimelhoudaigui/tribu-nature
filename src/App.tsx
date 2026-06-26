@@ -1521,7 +1521,7 @@ function AuthModal({
 
       await onAuthenticated(session);
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : "Connexion impossible pour le moment.");
+      setFeedback(getFriendlyAuthFeedback(error, mode));
     } finally {
       setIsSubmitting(false);
     }
@@ -1570,11 +1570,34 @@ function AuthModal({
         {feedback && <p className="mt-4 rounded-lg bg-skysoft px-4 py-3 text-sm font-semibold text-forest-900">{feedback}</p>}
 
         <button className="btn-primary mt-5 w-full disabled:cursor-wait disabled:opacity-70" disabled={isSubmitting} onClick={submit}>
-          {isSubmitting ? "Connexion..." : mode === "signup" ? "Créer mon compte" : "Me connecter"}
+          {isSubmitting ? mode === "signup" ? "Création..." : "Connexion..." : mode === "signup" ? "Créer mon compte" : "Me connecter"}
         </button>
       </div>
     </div>
   );
+}
+
+function getFriendlyAuthFeedback(error: unknown, mode: "signin" | "signup") {
+  const message = error instanceof Error ? error.message : "";
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("email rate limit") || normalized.includes("rate limit")) {
+    return "La limite d'emails Supabase est atteinte pour le moment. Pour la beta, désactive la confirmation email dans Supabase Auth ou branche un SMTP, puis réessaie dans quelques minutes.";
+  }
+
+  if (normalized.includes("user already registered") || normalized.includes("already registered")) {
+    return "Ce compte existe déjà. Passe sur Se connecter avec le même email et mot de passe.";
+  }
+
+  if (normalized.includes("invalid login credentials")) {
+    return "Email ou mot de passe incorrect. Vérifie les informations ou crée un compte si tu n'en as pas encore.";
+  }
+
+  if (normalized.includes("password") && normalized.includes("6")) {
+    return "Choisis un mot de passe d'au moins 6 caractères.";
+  }
+
+  return message || (mode === "signup" ? "Création de compte impossible pour le moment." : "Connexion impossible pour le moment.");
 }
 
 function NotificationPanel({
