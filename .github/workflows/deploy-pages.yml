@@ -38,9 +38,6 @@ jobs:
           VITE_SUPABASE_URL: "https://nfwyakqrdrsvndpqarmo.supabase.co"
           VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5md3lha3FyZHJzdm5kcHFhcm1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNzc3NjYsImV4cCI6MjA5Nzk1Mzc2Nn0.EfEkQ0KNPHDkpTVal5iQGKeE_urPWw2jEkM-6TkiFaY"
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
