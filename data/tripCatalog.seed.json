@@ -1,0 +1,4379 @@
+{
+  "trips": [
+    {
+      "id": "trip_vallee_aspe_weekend_nature",
+      "title": "Week-end nature en Vallée d’Aspe",
+      "destination": "Vallée d’Aspe, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-07-18 -> 2026-07-19",
+      "duration": "2 jours",
+      "budget_min": 180,
+      "budget_max": 340,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "nature",
+        "calme",
+        "petit groupe",
+        "déconnexion"
+      ],
+      "compatibility_score": 76,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end simple pour découvrir l’Aspe entre lac, village et repas local.",
+      "activities": [
+        "Randonnée au lac d’Estaens",
+        "Rafting sur le gave d’Aspe",
+        "Excursion Somport / Canfranc",
+        "Visite de ferme locale en vallée d’Aspe"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Gare d’Oloron-Sainte-Marie",
+        "Plan B météo: Visite village + repas local + café si météo mauvaise"
+      ],
+      "generated_activity_ids": [
+        "act_vallee_aspe_lac_estaens",
+        "act_vallee_aspe_rafting_gave",
+        "act_vallee_aspe_canfranc_excursion",
+        "act_vallee_aspe_ferme_locale"
+      ]
+    },
+    {
+      "id": "trip_lescun_deconnexion",
+      "title": "Déconnexion montagne à Lescun",
+      "destination": "Lescun, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-07-25 -> 2026-07-26",
+      "duration": "2 jours",
+      "budget_min": 190,
+      "budget_max": 380,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "calme",
+        "contemplatif",
+        "petit groupe",
+        "montagne"
+      ],
+      "compatibility_score": 77,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Séjour lent au pied du cirque de Lescun avec randonnée et patrimoine.",
+      "activities": [
+        "Randonnée dans le cirque de Lescun",
+        "Marche vers les cabanes / secteur Ansabère",
+        "Balade village de Lescun et patrimoine",
+        "Repas local fromage et produits béarnais"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Lescun centre",
+        "Plan B météo: Balade village + produits locaux + lecture paysage"
+      ],
+      "generated_activity_ids": [
+        "act_lescun_cirque_rando",
+        "act_lescun_refuge_ansabere",
+        "act_lescun_village_pierre",
+        "act_lescun_repas_fromage"
+      ]
+    },
+    {
+      "id": "trip_ossau_decouverte_locale",
+      "title": "Découverte locale en Vallée d’Ossau",
+      "destination": "Vallée d’Ossau, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-01 -> 2026-08-02",
+      "duration": "2 jours",
+      "budget_min": 210,
+      "budget_max": 420,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "découverte locale",
+        "calme",
+        "nature",
+        "pastoralisme"
+      ],
+      "compatibility_score": 78,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Trip local entre Laruns, pastoralisme et paysages d’Ossau.",
+      "activities": [
+        "Randonnée des lacs d’Ayous",
+        "Train d’Artouste et lac d’altitude",
+        "Canyoning encadré en vallée d’Ossau",
+        "Découverte pastoralisme et fromage d’Ossau"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Pau gare",
+        "Plan B météo: Musée/local food + thermes selon ouverture"
+      ],
+      "generated_activity_ids": [
+        "act_vallee_ossau_lacs_ayous",
+        "act_vallee_ossau_train_artouste",
+        "act_vallee_ossau_canyoning_ossau",
+        "act_vallee_ossau_fromage_pastoralisme"
+      ]
+    },
+    {
+      "id": "trip_cauterets_randonnee_douce",
+      "title": "Randonnée douce autour de Cauterets",
+      "destination": "Cauterets, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-08 -> 2026-08-09",
+      "duration": "2 jours",
+      "budget_min": 220,
+      "budget_max": 450,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "calme",
+        "contemplatif",
+        "confort",
+        "lac"
+      ],
+      "compatibility_score": 79,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Découverte accessible de Cauterets, Lac de Gaube et bains.",
+      "activities": [
+        "Randonnée au Lac de Gaube",
+        "Pont d’Espagne et cascades",
+        "Bains thermaux après rando",
+        "Panorama du Cirque du Lys"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Gare de Lourdes",
+        "Plan B météo: Bains + visite Cauterets + café si pluie"
+      ],
+      "generated_activity_ids": [
+        "act_cauterets_lac_gaube",
+        "act_cauterets_pont_espagne",
+        "act_cauterets_bains_rocher",
+        "act_cauterets_cirque_lys"
+      ]
+    },
+    {
+      "id": "trip_gavarnie_contemplation",
+      "title": "Séjour contemplation à Gavarnie",
+      "destination": "Gavarnie, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-15 -> 2026-08-16",
+      "duration": "2 jours",
+      "budget_min": 230,
+      "budget_max": 480,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "contemplatif",
+        "calme",
+        "nature",
+        "cirque"
+      ],
+      "compatibility_score": 80,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Trip photo et marche douce autour du cirque de Gavarnie.",
+      "activities": [
+        "Marche classique vers le Cirque de Gavarnie",
+        "Randonnée refuge des Espuguettes",
+        "Photographie grande cascade",
+        "Lecture de paysage glaciaire"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Gavarnie village",
+        "Plan B météo: Visite Luz + lecture paysage couverte"
+      ],
+      "generated_activity_ids": [
+        "act_gavarnie_cirque_classique",
+        "act_gavarnie_refuge_espuguettes",
+        "act_gavarnie_photo_cascade",
+        "act_gavarnie_lecture_paysage"
+      ]
+    },
+    {
+      "id": "trip_pyrenees_rafting_fun",
+      "title": "Week-end fun rafting dans les Pyrénées",
+      "destination": "Vallée d’Aspe, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-22 -> 2026-08-23",
+      "duration": "2 jours",
+      "budget_min": 230,
+      "budget_max": 430,
+      "physical_level": "sportif",
+      "ambience_tags": [
+        "fun",
+        "aventure douce",
+        "groupe",
+        "rafting"
+      ],
+      "compatibility_score": 81,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end plus dynamique avec rafting encadré et repas local.",
+      "activities": [
+        "Randonnée au lac d’Estaens",
+        "Rafting sur le gave d’Aspe",
+        "Excursion Somport / Canfranc",
+        "Visite de ferme locale en vallée d’Aspe"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Oloron gare",
+        "Plan B météo: Ferme locale + visite Canfranc si niveau eau/météo mauvais"
+      ],
+      "generated_activity_ids": [
+        "act_vallee_aspe_lac_estaens",
+        "act_vallee_aspe_rafting_gave",
+        "act_vallee_aspe_canfranc_excursion",
+        "act_vallee_aspe_ferme_locale"
+      ]
+    },
+    {
+      "id": "trip_pays_basque_petit_groupe",
+      "title": "Petit groupe nature au Pays basque intérieur",
+      "destination": "Pays basque intérieur, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-05 -> 2026-09-06",
+      "duration": "2 jours",
+      "budget_min": 180,
+      "budget_max": 360,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "découverte locale",
+        "calme",
+        "petit groupe",
+        "village"
+      ],
+      "compatibility_score": 82,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end villages et collines pour découvrir le Pays basque intérieur.",
+      "activities": [
+        "Villages Ainhoa et Sare",
+        "Randonnée douce vers la Rhune / collines",
+        "Marché local et produits basques",
+        "Initiation culture basque / pelote"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Bayonne gare",
+        "Plan B météo: Marché + visite culturelle si pluie"
+      ],
+      "generated_activity_ids": [
+        "act_pays_basque_interieur_ainhoa_sare",
+        "act_pays_basque_interieur_rando_rhune",
+        "act_pays_basque_interieur_marche_local_basque",
+        "act_pays_basque_interieur_pelote_culture"
+      ]
+    },
+    {
+      "id": "trip_premium_bains_montagne",
+      "title": "Trip premium montagne et bains chauds",
+      "destination": "Loudenvielle, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-12 -> 2026-09-13",
+      "duration": "2 jours",
+      "budget_min": 320,
+      "budget_max": 650,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "premium confort",
+        "calme",
+        "nature",
+        "thermes"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Séjour confort autour du lac de Génos et bains chauds.",
+      "activities": [
+        "Balade autour du lac de Génos",
+        "Bains Balnéa / bien-être",
+        "Parapente encadré en vallée du Louron",
+        "Randonnée Val Louron"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Loudenvielle centre",
+        "Plan B météo: Bains + restaurant local"
+      ],
+      "generated_activity_ids": [
+        "act_loudenvielle_lac_genos",
+        "act_loudenvielle_balnea",
+        "act_loudenvielle_parapente_louron",
+        "act_loudenvielle_rando_val_louron"
+      ]
+    },
+    {
+      "id": "trip_debutant_pyrenees",
+      "title": "Week-end débutant dans les Pyrénées",
+      "destination": "Val d’Azun, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-19 -> 2026-09-20",
+      "duration": "2 jours",
+      "budget_min": 160,
+      "budget_max": 330,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "calme",
+        "nature",
+        "facile",
+        "lac"
+      ],
+      "compatibility_score": 84,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Trip pensé pour débutants, sans pression sportive.",
+      "activities": [
+        "Balade au lac d’Estaing",
+        "Vélo doux dans le Val d’Azun",
+        "Villages et granges du Val d’Azun",
+        "Raquettes en Val d’Azun"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Argelès-Gazost",
+        "Plan B météo: Marché local + village"
+      ],
+      "generated_activity_ids": [
+        "act_val_azun_lac_estaing",
+        "act_val_azun_velo_val_azun",
+        "act_val_azun_village_val_azun",
+        "act_val_azun_raquettes_val_azun"
+      ]
+    },
+    {
+      "id": "trip_sportif_refuge",
+      "title": "Trip sportif randonnée et refuge",
+      "destination": "Parc national des Pyrénées, Nouvelle-Aquitaine / Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-26 -> 2026-09-28",
+      "duration": "3 jours",
+      "budget_min": 280,
+      "budget_max": 620,
+      "physical_level": "sportif",
+      "ambience_tags": [
+        "sport depassement",
+        "déconnexion",
+        "nature",
+        "refuge"
+      ],
+      "compatibility_score": 85,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Itinérance courte avec nuit refuge pour profils entraînés.",
+      "activities": [
+        "Observation faune et flore",
+        "Bivouac réglementé en itinérance",
+        "Nuit en refuge de montagne",
+        "Randonnée naturaliste encadrée"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine / Occitanie",
+        "Point de rendez-vous: Lourdes ou Pau selon itinéraire",
+        "Plan B météo: Refuge accessible + boucle plus courte"
+      ],
+      "generated_activity_ids": [
+        "act_parc_national_pyrenees_faune_flore",
+        "act_parc_national_pyrenees_bivouac_reglemente",
+        "act_parc_national_pyrenees_refuges_pnp",
+        "act_parc_national_pyrenees_rando_naturaliste"
+      ]
+    },
+    {
+      "id": "trip_saint_lary_slow",
+      "title": "Slow travel à Saint-Lary",
+      "destination": "Saint-Lary-Soulan, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-03 -> 2026-10-05",
+      "duration": "3 jours",
+      "budget_min": 230,
+      "budget_max": 520,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "calme",
+        "slow travel",
+        "confort",
+        "village"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Séjour lent entre village, vallée d’Aure, bains et balade.",
+      "activities": [
+        "Randonnée lacs du Néouvielle",
+        "Moment bien-être thermes / balnéo",
+        "Ski à Saint-Lary",
+        "Slow travel village et vallée d’Aure"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Saint-Lary office tourisme",
+        "Plan B météo: Thermes + visite village"
+      ],
+      "generated_activity_ids": [
+        "act_saint_lary_soulan_neouvielle_lacs",
+        "act_saint_lary_soulan_bains_saint_lary",
+        "act_saint_lary_soulan_ski_saint_lary",
+        "act_saint_lary_soulan_village_slow"
+      ]
+    },
+    {
+      "id": "trip_lac_gaube_montagne",
+      "title": "Week-end lac et montagne au Lac de Gaube",
+      "destination": "Lac de Gaube, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-10 -> 2026-10-11",
+      "duration": "2 jours",
+      "budget_min": 160,
+      "budget_max": 350,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "contemplatif",
+        "calme",
+        "nature",
+        "lac"
+      ],
+      "compatibility_score": 87,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end centré sur le Lac de Gaube et les cascades du Pont d’Espagne.",
+      "activities": [
+        "Marche vers le Lac de Gaube",
+        "Cascades et Pont d’Espagne",
+        "Pique-nique contemplatif au lac",
+        "Sortie accompagnée sécurité montagne"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Cauterets centre",
+        "Plan B météo: Bains + balade basse vallée"
+      ],
+      "generated_activity_ids": [
+        "act_lac_gaube_marche_lac_gaube",
+        "act_lac_gaube_cascade_gaube",
+        "act_lac_gaube_pique_nique_gaube",
+        "act_lac_gaube_guide_gaube"
+      ]
+    },
+    {
+      "id": "trip_ariege_villages_nature",
+      "title": "Nature et villages en Ariège",
+      "destination": "Ariège Pyrénées, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-17 -> 2026-10-19",
+      "duration": "3 jours",
+      "budget_min": 180,
+      "budget_max": 420,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "découverte locale",
+        "nature",
+        "calme",
+        "ariege"
+      ],
+      "compatibility_score": 88,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Séjour Ariège plus sauvage, entre villages et randonnées.",
+      "activities": [
+        "Étape douce du Sentier Cathare",
+        "Visite de grotte / patrimoine souterrain",
+        "Randonnée lac ariégeois",
+        "VTT Ariège Pyrénées"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Foix gare",
+        "Plan B météo: Grotte / patrimoine couvert"
+      ],
+      "generated_activity_ids": [
+        "act_ariege_pyrenees_sentier_cathare",
+        "act_ariege_pyrenees_grotte_ariege",
+        "act_ariege_pyrenees_lac_ariege",
+        "act_ariege_pyrenees_vtt_ariege"
+      ]
+    },
+    {
+      "id": "trip_font_romeu_deconnexion",
+      "title": "Déconnexion à Font-Romeu",
+      "destination": "Font-Romeu, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-24 -> 2026-10-26",
+      "duration": "3 jours",
+      "budget_min": 210,
+      "budget_max": 480,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "sport depassement",
+        "calme",
+        "altitude",
+        "trail"
+      ],
+      "compatibility_score": 89,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Séjour altitude en Cerdagne pour respirer, marcher et bouger.",
+      "activities": [
+        "Trail doux en altitude",
+        "VTT sur circuits balisés",
+        "Étape Train Jaune de Cerdagne",
+        "Ski à Font-Romeu Pyrénées 2000"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Font-Romeu office tourisme",
+        "Plan B météo: Train Jaune + bains chauds"
+      ],
+      "generated_activity_ids": [
+        "act_font_romeu_trail_altitude",
+        "act_font_romeu_vtt_ffc",
+        "act_font_romeu_train_jaune",
+        "act_font_romeu_ski_font_romeu"
+      ]
+    },
+    {
+      "id": "trip_pyrenees_espagne_villages",
+      "title": "Pyrénées côté espagnol entre nature et villages",
+      "destination": "Canfranc, Aragon",
+      "image_url": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-31 -> 2026-11-02",
+      "duration": "3 jours",
+      "budget_min": 240,
+      "budget_max": 560,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "découverte locale",
+        "contemplatif",
+        "nature",
+        "Espagne"
+      ],
+      "compatibility_score": 90,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Trip transfrontalier doux entre vallée d’Aspe et Canfranc.",
+      "activities": [
+        "Visite de la gare de Canfranc",
+        "Randonnée chemin transfrontalier",
+        "Village et tapas local",
+        "Photographie Somport / Pyrénées espagnoles"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Aragon",
+        "Point de rendez-vous: Oloron ou Pau",
+        "Plan B météo: Vallée d’Aspe côté français"
+      ],
+      "generated_activity_ids": [
+        "act_canfranc_gare_canfranc",
+        "act_canfranc_chemin_aragon",
+        "act_canfranc_village_canfranc",
+        "act_canfranc_photo_somport"
+      ]
+    },
+    {
+      "id": "trip_pic_du_midi_etoiles",
+      "title": "Nuit contemplative au Pic du Midi",
+      "destination": "Pic du Midi, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-11-07 -> 2026-11-08",
+      "duration": "2 jours",
+      "budget_min": 350,
+      "budget_max": 700,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "contemplatif",
+        "premium confort",
+        "spirituel introspectif",
+        "observation etoiles"
+      ],
+      "compatibility_score": 91,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Expérience sommet et ciel étoilé pour petit groupe.",
+      "activities": [
+        "Téléphérique et visite du sommet",
+        "Observation des étoiles",
+        "Photographie depuis le secteur Tourmalet",
+        "Raquettes autour du domaine"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: La Mongie",
+        "Plan B météo: Thermes + photo vallée si météo fermée"
+      ],
+      "generated_activity_ids": [
+        "act_pic_du_midi_telepherique_sommet",
+        "act_pic_du_midi_observation_etoiles",
+        "act_pic_du_midi_photo_tourmalet",
+        "act_pic_du_midi_raquettes_pic"
+      ]
+    },
+    {
+      "id": "trip_troumouse_calme",
+      "title": "Cirque de Troumouse en petit groupe calme",
+      "destination": "Cirque de Troumouse, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-07-11 -> 2026-07-11",
+      "duration": "1 jour",
+      "budget_min": 90,
+      "budget_max": 180,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "calme",
+        "contemplatif",
+        "petit groupe",
+        "cirque"
+      ],
+      "compatibility_score": 92,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Journée douce dans un grand cirque glaciaire.",
+      "activities": [
+        "Petit train de Troumouse",
+        "Marche facile dans le cirque",
+        "Photographie pastorale et glaciers",
+        "Pique-nique local en altitude"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Gèdre",
+        "Plan B météo: Visite village + repas local"
+      ],
+      "generated_activity_ids": [
+        "act_cirque_troumouse_petit_train",
+        "act_cirque_troumouse_marche_cirque",
+        "act_cirque_troumouse_photo_troumouse",
+        "act_cirque_troumouse_pique_nique_troumouse"
+      ]
+    },
+    {
+      "id": "trip_neouvielle_lacs",
+      "title": "Lacs du Néouvielle et photo nature",
+      "destination": "Réserve du Néouvielle, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-07-04 -> 2026-07-04",
+      "duration": "1 jour",
+      "budget_min": 100,
+      "budget_max": 240,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "contemplatif",
+        "nature",
+        "photographie",
+        "lac"
+      ],
+      "compatibility_score": 93,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Journée lacs, pins et photo nature dans le Néouvielle.",
+      "activities": [
+        "Boucle des lacs du Néouvielle",
+        "Photographie lacs et pins à crochets",
+        "Bivouac réglementé près des lacs",
+        "Sortie accompagnée Néouvielle"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Saint-Lary",
+        "Plan B météo: Saint-Lary + bains"
+      ],
+      "generated_activity_ids": [
+        "act_neouvielle_boucle_lacs",
+        "act_neouvielle_photo_neouvielle",
+        "act_neouvielle_bivouac_neouvielle",
+        "act_neouvielle_guide_neouvielle"
+      ]
+    },
+    {
+      "id": "trip_loudenvielle_lac_bains",
+      "title": "Loudenvielle lac et bains en douceur",
+      "destination": "Loudenvielle, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-11-14 -> 2026-11-15",
+      "duration": "2 jours",
+      "budget_min": 260,
+      "budget_max": 560,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "premium confort",
+        "calme",
+        "nature",
+        "lac"
+      ],
+      "compatibility_score": 76,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end détente au bord du lac et bains chauds.",
+      "activities": [
+        "Balade autour du lac de Génos",
+        "Bains Balnéa / bien-être",
+        "Parapente encadré en vallée du Louron",
+        "Randonnée Val Louron"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Loudenvielle lac",
+        "Plan B météo: Bains + restaurant"
+      ],
+      "generated_activity_ids": [
+        "act_loudenvielle_lac_genos",
+        "act_loudenvielle_balnea",
+        "act_loudenvielle_parapente_louron",
+        "act_loudenvielle_rando_val_louron"
+      ]
+    },
+    {
+      "id": "trip_ax_thermes_aventure",
+      "title": "Ax-les-Thermes aventure douce",
+      "destination": "Ax-les-Thermes, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-11-21 -> 2026-11-22",
+      "duration": "2 jours",
+      "budget_min": 210,
+      "budget_max": 460,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "fun aventure douce",
+        "confort",
+        "thermes",
+        "vtt"
+      ],
+      "compatibility_score": 77,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Mix Ariège: bains, activité encadrée et balade.",
+      "activities": [
+        "Bains chauds à Ax-les-Thermes",
+        "Raquettes encadrées en Haute-Ariège",
+        "VTT montagne autour d’Ax",
+        "Spéléologie découverte"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Gare Ax-les-Thermes",
+        "Plan B météo: Bains + visite couverte"
+      ],
+      "generated_activity_ids": [
+        "act_ax_les_thermes_bains_ax",
+        "act_ax_les_thermes_raquettes_ax",
+        "act_ax_les_thermes_vtt_ax",
+        "act_ax_les_thermes_speleologie_ax"
+      ]
+    },
+    {
+      "id": "trip_gourette_ski",
+      "title": "Week-end ski à Gourette",
+      "destination": "Gourette, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2027-01-09 -> 2027-01-10",
+      "duration": "2 jours",
+      "budget_min": 260,
+      "budget_max": 560,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "sport depassement",
+        "fun",
+        "ski",
+        "neige"
+      ],
+      "compatibility_score": 78,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end neige et glisse en vallée d’Ossau.",
+      "activities": [
+        "Ski à Gourette",
+        "Trail montagne autour de Gourette",
+        "Raquettes en station",
+        "Belvédère et photographie"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Pau gare",
+        "Plan B météo: Raquettes ou balade Laruns si météo mauvaise"
+      ],
+      "generated_activity_ids": [
+        "act_gourette_ski_gourette",
+        "act_gourette_trail_gourette",
+        "act_gourette_raquettes_gourette",
+        "act_gourette_belvedere_gourette"
+      ]
+    },
+    {
+      "id": "trip_bareges_raquettes_bains",
+      "title": "Barèges raquettes et bains",
+      "destination": "Barèges, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2027-01-16 -> 2027-01-17",
+      "duration": "2 jours",
+      "budget_min": 250,
+      "budget_max": 520,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "calme",
+        "confort",
+        "nature",
+        "raquettes"
+      ],
+      "compatibility_score": 79,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end hivernal avec raquettes encadrées et pause thermale.",
+      "activities": [
+        "Ski domaine Tourmalet",
+        "Raquettes autour de Barèges",
+        "Pause thermale à Barèges",
+        "Randonnée secteur Tourmalet"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Lourdes gare",
+        "Plan B météo: Thermes + village"
+      ],
+      "generated_activity_ids": [
+        "act_bareges_ski_tourmalet",
+        "act_bareges_raquettes_bareges",
+        "act_bareges_thermes_bareges",
+        "act_bareges_rando_tourmalet"
+      ]
+    },
+    {
+      "id": "trip_font_romeu_ski_train",
+      "title": "Font-Romeu ski et Train Jaune",
+      "destination": "Font-Romeu, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2027-01-23 -> 2027-01-25",
+      "duration": "3 jours",
+      "budget_min": 280,
+      "budget_max": 620,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "fun",
+        "sport depassement",
+        "découverte locale",
+        "ski"
+      ],
+      "compatibility_score": 80,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Séjour hiver en Cerdagne avec glisse et découverte douce.",
+      "activities": [
+        "Trail doux en altitude",
+        "VTT sur circuits balisés",
+        "Étape Train Jaune de Cerdagne",
+        "Ski à Font-Romeu Pyrénées 2000"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Gare Font-Romeu-Odeillo-Via à vérifier",
+        "Plan B météo: Train Jaune + bains si météo neige mauvaise"
+      ],
+      "generated_activity_ids": [
+        "act_font_romeu_trail_altitude",
+        "act_font_romeu_vtt_ffc",
+        "act_font_romeu_train_jaune",
+        "act_font_romeu_ski_font_romeu"
+      ]
+    },
+    {
+      "id": "trip_collioure_mer_montagne",
+      "title": "Collioure mer-montagne hors saison",
+      "destination": "Collioure nature / Côte Vermeille, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-11-28 -> 2026-11-29",
+      "duration": "2 jours",
+      "budget_min": 230,
+      "budget_max": 540,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "découverte locale",
+        "contemplatif",
+        "premium confort",
+        "littoral"
+      ],
+      "compatibility_score": 81,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end doux entre sentier littoral, village et photo.",
+      "activities": [
+        "Sentier littoral Collioure - Port-Vendres",
+        "Visite du Fort Saint-Elme",
+        "Balade vignes de la Côte Vermeille",
+        "Photographie coucher de soleil sur Collioure"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Gare Collioure",
+        "Plan B météo: Visite culturelle + café"
+      ],
+      "generated_activity_ids": [
+        "act_collioure_cote_vermeille_sentier_littoral",
+        "act_collioure_cote_vermeille_fort_saint_elme",
+        "act_collioure_cote_vermeille_vignes_vermeille",
+        "act_collioure_cote_vermeille_photo_coucher_soleil"
+      ]
+    },
+    {
+      "id": "trip_laruns_pastoralisme",
+      "title": "Laruns pastoralisme et lac",
+      "destination": "Laruns, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-06 -> 2026-09-07",
+      "duration": "2 jours",
+      "budget_min": 180,
+      "budget_max": 390,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "découverte locale",
+        "calme",
+        "pastoralisme",
+        "lac"
+      ],
+      "compatibility_score": 82,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end local en vallée d’Ossau autour de Laruns.",
+      "activities": [
+        "Balade au lac de Bious-Artigues",
+        "Marché de Laruns et produits locaux",
+        "Pastoralisme et fromages d’Ossau",
+        "Rafting encadré secteur Ossau"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Laruns centre",
+        "Plan B météo: Marché + repas local"
+      ],
+      "generated_activity_ids": [
+        "act_laruns_bious_artigues",
+        "act_laruns_marche_laruns",
+        "act_laruns_pastoralisme_laruns",
+        "act_laruns_rafting_laruns"
+      ]
+    },
+    {
+      "id": "trip_artouste_train_lac",
+      "title": "Artouste train et lac d’altitude",
+      "destination": "Artouste, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-29 -> 2026-08-29",
+      "duration": "1 jour",
+      "budget_min": 120,
+      "budget_max": 260,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "fun aventure douce",
+        "contemplatif",
+        "train de montagne",
+        "lac"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Journée train de montagne et panoramas d’altitude.",
+      "activities": [
+        "Train d’Artouste",
+        "Lac d’Artouste",
+        "Photographie panoramique Artouste",
+        "Pique-nique groupe à Artouste"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Fabrèges / Artouste",
+        "Plan B météo: Laruns + balade locale"
+      ],
+      "generated_activity_ids": [
+        "act_artouste_train_artouste",
+        "act_artouste_lac_artouste",
+        "act_artouste_photo_artouste",
+        "act_artouste_pique_nique_artouste"
+      ]
+    },
+    {
+      "id": "trip_ordesa_randonnee",
+      "title": "Ordesa randonnée et villages",
+      "destination": "Ordesa, Aragon",
+      "image_url": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-10 -> 2026-09-13",
+      "duration": "4 jours",
+      "budget_min": 360,
+      "budget_max": 780,
+      "physical_level": "sportif",
+      "ambience_tags": [
+        "sport depassement",
+        "contemplatif",
+        "Espagne",
+        "parc national"
+      ],
+      "compatibility_score": 84,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Séjour plus sportif côté espagnol autour d’Ordesa.",
+      "activities": [
+        "Randonnée Cola de Caballo",
+        "Village de Torla et accès parc",
+        "Miradors d’Ordesa",
+        "Canyons et lecture géologique guidée"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Aragon",
+        "Point de rendez-vous: Torla-Ordesa",
+        "Plan B météo: Villages + miradors accessibles"
+      ],
+      "generated_activity_ids": [
+        "act_ordesa_cola_caballo",
+        "act_ordesa_torla_village",
+        "act_ordesa_miradores_ordesa",
+        "act_ordesa_canyon_ordesa"
+      ]
+    },
+    {
+      "id": "trip_benasque_sportif",
+      "title": "Benasque haute montagne pour sportifs",
+      "destination": "Benasque, Aragon",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-17 -> 2026-09-20",
+      "duration": "4 jours",
+      "budget_min": 390,
+      "budget_max": 850,
+      "physical_level": "expert",
+      "ambience_tags": [
+        "sport depassement",
+        "haute montagne",
+        "expert",
+        "trail"
+      ],
+      "compatibility_score": 85,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Trip réservé aux profils sportifs avec encadrement conseillé.",
+      "activities": [
+        "Randonnée Forau d’Aigualluts",
+        "Village de Benasque et culture aragonaise",
+        "Trail sportif secteur Maladeta",
+        "Sortie haute montagne encadrée Aneto/Maladeta"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Aragon",
+        "Point de rendez-vous: Benasque centre",
+        "Plan B météo: Village + randonnée basse vallée"
+      ],
+      "generated_activity_ids": [
+        "act_benasque_aigualluts",
+        "act_benasque_village_benasque",
+        "act_benasque_trail_maladeta",
+        "act_benasque_guide_aneto"
+      ]
+    },
+    {
+      "id": "trip_vall_de_boi_culture_lacs",
+      "title": "Vall de Boí culture et lacs",
+      "destination": "Vall de Boí, Catalogne",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-01 -> 2026-10-04",
+      "duration": "4 jours",
+      "budget_min": 330,
+      "budget_max": 760,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "découverte locale",
+        "contemplatif",
+        "calme",
+        "catalogne"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Séjour catalan entre villages romans et nature.",
+      "activities": [
+        "Villages et églises romanes",
+        "Randonnée Aigüestortes et lacs",
+        "Slow travel villages catalans",
+        "Photographie vallée et montagnes catalanes"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Catalogne",
+        "Point de rendez-vous: Vall de Boí",
+        "Plan B météo: Villages + thermes/local food"
+      ],
+      "generated_activity_ids": [
+        "act_vall_de_boi_eglises_romanes",
+        "act_vall_de_boi_aiguestortes_lacs",
+        "act_vall_de_boi_village_boi",
+        "act_vall_de_boi_photo_boi"
+      ]
+    },
+    {
+      "id": "trip_cerdagne_bains_train",
+      "title": "Cerdagne-Capcir bains et Train Jaune",
+      "destination": "Cerdagne-Capcir, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-12-05 -> 2026-12-07",
+      "duration": "3 jours",
+      "budget_min": 240,
+      "budget_max": 560,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "calme",
+        "premium confort",
+        "découverte locale",
+        "Train Jaune"
+      ],
+      "compatibility_score": 87,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Séjour doux en Cerdagne entre train, bains et villages.",
+      "activities": [
+        "Randonnée des Bouillouses",
+        "Bains chauds Llo / Dorres",
+        "Ski nordique Capcir",
+        "Train Jaune et villages de Cerdagne"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Villefranche / Font-Romeu à vérifier",
+        "Plan B météo: Bains chauds + villages"
+      ],
+      "generated_activity_ids": [
+        "act_cerdagne_capcir_bouillouses",
+        "act_cerdagne_capcir_bains_llo_dorres",
+        "act_cerdagne_capcir_ski_nordique_capcir",
+        "act_cerdagne_capcir_train_jaune_capcir"
+      ]
+    },
+    {
+      "id": "trip_arreau_marche_vallee",
+      "title": "Arreau marché et vallées d’Aure-Louron",
+      "destination": "Arreau, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-12-12 -> 2026-12-13",
+      "duration": "2 jours",
+      "budget_min": 170,
+      "budget_max": 360,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "découverte locale",
+        "calme",
+        "marché local",
+        "village"
+      ],
+      "compatibility_score": 88,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end simple pour découvrir Arreau et les vallées autour.",
+      "activities": [
+        "Marché et produits locaux à Arreau",
+        "Balade patrimoine d’Arreau",
+        "Vélo vallée d’Aure-Louron",
+        "Repas local en vallée d’Aure"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Arreau centre",
+        "Plan B météo: Visite couverte + repas"
+      ],
+      "generated_activity_ids": [
+        "act_arreau_marche_arreau",
+        "act_arreau_patrimoine_arreau",
+        "act_arreau_velo_aure_louron",
+        "act_arreau_repas_arreau"
+      ]
+    },
+    {
+      "id": "trip_luz_thermes_aventure",
+      "title": "Luz-Saint-Sauveur thermes et aventure douce",
+      "destination": "Luz-Saint-Sauveur, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-12-19 -> 2026-12-20",
+      "duration": "2 jours",
+      "budget_min": 230,
+      "budget_max": 520,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "fun aventure douce",
+        "premium confort",
+        "thermes",
+        "village"
+      ],
+      "compatibility_score": 89,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Base pratique entre détente, patrimoine et activité encadrée selon saison.",
+      "activities": [
+        "Pont Napoléon et vallée",
+        "Bains chauds à Luzéa",
+        "Randonnée douce autour de Luz",
+        "Activité eaux vives encadrée"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Luz centre",
+        "Plan B météo: Thermes + visite village"
+      ],
+      "generated_activity_ids": [
+        "act_luz_saint_sauveur_pont_napoleon",
+        "act_luz_saint_sauveur_bains_luzea",
+        "act_luz_saint_sauveur_rando_luz",
+        "act_luz_saint_sauveur_eaux_vives_luz"
+      ]
+    },
+    {
+      "id": "trip_cauterets_premium_thermes",
+      "title": "Cauterets confort, cascades et thermes",
+      "destination": "Cauterets, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2027-02-06 -> 2027-02-07",
+      "duration": "2 jours",
+      "budget_min": 300,
+      "budget_max": 650,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "premium confort",
+        "calme",
+        "contemplatif",
+        "thermes"
+      ],
+      "compatibility_score": 90,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end confort à Cauterets avec bains et balades accessibles.",
+      "activities": [
+        "Randonnée au Lac de Gaube",
+        "Pont d’Espagne et cascades",
+        "Bains thermaux après rando",
+        "Panorama du Cirque du Lys"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Cauterets centre",
+        "Plan B météo: Thermes + cafés + visite"
+      ],
+      "generated_activity_ids": [
+        "act_cauterets_lac_gaube",
+        "act_cauterets_pont_espagne",
+        "act_cauterets_bains_rocher",
+        "act_cauterets_cirque_lys"
+      ]
+    },
+    {
+      "id": "trip_aspe_women_only",
+      "title": "Vallée d’Aspe women-only randonnée facile",
+      "destination": "Vallée d’Aspe, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2027-03-06 -> 2027-03-07",
+      "duration": "2 jours",
+      "budget_min": 180,
+      "budget_max": 360,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "calme",
+        "women only",
+        "petit groupe",
+        "randonnee douce"
+      ],
+      "compatibility_score": 91,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end rassurant en petit groupe féminin, nature et repas local.",
+      "activities": [
+        "Randonnée au lac d’Estaens",
+        "Rafting sur le gave d’Aspe",
+        "Excursion Somport / Canfranc",
+        "Visite de ferme locale en vallée d’Aspe"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Oloron gare",
+        "Plan B météo: Village + ferme locale"
+      ],
+      "generated_activity_ids": [
+        "act_vallee_aspe_lac_estaens",
+        "act_vallee_aspe_rafting_gave",
+        "act_vallee_aspe_canfranc_excursion",
+        "act_vallee_aspe_ferme_locale"
+      ]
+    },
+    {
+      "id": "trip_halal_friendly_montagne",
+      "title": "Montagne halal-friendly et déconnexion",
+      "destination": "Lescun, Nouvelle-Aquitaine",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2027-03-13 -> 2027-03-14",
+      "duration": "2 jours",
+      "budget_min": 190,
+      "budget_max": 390,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "calme",
+        "spirituel introspectif",
+        "petit groupe",
+        "halal friendly"
+      ],
+      "compatibility_score": 92,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Trip calme avec organisation attentive aux préférences personnelles.",
+      "activities": [
+        "Randonnée dans le cirque de Lescun",
+        "Marche vers les cabanes / secteur Ansabère",
+        "Balade village de Lescun et patrimoine",
+        "Repas local fromage et produits béarnais"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Nouvelle-Aquitaine",
+        "Point de rendez-vous: Lescun centre",
+        "Plan B météo: Village + repas adapté à vérifier"
+      ],
+      "generated_activity_ids": [
+        "act_lescun_cirque_rando",
+        "act_lescun_refuge_ansabere",
+        "act_lescun_village_pierre",
+        "act_lescun_repas_fromage"
+      ]
+    },
+    {
+      "id": "trip_luchon_train_thermes",
+      "title": "Luchon train, thermes et panoramas",
+      "destination": "Bagnères-de-Luchon, Occitanie",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2027-03-20 -> 2027-03-21",
+      "duration": "2 jours",
+      "budget_min": 230,
+      "budget_max": 520,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "premium confort",
+        "contemplatif",
+        "train accessible",
+        "thermes"
+      ],
+      "compatibility_score": 93,
+      "interested_count": 6,
+      "status": "Trip publiée",
+      "description": "Week-end accessible depuis Toulouse avec thermes et panoramas.",
+      "activities": [
+        "Panorama à Luchon-Superbagnères",
+        "Randonnée vers l’Hospice de France",
+        "Thermes et récupération à Luchon",
+        "Parapente encadré au-dessus de Luchon"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel",
+        "Zone: Occitanie",
+        "Point de rendez-vous: Gare Bagnères-de-Luchon",
+        "Plan B météo: Thermes + restaurant"
+      ],
+      "generated_activity_ids": [
+        "act_bagneres_luchon_superbagneres_panorama",
+        "act_bagneres_luchon_hospice_france",
+        "act_bagneres_luchon_thermes_luchon",
+        "act_bagneres_luchon_parapente_luchon"
+      ]
+    }
+  ],
+  "activities": [
+    {
+      "id": "act_lescun_cirque_rando",
+      "destinationId": "dest_lescun",
+      "name": "Randonnée dans le cirque de Lescun",
+      "category": "Randonnée",
+      "duration": "4h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "montagne",
+        "cirque",
+        "randonnée"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Boucle panoramique autour des paysages de Lescun.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees-bearnaises.com/toutes-les-experiences/le-cirque-de-lescun-au-printemps/"
+    },
+    {
+      "id": "act_lescun_refuge_ansabere",
+      "destinationId": "dest_lescun",
+      "name": "Marche vers les cabanes / secteur Ansabère",
+      "category": "Refuge",
+      "duration": "6h",
+      "estimated_price": 0,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "haute montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie plus sportive vers un secteur emblématique du cirque.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees-bearnaises.com/toutes-les-experiences/le-cirque-de-lescun-au-printemps/"
+    },
+    {
+      "id": "act_lescun_village_pierre",
+      "destinationId": "dest_lescun",
+      "name": "Balade village de Lescun et patrimoine",
+      "category": "Village",
+      "duration": "1h30",
+      "estimated_price": 5,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "patrimoine",
+        "calme"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Promenade douce dans le village et ses ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees-bearnaises.com/toutes-les-experiences/le-cirque-de-lescun-au-printemps/"
+    },
+    {
+      "id": "act_lescun_repas_fromage",
+      "destinationId": "dest_lescun",
+      "name": "Repas local fromage et produits béarnais",
+      "category": "Repas local",
+      "duration": "2h",
+      "estimated_price": 30,
+      "physical_level": "facile",
+      "ambience": [
+        "repas local",
+        "village"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Moment convivial autour de produits locaux.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees-bearnaises.com/toutes-les-experiences/le-cirque-de-lescun-au-printemps/"
+    },
+    {
+      "id": "act_vallee_aspe_lac_estaens",
+      "destinationId": "dest_vallee_aspe",
+      "name": "Randonnée au lac d’Estaens",
+      "category": "Lac",
+      "duration": "5h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "lac",
+        "randonnée",
+        "frontière"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Randonnée vers un lac de montagne côté frontière.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.tourisme64.com/vos-envies/tourisme-de-nature-dans-le-64/la-vallee-daspe/"
+    },
+    {
+      "id": "act_vallee_aspe_rafting_gave",
+      "destinationId": "dest_vallee_aspe",
+      "name": "Rafting sur le gave d’Aspe",
+      "category": "Rafting",
+      "duration": "3h",
+      "estimated_price": 60,
+      "physical_level": "sportif",
+      "ambience": [
+        "eaux vives",
+        "fun",
+        "groupe"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité eaux vives à réserver auprès d’un prestataire.",
+      "image": "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.tourisme64.com/vos-envies/tourisme-de-nature-dans-le-64/la-vallee-daspe/"
+    },
+    {
+      "id": "act_vallee_aspe_canfranc_excursion",
+      "destinationId": "dest_vallee_aspe",
+      "name": "Excursion Somport / Canfranc",
+      "category": "Visite culturelle",
+      "duration": "4h",
+      "estimated_price": 25,
+      "physical_level": "facile",
+      "ambience": [
+        "frontière",
+        "Espagne",
+        "patrimoine"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte transfrontalière douce.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.tourisme64.com/vos-envies/tourisme-de-nature-dans-le-64/la-vallee-daspe/"
+    },
+    {
+      "id": "act_vallee_aspe_ferme_locale",
+      "destinationId": "dest_vallee_aspe",
+      "name": "Visite de ferme locale en vallée d’Aspe",
+      "category": "Ferme locale",
+      "duration": "2h",
+      "estimated_price": 12,
+      "physical_level": "facile",
+      "ambience": [
+        "repas local",
+        "pastoralisme"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Rencontre avec productions locales.",
+      "image": "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.tourisme64.com/vos-envies/tourisme-de-nature-dans-le-64/la-vallee-daspe/"
+    },
+    {
+      "id": "act_vallee_ossau_lacs_ayous",
+      "destinationId": "dest_vallee_ossau",
+      "name": "Randonnée des lacs d’Ayous",
+      "category": "Lac",
+      "duration": "6h",
+      "estimated_price": 0,
+      "physical_level": "sportif",
+      "ambience": [
+        "lac",
+        "Ossau",
+        "randonnée"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Grande classique face au Pic du Midi d’Ossau.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_vallee_ossau_train_artouste",
+      "destinationId": "dest_vallee_ossau",
+      "name": "Train d’Artouste et lac d’altitude",
+      "category": "Visite culturelle",
+      "duration": "4h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "train de montagne",
+        "lac",
+        "famille"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie panoramique en train de montagne.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_vallee_ossau_canyoning_ossau",
+      "destinationId": "dest_vallee_ossau",
+      "name": "Canyoning encadré en vallée d’Ossau",
+      "category": "Canyoning",
+      "duration": "3h",
+      "estimated_price": 68,
+      "physical_level": "sportif",
+      "ambience": [
+        "eaux vives",
+        "fun"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité engagée avec guide recommandé/obligatoire.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_vallee_ossau_fromage_pastoralisme",
+      "destinationId": "dest_vallee_ossau",
+      "name": "Découverte pastoralisme et fromage d’Ossau",
+      "category": "Ferme locale",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "repas local",
+        "pastoralisme"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte locale autour des savoir-faire pastoraux.",
+      "image": "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_cauterets_lac_gaube",
+      "destinationId": "dest_cauterets",
+      "name": "Randonnée au Lac de Gaube",
+      "category": "Lac",
+      "duration": "3h",
+      "estimated_price": 12,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "cascade",
+        "parc national"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche vers un lac emblématique depuis le Pont d’Espagne.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.cauterets.com/"
+    },
+    {
+      "id": "act_cauterets_pont_espagne",
+      "destinationId": "dest_cauterets",
+      "name": "Pont d’Espagne et cascades",
+      "category": "Cascade",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "cascade",
+        "facile",
+        "photographie"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade accessible autour des cascades.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.cauterets.com/"
+    },
+    {
+      "id": "act_cauterets_bains_rocher",
+      "destinationId": "dest_cauterets",
+      "name": "Bains thermaux après rando",
+      "category": "Bains thermaux",
+      "duration": "2h",
+      "estimated_price": 26,
+      "physical_level": "facile",
+      "ambience": [
+        "thermes",
+        "confort",
+        "premium"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Récupération douce après l’effort.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.cauterets.com/"
+    },
+    {
+      "id": "act_cauterets_cirque_lys",
+      "destinationId": "dest_cauterets",
+      "name": "Panorama du Cirque du Lys",
+      "category": "Photographie",
+      "duration": "3h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "panorama",
+        "photographie"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Panorama accessible selon remontées et saison.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.cauterets.com/"
+    },
+    {
+      "id": "act_gavarnie_cirque_classique",
+      "destinationId": "dest_gavarnie",
+      "name": "Marche classique vers le Cirque de Gavarnie",
+      "category": "Randonnée",
+      "duration": "3h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "cirque",
+        "UNESCO",
+        "cascade"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte incontournable du cirque.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/en-plein-air/visiter-le-cirque-de-gavarnie/"
+    },
+    {
+      "id": "act_gavarnie_refuge_espuguettes",
+      "destinationId": "dest_gavarnie",
+      "name": "Randonnée refuge des Espuguettes",
+      "category": "Refuge",
+      "duration": "5h",
+      "estimated_price": 10,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "refuge",
+        "panorama",
+        "randonnée"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie panoramique au-dessus de Gavarnie.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/en-plein-air/visiter-le-cirque-de-gavarnie/"
+    },
+    {
+      "id": "act_gavarnie_photo_cascade",
+      "destinationId": "dest_gavarnie",
+      "name": "Photographie grande cascade",
+      "category": "Photographie",
+      "duration": "2h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "photographie",
+        "cascade"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment photo et contemplation.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/en-plein-air/visiter-le-cirque-de-gavarnie/"
+    },
+    {
+      "id": "act_gavarnie_lecture_paysage",
+      "destinationId": "dest_gavarnie",
+      "name": "Lecture de paysage glaciaire",
+      "category": "Visite culturelle",
+      "duration": "2h",
+      "estimated_price": 25,
+      "physical_level": "facile",
+      "ambience": [
+        "culture",
+        "geologie",
+        "nature"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie guidée recommandée pour comprendre le site.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/en-plein-air/visiter-le-cirque-de-gavarnie/"
+    },
+    {
+      "id": "act_saint_lary_soulan_neouvielle_lacs",
+      "destinationId": "dest_saint_lary_soulan",
+      "name": "Randonnée lacs du Néouvielle",
+      "category": "Lac",
+      "duration": "5h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "lac",
+        "reserve",
+        "randonnée"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte des lacs de la réserve.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.saintlary.com/"
+    },
+    {
+      "id": "act_saint_lary_soulan_bains_saint_lary",
+      "destinationId": "dest_saint_lary_soulan",
+      "name": "Moment bien-être thermes / balnéo",
+      "category": "Bains thermaux",
+      "duration": "2h",
+      "estimated_price": 30,
+      "physical_level": "facile",
+      "ambience": [
+        "thermes",
+        "premium",
+        "confort"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Pause confort après activité montagne.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.saintlary.com/"
+    },
+    {
+      "id": "act_saint_lary_soulan_ski_saint_lary",
+      "destinationId": "dest_saint_lary_soulan",
+      "name": "Ski à Saint-Lary",
+      "category": "Ski",
+      "duration": "5h",
+      "estimated_price": 50,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "ski",
+        "neige",
+        "station"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Journée ski avec forfait et matériel à vérifier.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.saintlary.com/"
+    },
+    {
+      "id": "act_saint_lary_soulan_village_slow",
+      "destinationId": "dest_saint_lary_soulan",
+      "name": "Slow travel village et vallée d’Aure",
+      "category": "Village",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "slow travel",
+        "repas local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte lente du village et de la vallée.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.saintlary.com/"
+    },
+    {
+      "id": "act_bagneres_luchon_superbagneres_panorama",
+      "destinationId": "dest_bagneres_luchon",
+      "name": "Panorama à Luchon-Superbagnères",
+      "category": "Photographie",
+      "duration": "3h",
+      "estimated_price": 12,
+      "physical_level": "facile",
+      "ambience": [
+        "panorama",
+        "station",
+        "photographie"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Accès panoramique selon remontées.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees31.com/"
+    },
+    {
+      "id": "act_bagneres_luchon_hospice_france",
+      "destinationId": "dest_bagneres_luchon",
+      "name": "Randonnée vers l’Hospice de France",
+      "category": "Randonnée",
+      "duration": "4h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnée",
+        "vallee",
+        "nature"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Classique du Luchonnais.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees31.com/"
+    },
+    {
+      "id": "act_bagneres_luchon_thermes_luchon",
+      "destinationId": "dest_bagneres_luchon",
+      "name": "Thermes et récupération à Luchon",
+      "category": "Bains thermaux",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "thermes",
+        "premium",
+        "confort"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Pause bien-être dans une ville thermale.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees31.com/"
+    },
+    {
+      "id": "act_bagneres_luchon_parapente_luchon",
+      "destinationId": "dest_bagneres_luchon",
+      "name": "Parapente encadré au-dessus de Luchon",
+      "category": "Parapente",
+      "duration": "2h",
+      "estimated_price": 105,
+      "physical_level": "sportif",
+      "ambience": [
+        "parapente",
+        "fun",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Vol accompagné selon météo.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees31.com/"
+    },
+    {
+      "id": "act_ax_les_thermes_bains_ax",
+      "destinationId": "dest_ax_les_thermes",
+      "name": "Bains chauds à Ax-les-Thermes",
+      "category": "Bains thermaux",
+      "duration": "2h",
+      "estimated_price": 18,
+      "physical_level": "facile",
+      "ambience": [
+        "thermes",
+        "confort"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Détente thermale au cœur de l’Ariège.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.ariegepyrenees.com/preparer/randonner/"
+    },
+    {
+      "id": "act_ax_les_thermes_raquettes_ax",
+      "destinationId": "dest_ax_les_thermes",
+      "name": "Raquettes encadrées en Haute-Ariège",
+      "category": "Raquettes",
+      "duration": "3h",
+      "estimated_price": 42,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "neige",
+        "raquettes"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie neige encadrée recommandée.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.ariegepyrenees.com/preparer/randonner/"
+    },
+    {
+      "id": "act_ax_les_thermes_vtt_ax",
+      "destinationId": "dest_ax_les_thermes",
+      "name": "VTT montagne autour d’Ax",
+      "category": "Vtt",
+      "duration": "3h",
+      "estimated_price": 52,
+      "physical_level": "sportif",
+      "ambience": [
+        "vtt",
+        "sportif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie VTT avec prestataire.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.ariegepyrenees.com/preparer/randonner/"
+    },
+    {
+      "id": "act_ax_les_thermes_speleologie_ax",
+      "destinationId": "dest_ax_les_thermes",
+      "name": "Spéléologie découverte",
+      "category": "Visite culturelle",
+      "duration": "3h",
+      "estimated_price": 48,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "speleologie",
+        "aventure"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte souterraine avec guide.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.ariegepyrenees.com/preparer/randonner/"
+    },
+    {
+      "id": "act_font_romeu_trail_altitude",
+      "destinationId": "dest_font_romeu",
+      "name": "Trail doux en altitude",
+      "category": "Trail",
+      "duration": "2h30",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "trail",
+        "altitude",
+        "sportif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours de trail accessible avec adaptation au niveau.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://font-romeu.fr/"
+    },
+    {
+      "id": "act_font_romeu_vtt_ffc",
+      "destinationId": "dest_font_romeu",
+      "name": "VTT sur circuits balisés",
+      "category": "Vtt",
+      "duration": "3h",
+      "estimated_price": 45,
+      "physical_level": "sportif",
+      "ambience": [
+        "vtt",
+        "sportif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Circuits VTT balisés en Pyrénées catalanes.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://font-romeu.fr/"
+    },
+    {
+      "id": "act_font_romeu_train_jaune",
+      "destinationId": "dest_font_romeu",
+      "name": "Étape Train Jaune de Cerdagne",
+      "category": "Visite culturelle",
+      "duration": "3h",
+      "estimated_price": 22,
+      "physical_level": "facile",
+      "ambience": [
+        "Train Jaune",
+        "cerdagne",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte douce via le train jaune.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://font-romeu.fr/"
+    },
+    {
+      "id": "act_font_romeu_ski_font_romeu",
+      "destinationId": "dest_font_romeu",
+      "name": "Ski à Font-Romeu Pyrénées 2000",
+      "category": "Ski",
+      "duration": "5h",
+      "estimated_price": 50,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "ski",
+        "neige",
+        "station"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Journée de glisse en station.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://font-romeu.fr/"
+    },
+    {
+      "id": "act_collioure_cote_vermeille_sentier_littoral",
+      "destinationId": "dest_collioure_cote_vermeille",
+      "name": "Sentier littoral Collioure - Port-Vendres",
+      "category": "Randonnée",
+      "duration": "3h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "littoral",
+        "mer montagne",
+        "photographie"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade mer-montagne entre criques et villages.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.collioure.com/"
+    },
+    {
+      "id": "act_collioure_cote_vermeille_fort_saint_elme",
+      "destinationId": "dest_collioure_cote_vermeille",
+      "name": "Visite du Fort Saint-Elme",
+      "category": "Visite culturelle",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "patrimoine",
+        "village"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Visite culturelle panoramique.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.collioure.com/"
+    },
+    {
+      "id": "act_collioure_cote_vermeille_vignes_vermeille",
+      "destinationId": "dest_collioure_cote_vermeille",
+      "name": "Balade vignes de la Côte Vermeille",
+      "category": "Village",
+      "duration": "2h",
+      "estimated_price": 12,
+      "physical_level": "facile",
+      "ambience": [
+        "vignes",
+        "repas local",
+        "photographie"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Promenade dans le paysage viticole.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.collioure.com/"
+    },
+    {
+      "id": "act_collioure_cote_vermeille_photo_coucher_soleil",
+      "destinationId": "dest_collioure_cote_vermeille",
+      "name": "Photographie coucher de soleil sur Collioure",
+      "category": "Photographie",
+      "duration": "1h30",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "photographie",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment calme en fin de journée.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.collioure.com/"
+    },
+    {
+      "id": "act_pays_basque_interieur_ainhoa_sare",
+      "destinationId": "dest_pays_basque_interieur",
+      "name": "Villages Ainhoa et Sare",
+      "category": "Village",
+      "duration": "4h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "pays basque"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte des villages basques intérieurs.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.tourisme64.com/vos-envies/tourisme-de-nature-dans-le-64/la-vallee-daspe/"
+    },
+    {
+      "id": "act_pays_basque_interieur_rando_rhune",
+      "destinationId": "dest_pays_basque_interieur",
+      "name": "Randonnée douce vers la Rhune / collines",
+      "category": "Randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnée",
+        "pays basque",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Randonnée panoramique selon niveau.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.tourisme64.com/vos-envies/tourisme-de-nature-dans-le-64/la-vallee-daspe/"
+    },
+    {
+      "id": "act_pays_basque_interieur_marche_local_basque",
+      "destinationId": "dest_pays_basque_interieur",
+      "name": "Marché local et produits basques",
+      "category": "Marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "repas local",
+        "marché local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte de produits locaux.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.tourisme64.com/vos-envies/tourisme-de-nature-dans-le-64/la-vallee-daspe/"
+    },
+    {
+      "id": "act_pays_basque_interieur_pelote_culture",
+      "destinationId": "dest_pays_basque_interieur",
+      "name": "Initiation culture basque / pelote",
+      "category": "Visite culturelle",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "culture",
+        "groupe"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité culturelle en petit groupe.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.tourisme64.com/vos-envies/tourisme-de-nature-dans-le-64/la-vallee-daspe/"
+    },
+    {
+      "id": "act_pic_du_midi_telepherique_sommet",
+      "destinationId": "dest_pic_du_midi",
+      "name": "Téléphérique et visite du sommet",
+      "category": "Visite culturelle",
+      "duration": "3h",
+      "estimated_price": 50,
+      "physical_level": "facile",
+      "ambience": [
+        "sommet",
+        "premium",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Accès contemplatif au sommet.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_pic_du_midi_observation_etoiles",
+      "destinationId": "dest_pic_du_midi",
+      "name": "Observation des étoiles",
+      "category": "Observation étoiles",
+      "duration": "3h",
+      "estimated_price": 85,
+      "physical_level": "facile",
+      "ambience": [
+        "observation etoiles",
+        "spirituel",
+        "premium"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Expérience nocturne selon offres disponibles.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_pic_du_midi_photo_tourmalet",
+      "destinationId": "dest_pic_du_midi",
+      "name": "Photographie depuis le secteur Tourmalet",
+      "category": "Photographie",
+      "duration": "2h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "photographie",
+        "sommet"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Session photo avec vue montagne.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_pic_du_midi_raquettes_pic",
+      "destinationId": "dest_pic_du_midi",
+      "name": "Raquettes autour du domaine",
+      "category": "Raquettes",
+      "duration": "3h",
+      "estimated_price": 45,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "raquettes",
+        "neige"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie neige encadrée recommandée.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_cirque_troumouse_petit_train",
+      "destinationId": "dest_cirque_troumouse",
+      "name": "Petit train de Troumouse",
+      "category": "Visite culturelle",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "cirque",
+        "facile",
+        "famille"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Accès doux au cœur du cirque en saison.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/loisirs/petit-train-de-troumouse/"
+    },
+    {
+      "id": "act_cirque_troumouse_marche_cirque",
+      "destinationId": "dest_cirque_troumouse",
+      "name": "Marche facile dans le cirque",
+      "category": "Randonnée",
+      "duration": "2h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "cirque",
+        "randonnee douce"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche contemplative en fond de cirque.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/loisirs/petit-train-de-troumouse/"
+    },
+    {
+      "id": "act_cirque_troumouse_photo_troumouse",
+      "destinationId": "dest_cirque_troumouse",
+      "name": "Photographie pastorale et glaciers",
+      "category": "Photographie",
+      "duration": "2h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "photographie",
+        "pastoralisme"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Temps photo dans un grand paysage.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/loisirs/petit-train-de-troumouse/"
+    },
+    {
+      "id": "act_cirque_troumouse_pique_nique_troumouse",
+      "destinationId": "dest_cirque_troumouse",
+      "name": "Pique-nique local en altitude",
+      "category": "Repas local",
+      "duration": "2h",
+      "estimated_price": 18,
+      "physical_level": "facile",
+      "ambience": [
+        "repas local",
+        "calme"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Repas simple avec respect du site.",
+      "image": "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/loisirs/petit-train-de-troumouse/"
+    },
+    {
+      "id": "act_lac_gaube_marche_lac_gaube",
+      "destinationId": "dest_lac_gaube",
+      "name": "Marche vers le Lac de Gaube",
+      "category": "Lac",
+      "duration": "3h",
+      "estimated_price": 12,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "facile",
+        "photographie"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Accès classique depuis Pont d’Espagne.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.cauterets.com/nos-tops/le-lac-de-gaube-sa-vallee/"
+    },
+    {
+      "id": "act_lac_gaube_cascade_gaube",
+      "destinationId": "dest_lac_gaube",
+      "name": "Cascades et Pont d’Espagne",
+      "category": "Cascade",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "cascade",
+        "parc national"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade photographique autour des cascades.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.cauterets.com/nos-tops/le-lac-de-gaube-sa-vallee/"
+    },
+    {
+      "id": "act_lac_gaube_pique_nique_gaube",
+      "destinationId": "dest_lac_gaube",
+      "name": "Pique-nique contemplatif au lac",
+      "category": "Repas local",
+      "duration": "2h",
+      "estimated_price": 18,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "calme",
+        "déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Temps calme au bord du lac.",
+      "image": "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.cauterets.com/nos-tops/le-lac-de-gaube-sa-vallee/"
+    },
+    {
+      "id": "act_lac_gaube_guide_gaube",
+      "destinationId": "dest_lac_gaube",
+      "name": "Sortie accompagnée sécurité montagne",
+      "category": "Randonnée",
+      "duration": "3h",
+      "estimated_price": 38,
+      "physical_level": "facile",
+      "ambience": [
+        "guided",
+        "safety",
+        "parc national"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Accompagnement utile pour groupe débutant.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.cauterets.com/nos-tops/le-lac-de-gaube-sa-vallee/"
+    },
+    {
+      "id": "act_parc_national_pyrenees_faune_flore",
+      "destinationId": "dest_parc_national_pyrenees",
+      "name": "Observation faune et flore",
+      "category": "Photographie",
+      "duration": "3h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "faune",
+        "flore",
+        "parc national"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte naturaliste respectueuse.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees-parcnational.fr/fr/le-parc-national-des-pyrenees/la-reglementation-du-parc-national-des-pyrenees"
+    },
+    {
+      "id": "act_parc_national_pyrenees_bivouac_reglemente",
+      "destinationId": "dest_parc_national_pyrenees",
+      "name": "Bivouac réglementé en itinérance",
+      "category": "Bivouac",
+      "duration": "10h",
+      "estimated_price": 15,
+      "physical_level": "sportif",
+      "ambience": [
+        "bivouac",
+        "itinerance",
+        "refuge"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Bivouac uniquement dans le cadre autorisé.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees-parcnational.fr/fr/le-parc-national-des-pyrenees/la-reglementation-du-parc-national-des-pyrenees"
+    },
+    {
+      "id": "act_parc_national_pyrenees_refuges_pnp",
+      "destinationId": "dest_parc_national_pyrenees",
+      "name": "Nuit en refuge de montagne",
+      "category": "Refuge",
+      "duration": "6h",
+      "estimated_price": 65,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "refuge",
+        "randonnée"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Expérience refuge à réserver.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees-parcnational.fr/fr/le-parc-national-des-pyrenees/la-reglementation-du-parc-national-des-pyrenees"
+    },
+    {
+      "id": "act_parc_national_pyrenees_rando_naturaliste",
+      "destinationId": "dest_parc_national_pyrenees",
+      "name": "Randonnée naturaliste encadrée",
+      "category": "Randonnée",
+      "duration": "4h",
+      "estimated_price": 38,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "guided",
+        "faune",
+        "flore"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie guidée pour comprendre le Parc.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees-parcnational.fr/fr/le-parc-national-des-pyrenees/la-reglementation-du-parc-national-des-pyrenees"
+    },
+    {
+      "id": "act_val_azun_lac_estaing",
+      "destinationId": "dest_val_azun",
+      "name": "Balade au lac d’Estaing",
+      "category": "Lac",
+      "duration": "2h30",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "famille",
+        "facile"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade douce autour du lac.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_val_azun_velo_val_azun",
+      "destinationId": "dest_val_azun",
+      "name": "Vélo doux dans le Val d’Azun",
+      "category": "Vtt",
+      "duration": "3h",
+      "estimated_price": 35,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "velo",
+        "vallee"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie vélo adaptée au niveau.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_val_azun_village_val_azun",
+      "destinationId": "dest_val_azun",
+      "name": "Villages et granges du Val d’Azun",
+      "category": "Village",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "patrimoine"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte des villages.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_val_azun_raquettes_val_azun",
+      "destinationId": "dest_val_azun",
+      "name": "Raquettes en Val d’Azun",
+      "category": "Raquettes",
+      "duration": "3h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "raquettes",
+        "neige"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie hivernale douce.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_arreau_marche_arreau",
+      "destinationId": "dest_arreau",
+      "name": "Marché et produits locaux à Arreau",
+      "category": "Marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "marché local",
+        "repas local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte locale simple.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_arreau_patrimoine_arreau",
+      "destinationId": "dest_arreau",
+      "name": "Balade patrimoine d’Arreau",
+      "category": "Visite culturelle",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "patrimoine",
+        "village"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Visite légère du village.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_arreau_velo_aure_louron",
+      "destinationId": "dest_arreau",
+      "name": "Vélo vallée d’Aure-Louron",
+      "category": "Vtt",
+      "duration": "3h",
+      "estimated_price": 35,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "velo",
+        "vallee"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Parcours vélo selon niveau.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_arreau_repas_arreau",
+      "destinationId": "dest_arreau",
+      "name": "Repas local en vallée d’Aure",
+      "category": "Repas local",
+      "duration": "2h",
+      "estimated_price": 30,
+      "physical_level": "facile",
+      "ambience": [
+        "repas local",
+        "convivial"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas convivial dans la vallée.",
+      "image": "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_bareges_ski_tourmalet",
+      "destinationId": "dest_bareges",
+      "name": "Ski domaine Tourmalet",
+      "category": "Ski",
+      "duration": "5h",
+      "estimated_price": 55,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "ski",
+        "neige",
+        "station"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Journée ski selon enneigement.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_bareges_raquettes_bareges",
+      "destinationId": "dest_bareges",
+      "name": "Raquettes autour de Barèges",
+      "category": "Raquettes",
+      "duration": "3h",
+      "estimated_price": 40,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "raquettes",
+        "neige"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie neige encadrée.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_bareges_thermes_bareges",
+      "destinationId": "dest_bareges",
+      "name": "Pause thermale à Barèges",
+      "category": "Bains thermaux",
+      "duration": "2h",
+      "estimated_price": 25,
+      "physical_level": "facile",
+      "ambience": [
+        "thermes",
+        "confort"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Récupération après ski ou randonnée.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_bareges_rando_tourmalet",
+      "destinationId": "dest_bareges",
+      "name": "Randonnée secteur Tourmalet",
+      "category": "Randonnée",
+      "duration": "5h",
+      "estimated_price": 0,
+      "physical_level": "sportif",
+      "ambience": [
+        "randonnée",
+        "tourmalet"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie sportive selon météo.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_luz_saint_sauveur_pont_napoleon",
+      "destinationId": "dest_luz_saint_sauveur",
+      "name": "Pont Napoléon et vallée",
+      "category": "Visite culturelle",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "patrimoine",
+        "village"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte du patrimoine local.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/"
+    },
+    {
+      "id": "act_luz_saint_sauveur_bains_luzea",
+      "destinationId": "dest_luz_saint_sauveur",
+      "name": "Bains chauds à Luzéa",
+      "category": "Bains thermaux",
+      "duration": "2h",
+      "estimated_price": 30,
+      "physical_level": "facile",
+      "ambience": [
+        "thermes",
+        "premium"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Moment détente en vallée.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/"
+    },
+    {
+      "id": "act_luz_saint_sauveur_rando_luz",
+      "destinationId": "dest_luz_saint_sauveur",
+      "name": "Randonnée douce autour de Luz",
+      "category": "Randonnée",
+      "duration": "3h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "randonnee douce",
+        "vallee"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche accessible au départ de la vallée.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/"
+    },
+    {
+      "id": "act_luz_saint_sauveur_eaux_vives_luz",
+      "destinationId": "dest_luz_saint_sauveur",
+      "name": "Activité eaux vives encadrée",
+      "category": "Rafting",
+      "duration": "3h",
+      "estimated_price": 62,
+      "physical_level": "sportif",
+      "ambience": [
+        "eaux vives",
+        "fun"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité à encadrer professionnellement.",
+      "image": "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleesdegavarnie.com/"
+    },
+    {
+      "id": "act_ariege_pyrenees_sentier_cathare",
+      "destinationId": "dest_ariege_pyrenees",
+      "name": "Étape douce du Sentier Cathare",
+      "category": "Randonnée",
+      "duration": "5h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "patrimoine",
+        "randonnée",
+        "ariege"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Portion adaptée du sentier selon saison.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.ariegepyrenees.com/preparer/randonner/"
+    },
+    {
+      "id": "act_ariege_pyrenees_grotte_ariege",
+      "destinationId": "dest_ariege_pyrenees",
+      "name": "Visite de grotte / patrimoine souterrain",
+      "category": "Visite culturelle",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "grotte",
+        "patrimoine"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte culturelle souterraine.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.ariegepyrenees.com/preparer/randonner/"
+    },
+    {
+      "id": "act_ariege_pyrenees_lac_ariege",
+      "destinationId": "dest_ariege_pyrenees",
+      "name": "Randonnée lac ariégeois",
+      "category": "Lac",
+      "duration": "5h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "lac",
+        "sauvage",
+        "randonnée"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie nature plus sauvage.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.ariegepyrenees.com/preparer/randonner/"
+    },
+    {
+      "id": "act_ariege_pyrenees_vtt_ariege",
+      "destinationId": "dest_ariege_pyrenees",
+      "name": "VTT Ariège Pyrénées",
+      "category": "Vtt",
+      "duration": "3h",
+      "estimated_price": 42,
+      "physical_level": "sportif",
+      "ambience": [
+        "vtt",
+        "sportif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "VTT avec niveau adapté.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.ariegepyrenees.com/preparer/randonner/"
+    },
+    {
+      "id": "act_laruns_bious_artigues",
+      "destinationId": "dest_laruns",
+      "name": "Balade au lac de Bious-Artigues",
+      "category": "Lac",
+      "duration": "3h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "Ossau",
+        "facile"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade de découverte près du lac.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_laruns_marche_laruns",
+      "destinationId": "dest_laruns",
+      "name": "Marché de Laruns et produits locaux",
+      "category": "Marché local",
+      "duration": "2h",
+      "estimated_price": 22,
+      "physical_level": "facile",
+      "ambience": [
+        "marché local",
+        "repas local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment local et convivial.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_laruns_pastoralisme_laruns",
+      "destinationId": "dest_laruns",
+      "name": "Pastoralisme et fromages d’Ossau",
+      "category": "Ferme locale",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "pastoralisme",
+        "repas local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Rencontre autour de la culture pastorale.",
+      "image": "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_laruns_rafting_laruns",
+      "destinationId": "dest_laruns",
+      "name": "Rafting encadré secteur Ossau",
+      "category": "Rafting",
+      "duration": "3h",
+      "estimated_price": 62,
+      "physical_level": "sportif",
+      "ambience": [
+        "eaux vives",
+        "fun"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité eaux vives avec prestataire.",
+      "image": "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_gourette_ski_gourette",
+      "destinationId": "dest_gourette",
+      "name": "Ski à Gourette",
+      "category": "Ski",
+      "duration": "5h",
+      "estimated_price": 50,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "ski",
+        "neige"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Journée ski en station.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_gourette_trail_gourette",
+      "destinationId": "dest_gourette",
+      "name": "Trail montagne autour de Gourette",
+      "category": "Trail",
+      "duration": "3h",
+      "estimated_price": 0,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sportif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie trail adaptée aux sportifs.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_gourette_raquettes_gourette",
+      "destinationId": "dest_gourette",
+      "name": "Raquettes en station",
+      "category": "Raquettes",
+      "duration": "3h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "raquettes",
+        "neige"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité hiver accessible.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_gourette_belvedere_gourette",
+      "destinationId": "dest_gourette",
+      "name": "Belvédère et photographie",
+      "category": "Photographie",
+      "duration": "2h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "photographie",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Pause panorama en altitude.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_artouste_train_artouste",
+      "destinationId": "dest_artouste",
+      "name": "Train d’Artouste",
+      "category": "Visite culturelle",
+      "duration": "4h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "train de montagne",
+        "facile"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Train panoramique en altitude.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_artouste_lac_artouste",
+      "destinationId": "dest_artouste",
+      "name": "Lac d’Artouste",
+      "category": "Lac",
+      "duration": "4h",
+      "estimated_price": 22,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "lac",
+        "haute montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte du lac selon accès.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_artouste_photo_artouste",
+      "destinationId": "dest_artouste",
+      "name": "Photographie panoramique Artouste",
+      "category": "Photographie",
+      "duration": "2h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "photographie",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Spot photo en haute montagne.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_artouste_pique_nique_artouste",
+      "destinationId": "dest_artouste",
+      "name": "Pique-nique groupe à Artouste",
+      "category": "Repas local",
+      "duration": "2h",
+      "estimated_price": 18,
+      "physical_level": "facile",
+      "ambience": [
+        "repas local",
+        "groupe"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment convivial à organiser.",
+      "image": "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.valleedossau.com/"
+    },
+    {
+      "id": "act_neouvielle_boucle_lacs",
+      "destinationId": "dest_neouvielle",
+      "name": "Boucle des lacs du Néouvielle",
+      "category": "Lac",
+      "duration": "5h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "lac",
+        "reserve",
+        "photographie"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Boucle contemplative dans la réserve.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.saintlary.com/ete/experiences-a-vivre/randonnee-autour-des-lacs-du-neouvielle/"
+    },
+    {
+      "id": "act_neouvielle_photo_neouvielle",
+      "destinationId": "dest_neouvielle",
+      "name": "Photographie lacs et pins à crochets",
+      "category": "Photographie",
+      "duration": "3h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "photographie",
+        "lac",
+        "calme"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Session photo nature.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.saintlary.com/ete/experiences-a-vivre/randonnee-autour-des-lacs-du-neouvielle/"
+    },
+    {
+      "id": "act_neouvielle_bivouac_neouvielle",
+      "destinationId": "dest_neouvielle",
+      "name": "Bivouac réglementé près des lacs",
+      "category": "Bivouac",
+      "duration": "10h",
+      "estimated_price": 15,
+      "physical_level": "sportif",
+      "ambience": [
+        "bivouac",
+        "déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "À cadrer strictement avec règles locales.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.saintlary.com/ete/experiences-a-vivre/randonnee-autour-des-lacs-du-neouvielle/"
+    },
+    {
+      "id": "act_neouvielle_guide_neouvielle",
+      "destinationId": "dest_neouvielle",
+      "name": "Sortie accompagnée Néouvielle",
+      "category": "Randonnée",
+      "duration": "5h",
+      "estimated_price": 45,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "guided",
+        "safety"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Guide recommandé pour groupe mixte.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.saintlary.com/ete/experiences-a-vivre/randonnee-autour-des-lacs-du-neouvielle/"
+    },
+    {
+      "id": "act_loudenvielle_lac_genos",
+      "destinationId": "dest_loudenvielle",
+      "name": "Balade autour du lac de Génos",
+      "category": "Lac",
+      "duration": "2h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "facile",
+        "famille"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade douce autour du lac.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_loudenvielle_balnea",
+      "destinationId": "dest_loudenvielle",
+      "name": "Bains Balnéa / bien-être",
+      "category": "Bains thermaux",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "thermes",
+        "premium",
+        "confort"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Pause confort et détente.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_loudenvielle_parapente_louron",
+      "destinationId": "dest_loudenvielle",
+      "name": "Parapente encadré en vallée du Louron",
+      "category": "Parapente",
+      "duration": "2h",
+      "estimated_price": 105,
+      "physical_level": "sportif",
+      "ambience": [
+        "parapente",
+        "fun"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Vol encadré selon météo.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_loudenvielle_rando_val_louron",
+      "destinationId": "dest_loudenvielle",
+      "name": "Randonnée Val Louron",
+      "category": "Randonnée",
+      "duration": "4h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnée",
+        "vallee"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche panoramique dans le Louron.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.pyrenees2vallees.com/accueil"
+    },
+    {
+      "id": "act_canfranc_gare_canfranc",
+      "destinationId": "dest_canfranc",
+      "name": "Visite de la gare de Canfranc",
+      "category": "Visite culturelle",
+      "duration": "2h",
+      "estimated_price": 12,
+      "physical_level": "facile",
+      "ambience": [
+        "patrimoine",
+        "Espagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte d’un site ferroviaire emblématique.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.turismodearagon.com/rutas-por-aragon/pirineo-de-oeste-a-este/"
+    },
+    {
+      "id": "act_canfranc_chemin_aragon",
+      "destinationId": "dest_canfranc",
+      "name": "Randonnée chemin transfrontalier",
+      "category": "Randonnée",
+      "duration": "4h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "frontière",
+        "randonnée"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche entre vallée et frontière.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.turismodearagon.com/rutas-por-aragon/pirineo-de-oeste-a-este/"
+    },
+    {
+      "id": "act_canfranc_village_canfranc",
+      "destinationId": "dest_canfranc",
+      "name": "Village et tapas local",
+      "category": "Repas local",
+      "duration": "2h",
+      "estimated_price": 25,
+      "physical_level": "facile",
+      "ambience": [
+        "repas local",
+        "Espagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Pause locale côté espagnol.",
+      "image": "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.turismodearagon.com/rutas-por-aragon/pirineo-de-oeste-a-este/"
+    },
+    {
+      "id": "act_canfranc_photo_somport",
+      "destinationId": "dest_canfranc",
+      "name": "Photographie Somport / Pyrénées espagnoles",
+      "category": "Photographie",
+      "duration": "2h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "photographie",
+        "frontière"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment photo au passage frontalier.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.turismodearagon.com/rutas-por-aragon/pirineo-de-oeste-a-este/"
+    },
+    {
+      "id": "act_ordesa_cola_caballo",
+      "destinationId": "dest_ordesa",
+      "name": "Randonnée Cola de Caballo",
+      "category": "Randonnée",
+      "duration": "7h",
+      "estimated_price": 0,
+      "physical_level": "sportif",
+      "ambience": [
+        "cascade",
+        "parc national",
+        "sportif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Grande randonnée emblématique d’Ordesa.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_ordesa_torla_village",
+      "destinationId": "dest_ordesa",
+      "name": "Village de Torla et accès parc",
+      "category": "Village",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "Espagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte du village porte du parc.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_ordesa_miradores_ordesa",
+      "destinationId": "dest_ordesa",
+      "name": "Miradors d’Ordesa",
+      "category": "Photographie",
+      "duration": "4h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "photographie",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Points de vue panoramiques.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_ordesa_canyon_ordesa",
+      "destinationId": "dest_ordesa",
+      "name": "Canyons et lecture géologique guidée",
+      "category": "Visite culturelle",
+      "duration": "3h",
+      "estimated_price": 42,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "geologie",
+        "guided"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Approche guidée et non spéculative du parc.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_benasque_aigualluts",
+      "destinationId": "dest_benasque",
+      "name": "Randonnée Forau d’Aigualluts",
+      "category": "Randonnée",
+      "duration": "5h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnée",
+        "haute montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Classique vers le secteur Aneto.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_benasque_village_benasque",
+      "destinationId": "dest_benasque",
+      "name": "Village de Benasque et culture aragonaise",
+      "category": "Village",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "Espagne",
+        "repas local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade village et repas.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_benasque_trail_maladeta",
+      "destinationId": "dest_benasque",
+      "name": "Trail sportif secteur Maladeta",
+      "category": "Trail",
+      "duration": "4h",
+      "estimated_price": 0,
+      "physical_level": "expert",
+      "ambience": [
+        "trail",
+        "expert",
+        "haute montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie réservée à profils sportifs.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_benasque_guide_aneto",
+      "destinationId": "dest_benasque",
+      "name": "Sortie haute montagne encadrée Aneto/Maladeta",
+      "category": "Randonnée",
+      "duration": "8h",
+      "estimated_price": 130,
+      "physical_level": "expert",
+      "ambience": [
+        "haute montagne",
+        "guided"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Uniquement avec professionnels qualifiés.",
+      "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_vall_de_boi_eglises_romanes",
+      "destinationId": "dest_vall_de_boi",
+      "name": "Villages et églises romanes",
+      "category": "Visite culturelle",
+      "duration": "3h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "patrimoine",
+        "catalogne",
+        "village"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte patrimoniale de la vallée.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_vall_de_boi_aiguestortes_lacs",
+      "destinationId": "dest_vall_de_boi",
+      "name": "Randonnée Aigüestortes et lacs",
+      "category": "Lac",
+      "duration": "5h",
+      "estimated_price": 0,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "lac",
+        "parc national",
+        "randonnée"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte nature en parc national.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_vall_de_boi_village_boi",
+      "destinationId": "dest_vall_de_boi",
+      "name": "Slow travel villages catalans",
+      "category": "Village",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "slow travel",
+        "village",
+        "catalogne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Temps calme entre villages.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_vall_de_boi_photo_boi",
+      "destinationId": "dest_vall_de_boi",
+      "name": "Photographie vallée et montagnes catalanes",
+      "category": "Photographie",
+      "duration": "2h",
+      "estimated_price": 0,
+      "physical_level": "facile",
+      "ambience": [
+        "photographie",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Session photo contemplative.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://www.spain.info/en/discover-spain/pyrenees/"
+    },
+    {
+      "id": "act_cerdagne_capcir_bouillouses",
+      "destinationId": "dest_cerdagne_capcir",
+      "name": "Randonnée des Bouillouses",
+      "category": "Lac",
+      "duration": "5h",
+      "estimated_price": 10,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "lac",
+        "cerdagne",
+        "randonnée"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Randonnée autour des lacs.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://font-romeu.fr/"
+    },
+    {
+      "id": "act_cerdagne_capcir_bains_llo_dorres",
+      "destinationId": "dest_cerdagne_capcir",
+      "name": "Bains chauds Llo / Dorres",
+      "category": "Bains thermaux",
+      "duration": "2h",
+      "estimated_price": 25,
+      "physical_level": "facile",
+      "ambience": [
+        "bains chauds",
+        "premium",
+        "confort"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Détente en eaux chaudes.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://font-romeu.fr/"
+    },
+    {
+      "id": "act_cerdagne_capcir_ski_nordique_capcir",
+      "destinationId": "dest_cerdagne_capcir",
+      "name": "Ski nordique Capcir",
+      "category": "Ski",
+      "duration": "4h",
+      "estimated_price": 32,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "ski nordique",
+        "neige"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité hiver plus douce que ski alpin.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://font-romeu.fr/"
+    },
+    {
+      "id": "act_cerdagne_capcir_train_jaune_capcir",
+      "destinationId": "dest_cerdagne_capcir",
+      "name": "Train Jaune et villages de Cerdagne",
+      "category": "Visite culturelle",
+      "duration": "4h",
+      "estimated_price": 22,
+      "physical_level": "facile",
+      "ambience": [
+        "Train Jaune",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte sans voiture partielle.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
+      "source": "mock",
+      "external_url": "https://font-romeu.fr/"
+    }
+  ]
+}

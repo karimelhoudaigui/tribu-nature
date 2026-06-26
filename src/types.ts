@@ -1,5 +1,11 @@
 export type PhysicalLevel = "tres-facile" | "facile" | "facile-intermediaire" | "intermediaire" | "sportif";
 
+export type TripCardType = "catalog" | "user_project";
+export type TripCreatedByType = "platform" | "user";
+export type TripPlanningStatus = "idea" | "forming_group" | "planned" | "confirmed" | "cancelled";
+export type TripVisibility = "public" | "private" | "unlisted";
+export type TripModerationStatus = "approved" | "pending" | "rejected";
+
 export type UserProfile = {
   id: string;
   name: string;
@@ -52,6 +58,19 @@ export type Trip = {
   community?: boolean;
   created_by?: string;
   brief?: string;
+  card_type?: TripCardType;
+  created_by_type?: TripCreatedByType;
+  planning_status?: TripPlanningStatus;
+  visibility?: TripVisibility;
+  moderation_status?: TripModerationStatus;
+  creator_name?: string;
+  creator_id?: string;
+  departure_city?: string;
+  max_participants?: number;
+  current_participants?: number;
+  conversation_id?: string;
+  source_catalog_trip_id?: string;
+  created_from_catalog?: boolean;
 };
 
 export type OnboardingProfile = {

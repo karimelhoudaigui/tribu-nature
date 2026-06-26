@@ -13,8 +13,9 @@ import type {
   UserProfile,
   Vote
 } from "./types";
+import { excelActivities, excelTrips } from "./excelCatalog";
 
-export const trips: Trip[] = [
+const baseTrips: Trip[] = [
   {
     id: "aspe",
     title: "Week-end nature en Vallée d'Aspe",
@@ -101,6 +102,8 @@ export const trips: Trip[] = [
     activities: ["Randonnée", "Ferme", "Marché", "Village"]
   }
 ];
+
+export const trips: Trip[] = [...baseTrips, ...excelTrips];
 
 export const mockDestinations: MockDestination[] = [
   {
@@ -264,7 +267,7 @@ export const mockCollectiveIntents: CollectiveIntent[] = [
   }
 ];
 
-export const mockLocalActivities: MockLocalActivity[] = [
+const baseMockLocalActivities: MockLocalActivity[] = [
   {
     id: "aspe-rando",
     destinationId: "vallee-aspe",
@@ -426,6 +429,8 @@ export const mockLocalActivities: MockLocalActivity[] = [
     external_url: "https://www.openstreetmap.org/#map=13/48.404/2.701"
   }
 ];
+
+export const mockLocalActivities: MockLocalActivity[] = [...baseMockLocalActivities, ...excelActivities];
 
 export const mockMembers: MockMember[] = [
   {

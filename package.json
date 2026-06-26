@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "seed:supabase": "node scripts/seedSupabaseCatalog.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

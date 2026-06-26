@@ -1,0 +1,5428 @@
+{
+  "trips": [
+    {
+      "id": "trip_week_end_nature_dans_les_calanques",
+      "title": "Week-end nature dans les Calanques",
+      "destination": "Calanques Marseille-Cassis, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-07-11 -> 2026-07-12",
+      "duration": "2 jours",
+      "budget_min": 120,
+      "budget_max": 360,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "nature",
+        "Fun & aventure douce",
+        "petit groupe"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Week-end nature dans les Calanques : séjour 2 jours autour de Calanques Marseille-Cassis, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Sentier littoral - Calanques Marseille-Cassis",
+        "Kayak de mer encadré - Calanques Marseille-Cassis",
+        "Baignade et criques - Calanques Marseille-Cassis",
+        "Photographie littorale - Calanques Marseille-Cassis"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_calanques",
+        "Point de rendez-vous: Marseille/Cassis accessibles en train",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.calanques-parcnational.fr/fr"
+      ],
+      "matched_member_ids": [
+        "jonathan"
+      ],
+      "generated_activity_ids": [
+        "act_sentier_littoral_calanques_marseille_cass",
+        "act_kayak_de_mer_encadre_calanques_marseille_cass",
+        "act_baignade_et_criques_calanques_marseille_cass",
+        "act_photographie_littorale_calanques_marseille_cass"
+      ]
+    },
+    {
+      "id": "trip_deconnexion_mer_et_criques_a_cassis",
+      "title": "Déconnexion mer et criques à Cassis",
+      "destination": "Cassis, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-07-18 -> 2026-07-19",
+      "duration": "2 jours",
+      "budget_min": 180,
+      "budget_max": 560,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Calme & déconnexion",
+        "Premium & confort",
+        "contemplatif"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Déconnexion mer et criques à Cassis : séjour 2 jours autour de Cassis, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Cassis",
+        "Marché local - Cassis",
+        "Repas local - Cassis",
+        "Atelier artisanal - Cassis"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_calanques",
+        "Point de rendez-vous: Gare de Cassis",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.marseille-tourisme.com/decouvrez-marseille/calanques-plages-et-nature/les-calanques-de-marseille/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_visite_du_village_cassis",
+        "act_marche_local_cassis",
+        "act_repas_local_cassis",
+        "act_atelier_artisanal_cassis"
+      ]
+    },
+    {
+      "id": "trip_verdon_aventure_douce_kayak_et_villages",
+      "title": "Verdon aventure douce kayak et villages",
+      "destination": "Gorges du Verdon, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-01 -> 2026-08-03",
+      "duration": "3 jours",
+      "budget_min": 190,
+      "budget_max": 520,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "Fun & aventure douce",
+        "nature",
+        "Découverte locale"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Verdon aventure douce kayak et villages : séjour 3 jours autour de Gorges du Verdon, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Balade autour du lac - Gorges du Verdon",
+        "Kayak ou paddle - Gorges du Verdon",
+        "Bivouac encadré - Gorges du Verdon",
+        "Photographie au coucher du soleil - Gorges du Verdon"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_verdon",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.parcduverdon.fr/"
+      ],
+      "matched_member_ids": [
+        "jonathan",
+        "mehdi"
+      ],
+      "generated_activity_ids": [
+        "act_balade_autour_du_lac_gorges_du_verdon",
+        "act_kayak_ou_paddle_gorges_du_verdon",
+        "act_bivouac_encadre_gorges_du_verdon",
+        "act_photographie_au_coucher_du_soleil_gorges_du_verdon"
+      ]
+    },
+    {
+      "id": "trip_lac_de_sainte_croix_en_petit_groupe",
+      "title": "Lac de Sainte-Croix en petit groupe",
+      "destination": "Lac de Sainte-Croix, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-15 -> 2026-08-16",
+      "duration": "2 jours",
+      "budget_min": 150,
+      "budget_max": 430,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Calme & déconnexion",
+        "Fun & aventure douce",
+        "petit groupe"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Lac de Sainte-Croix en petit groupe : séjour 2 jours autour de Lac de Sainte-Croix, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Balade autour du lac - Lac de Sainte-Croix",
+        "Kayak ou paddle - Lac de Sainte-Croix",
+        "Bivouac encadré - Lac de Sainte-Croix",
+        "Photographie au coucher du soleil - Lac de Sainte-Croix"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_verdon",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.verdontourisme.com/"
+      ],
+      "matched_member_ids": [
+        "sofia"
+      ],
+      "generated_activity_ids": [
+        "act_balade_autour_du_lac_lac_de_sainte_croix",
+        "act_kayak_ou_paddle_lac_de_sainte_croix",
+        "act_bivouac_encadre_lac_de_sainte_croix",
+        "act_photographie_au_coucher_du_soleil_lac_de_sainte_croix"
+      ]
+    },
+    {
+      "id": "trip_mercantour_lacs_et_contemplation",
+      "title": "Mercantour lacs et contemplation",
+      "destination": "Parc national du Mercantour, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-22 -> 2026-08-24",
+      "duration": "3 jours",
+      "budget_min": 200,
+      "budget_max": 520,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "nature",
+        "contemplatif",
+        "Calme & déconnexion"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Mercantour lacs et contemplation : séjour 3 jours autour de Parc national du Mercantour, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée panoramique - Parc national du Mercantour",
+        "Nuit en refuge - Parc national du Mercantour",
+        "Observation étoiles - Parc national du Mercantour",
+        "Trail découverte - Parc national du Mercantour"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_mercantour",
+        "Point de rendez-vous: Nice",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.mercantour-parcnational.fr/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_randonnee_panoramique_parc_national_du_mercant",
+        "act_nuit_en_refuge_parc_national_du_mercant",
+        "act_observation_etoiles_parc_national_du_mercant",
+        "act_trail_decouverte_parc_national_du_mercant"
+      ]
+    },
+    {
+      "id": "trip_vallee_des_merveilles_en_refuge",
+      "title": "Vallée des Merveilles en refuge",
+      "destination": "Vallée des Merveilles, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-04 -> 2026-09-06",
+      "duration": "3 jours",
+      "budget_min": 240,
+      "budget_max": 620,
+      "physical_level": "sportif",
+      "ambience_tags": [
+        "Sport & dépassement",
+        "contemplatif",
+        "refuge"
+      ],
+      "compatibility_score": 78,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Vallée des Merveilles en refuge : séjour 3 jours autour de Vallée des Merveilles, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée panoramique - Vallée des Merveilles",
+        "Nuit en refuge - Vallée des Merveilles",
+        "Observation étoiles - Vallée des Merveilles",
+        "Trail découverte - Vallée des Merveilles"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_mercantour",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.mercantour-parcnational.fr/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_randonnee_panoramique_vallee_des_merveilles",
+        "act_nuit_en_refuge_vallee_des_merveilles",
+        "act_observation_etoiles_vallee_des_merveilles",
+        "act_trail_decouverte_vallee_des_merveilles"
+      ]
+    },
+    {
+      "id": "trip_week_end_sportif_a_saint_martin_vesubie",
+      "title": "Week-end sportif à Saint-Martin-Vésubie",
+      "destination": "Saint-Martin-Vésubie, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-12 -> 2026-09-13",
+      "duration": "2 jours",
+      "budget_min": 150,
+      "budget_max": 420,
+      "physical_level": "sportif",
+      "ambience_tags": [
+        "Sport & dépassement",
+        "Fun & aventure douce",
+        "nature"
+      ],
+      "compatibility_score": 78,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Week-end sportif à Saint-Martin-Vésubie : séjour 2 jours autour de Saint-Martin-Vésubie, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée panoramique - Saint-Martin-Vésubie",
+        "Nuit en refuge - Saint-Martin-Vésubie",
+        "Observation étoiles - Saint-Martin-Vésubie",
+        "Trail découverte - Saint-Martin-Vésubie"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_vesubie",
+        "Point de rendez-vous: Nice",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.explorenicecotedazur.com/sortir/randonnees/"
+      ],
+      "matched_member_ids": [
+        "mehdi"
+      ],
+      "generated_activity_ids": [
+        "act_randonnee_panoramique_saint_martin_vesubie",
+        "act_nuit_en_refuge_saint_martin_vesubie",
+        "act_observation_etoiles_saint_martin_vesubie",
+        "act_trail_decouverte_saint_martin_vesubie"
+      ]
+    },
+    {
+      "id": "trip_valberg_famille_montagne_et_raquettes",
+      "title": "Valberg famille montagne et raquettes",
+      "destination": "Valberg, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-12-12 -> 2026-12-13",
+      "duration": "2 jours",
+      "budget_min": 160,
+      "budget_max": 480,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Fun & aventure douce",
+        "famille",
+        "nature"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Valberg famille montagne et raquettes : séjour 2 jours autour de Valberg, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée panoramique - Valberg",
+        "Nuit en refuge - Valberg",
+        "Observation étoiles - Valberg",
+        "Trail découverte - Valberg"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_mercantour",
+        "Point de rendez-vous: Nice",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.mercantour-parcnational.fr/"
+      ],
+      "matched_member_ids": [
+        "sofia"
+      ],
+      "generated_activity_ids": [
+        "act_randonnee_panoramique_valberg",
+        "act_nuit_en_refuge_valberg",
+        "act_observation_etoiles_valberg",
+        "act_trail_decouverte_valberg"
+      ]
+    },
+    {
+      "id": "trip_road_trip_panoramique_col_de_la_bonette",
+      "title": "Road trip panoramique Col de la Bonette",
+      "destination": "Col de la Bonette, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-19 -> 2026-09-20",
+      "duration": "2 jours",
+      "budget_min": 130,
+      "budget_max": 380,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "contemplatif",
+        "road trip",
+        "petit groupe"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Road trip panoramique Col de la Bonette : séjour 2 jours autour de Col de la Bonette, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée panoramique - Col de la Bonette",
+        "Nuit en refuge - Col de la Bonette",
+        "Observation étoiles - Col de la Bonette",
+        "Trail découverte - Col de la Bonette"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_ubaye",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.ubaye.com/"
+      ],
+      "matched_member_ids": [
+        "mehdi"
+      ],
+      "generated_activity_ids": [
+        "act_randonnee_panoramique_col_de_la_bonette",
+        "act_nuit_en_refuge_col_de_la_bonette",
+        "act_observation_etoiles_col_de_la_bonette",
+        "act_trail_decouverte_col_de_la_bonette"
+      ]
+    },
+    {
+      "id": "trip_ubaye_rafting_et_villages",
+      "title": "Ubaye rafting et villages",
+      "destination": "Barcelonnette, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-07-25 -> 2026-07-27",
+      "duration": "3 jours",
+      "budget_min": 180,
+      "budget_max": 500,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "Fun & aventure douce",
+        "Découverte locale",
+        "group"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Ubaye rafting et villages : séjour 3 jours autour de Barcelonnette, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Barcelonnette",
+        "Marché local - Barcelonnette",
+        "Repas local - Barcelonnette",
+        "Atelier artisanal - Barcelonnette"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_ubaye",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.ubaye.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_visite_du_village_barcelonnette",
+        "act_marche_local_barcelonnette",
+        "act_repas_local_barcelonnette",
+        "act_atelier_artisanal_barcelonnette"
+      ]
+    },
+    {
+      "id": "trip_lac_d_allos_randonnee_contemplative",
+      "title": "Lac d'Allos randonnée contemplative",
+      "destination": "Lac d'Allos, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-29 -> 2026-08-30",
+      "duration": "2 jours",
+      "budget_min": 130,
+      "budget_max": 360,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "Calme & déconnexion",
+        "contemplatif",
+        "nature"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Lac d'Allos randonnée contemplative : séjour 2 jours autour de Lac d'Allos, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée panoramique - Lac d'Allos",
+        "Nuit en refuge - Lac d'Allos",
+        "Observation étoiles - Lac d'Allos",
+        "Trail découverte - Lac d'Allos"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_mercantour",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.mercantour-parcnational.fr/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_randonnee_panoramique_lac_d_allos",
+        "act_nuit_en_refuge_lac_d_allos",
+        "act_observation_etoiles_lac_d_allos",
+        "act_trail_decouverte_lac_d_allos"
+      ]
+    },
+    {
+      "id": "trip_sisteron_patrimoine_et_falaises",
+      "title": "Sisteron patrimoine et falaises",
+      "destination": "Sisteron, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-03 -> 2026-10-04",
+      "duration": "2 jours",
+      "budget_min": 120,
+      "budget_max": 330,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Découverte locale",
+        "Calme & déconnexion",
+        "culture"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Sisteron patrimoine et falaises : séjour 2 jours autour de Sisteron, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Sisteron",
+        "Marché local - Sisteron",
+        "Repas local - Sisteron",
+        "Atelier artisanal - Sisteron"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_alpes_haute_provence",
+        "Point de rendez-vous: Gare de Sisteron",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://provence-alpes-cotedazur.com/"
+      ],
+      "matched_member_ids": [
+        "sofia"
+      ],
+      "generated_activity_ids": [
+        "act_visite_du_village_sisteron",
+        "act_marche_local_sisteron",
+        "act_repas_local_sisteron",
+        "act_atelier_artisanal_sisteron"
+      ]
+    },
+    {
+      "id": "trip_slow_travel_lavandes_a_valensole",
+      "title": "Slow travel lavandes à Valensole",
+      "destination": "Plateau de Valensole, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1499002238440-d264edd596ec?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2027-06-26 -> 2027-06-27",
+      "duration": "2 jours",
+      "budget_min": 130,
+      "budget_max": 390,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "contemplatif",
+        "Découverte locale",
+        "Premium & confort"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Slow travel lavandes à Valensole : séjour 2 jours autour de Plateau de Valensole, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Plateau de Valensole",
+        "Marché local - Plateau de Valensole",
+        "Repas local - Plateau de Valensole",
+        "Atelier artisanal - Plateau de Valensole"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_valensole",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.verdontourisme.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_visite_du_village_plateau_de_valensole",
+        "act_marche_local_plateau_de_valensole",
+        "act_repas_local_plateau_de_valensole",
+        "act_atelier_artisanal_plateau_de_valensole"
+      ]
+    },
+    {
+      "id": "trip_castellane_verdon_sportif",
+      "title": "Castellane Verdon sportif",
+      "destination": "Castellane, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-26 -> 2026-09-28",
+      "duration": "3 jours",
+      "budget_min": 190,
+      "budget_max": 520,
+      "physical_level": "sportif",
+      "ambience_tags": [
+        "Sport & dépassement",
+        "Fun & aventure douce",
+        "nature"
+      ],
+      "compatibility_score": 78,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Castellane Verdon sportif : séjour 3 jours autour de Castellane, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée dans les gorges - Castellane",
+        "Canyoning encadré - Castellane",
+        "Rafting encadré - Castellane",
+        "Village et belvédères - Castellane"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_verdon",
+        "Point de rendez-vous: Bus depuis Digne/Nice à vérifier",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.verdontourisme.com/"
+      ],
+      "matched_member_ids": [
+        "mehdi"
+      ],
+      "generated_activity_ids": [
+        "act_randonnee_dans_les_gorges_castellane",
+        "act_canyoning_encadre_castellane",
+        "act_rafting_encadre_castellane",
+        "act_village_et_belvederes_castellane"
+      ]
+    },
+    {
+      "id": "trip_serre_poncon_lac_et_montagne",
+      "title": "Serre-Ponçon lac et montagne",
+      "destination": "Serre-Ponçon, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-08 -> 2026-08-10",
+      "duration": "3 jours",
+      "budget_min": 170,
+      "budget_max": 500,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Fun & aventure douce",
+        "nature",
+        "petit groupe"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Serre-Ponçon lac et montagne : séjour 3 jours autour de Serre-Ponçon, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée panoramique - Serre-Ponçon",
+        "Nuit en refuge - Serre-Ponçon",
+        "Observation étoiles - Serre-Ponçon",
+        "Trail découverte - Serre-Ponçon"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_serre_poncon",
+        "Point de rendez-vous: Gares Embrun/Gap selon secteur",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.serreponcon.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_randonnee_panoramique_serre_poncon",
+        "act_nuit_en_refuge_serre_poncon",
+        "act_observation_etoiles_serre_poncon",
+        "act_trail_decouverte_serre_poncon"
+      ]
+    },
+    {
+      "id": "trip_embrun_train_accessible_et_lac",
+      "title": "Embrun train accessible et lac",
+      "destination": "Embrun, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-10 -> 2026-10-11",
+      "duration": "2 jours",
+      "budget_min": 140,
+      "budget_max": 400,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Découverte locale",
+        "Calme & déconnexion",
+        "nature"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Embrun train accessible et lac : séjour 2 jours autour de Embrun, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Balade autour du lac - Embrun",
+        "Kayak ou paddle - Embrun",
+        "Bivouac encadré - Embrun",
+        "Photographie au coucher du soleil - Embrun"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_serre_poncon",
+        "Point de rendez-vous: Gare d'Embrun",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.serreponcon.com/"
+      ],
+      "matched_member_ids": [
+        "sofia"
+      ],
+      "generated_activity_ids": [
+        "act_balade_autour_du_lac_embrun",
+        "act_kayak_ou_paddle_embrun",
+        "act_bivouac_encadre_embrun",
+        "act_photographie_au_coucher_du_soleil_embrun"
+      ]
+    },
+    {
+      "id": "trip_queyras_refuge_et_ciel_etoile",
+      "title": "Queyras refuge et ciel étoilé",
+      "destination": "Queyras, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-05 -> 2026-09-08",
+      "duration": "4 jours",
+      "budget_min": 240,
+      "budget_max": 650,
+      "physical_level": "sportif",
+      "ambience_tags": [
+        "nature",
+        "contemplatif",
+        "refuge"
+      ],
+      "compatibility_score": 78,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Queyras refuge et ciel étoilé : séjour 4 jours autour de Queyras, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée panoramique - Queyras",
+        "Nuit en refuge - Queyras",
+        "Observation étoiles - Queyras",
+        "Trail découverte - Queyras"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_queyras",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://lequeyras.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_randonnee_panoramique_queyras",
+        "act_nuit_en_refuge_queyras",
+        "act_observation_etoiles_queyras",
+        "act_trail_decouverte_queyras"
+      ]
+    },
+    {
+      "id": "trip_saint_veran_contemplation_premium",
+      "title": "Saint-Véran contemplation premium",
+      "destination": "Saint-Véran, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-18 -> 2026-09-20",
+      "duration": "3 jours",
+      "budget_min": 220,
+      "budget_max": 620,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "contemplatif",
+        "Calme & déconnexion",
+        "Premium & confort"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Saint-Véran contemplation premium : séjour 3 jours autour de Saint-Véran, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Saint-Véran",
+        "Marché local - Saint-Véran",
+        "Repas local - Saint-Véran",
+        "Atelier artisanal - Saint-Véran"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_queyras",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://lequeyras.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_visite_du_village_saint_veran",
+        "act_marche_local_saint_veran",
+        "act_repas_local_saint_veran",
+        "act_atelier_artisanal_saint_veran"
+      ]
+    },
+    {
+      "id": "trip_briancon_culture_et_montagne",
+      "title": "Briançon culture et montagne",
+      "destination": "Briançon, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-17 -> 2026-10-19",
+      "duration": "3 jours",
+      "budget_min": 170,
+      "budget_max": 500,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "Découverte locale",
+        "nature",
+        "culture"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Briançon culture et montagne : séjour 3 jours autour de Briançon, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée panoramique - Briançon",
+        "Nuit en refuge - Briançon",
+        "Observation étoiles - Briançon",
+        "Trail découverte - Briançon"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_brianconnais",
+        "Point de rendez-vous: Gare de Briançon",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.hautes-alpes.net/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_randonnee_panoramique_briancon",
+        "act_nuit_en_refuge_briancon",
+        "act_observation_etoiles_briancon",
+        "act_trail_decouverte_briancon"
+      ]
+    },
+    {
+      "id": "trip_claree_lacs_et_silence",
+      "title": "Clarée lacs et silence",
+      "destination": "Vallée de la Clarée, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-11 -> 2026-09-13",
+      "duration": "3 jours",
+      "budget_min": 200,
+      "budget_max": 560,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "Calme & déconnexion",
+        "contemplatif",
+        "petit groupe"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Clarée lacs et silence : séjour 3 jours autour de Vallée de la Clarée, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Balade autour du lac - Vallée de la Clarée",
+        "Kayak ou paddle - Vallée de la Clarée",
+        "Bivouac encadré - Vallée de la Clarée",
+        "Photographie au coucher du soleil - Vallée de la Clarée"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_claree",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.hautes-alpes.net/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_balade_autour_du_lac_vallee_de_la_claree",
+        "act_kayak_ou_paddle_vallee_de_la_claree",
+        "act_bivouac_encadre_vallee_de_la_claree",
+        "act_photographie_au_coucher_du_soleil_vallee_de_la_claree"
+      ]
+    },
+    {
+      "id": "trip_orcieres_week_end_neige_debutant",
+      "title": "Orcières week-end neige débutant",
+      "destination": "Orcières-Merlette, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2027-01-16 -> 2027-01-17",
+      "duration": "2 jours",
+      "budget_min": 170,
+      "budget_max": 480,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Fun & aventure douce",
+        "famille",
+        "nature"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Orcières week-end neige débutant : séjour 2 jours autour de Orcières-Merlette, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Ski alpin ou nordique - Orcières-Merlette",
+        "Raquettes encadrées - Orcières-Merlette",
+        "Vtt station - Orcières-Merlette",
+        "Balade station famille - Orcières-Merlette"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_champsaur",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.hautes-alpes.net/"
+      ],
+      "matched_member_ids": [
+        "sofia"
+      ],
+      "generated_activity_ids": [
+        "act_ski_alpin_ou_nordique_orcieres_merlette",
+        "act_raquettes_encadrees_orcieres_merlette",
+        "act_vtt_station_orcieres_merlette",
+        "act_balade_station_famille_orcieres_merlette"
+      ]
+    },
+    {
+      "id": "trip_pays_des_ecrins_randonnee_et_refuge",
+      "title": "Pays des Écrins randonnée et refuge",
+      "destination": "Vallouise-Pays des Écrins, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-29 -> 2026-09-01",
+      "duration": "4 jours",
+      "budget_min": 240,
+      "budget_max": 680,
+      "physical_level": "sportif",
+      "ambience_tags": [
+        "Sport & dépassement",
+        "nature",
+        "refuge"
+      ],
+      "compatibility_score": 78,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Pays des Écrins randonnée et refuge : séjour 4 jours autour de Vallouise-Pays des Écrins, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Balade provençale - Vallouise-Pays des Écrins",
+        "Dégustation locale - Vallouise-Pays des Écrins",
+        "Visite culturelle - Vallouise-Pays des Écrins",
+        "Marché et produits locaux - Vallouise-Pays des Écrins"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_ecrins",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.ecrins-parcnational.fr/parc-national-des-ecrins"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_balade_provencale_vallouise_pays_des_ecrin",
+        "act_degustation_locale_vallouise_pays_des_ecrin",
+        "act_visite_culturelle_vallouise_pays_des_ecrin",
+        "act_marche_et_produits_locaux_vallouise_pays_des_ecrin"
+      ]
+    },
+    {
+      "id": "trip_mont_ventoux_velo_et_villages",
+      "title": "Mont Ventoux vélo et villages",
+      "destination": "Mont Ventoux, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-24 -> 2026-10-25",
+      "duration": "2 jours",
+      "budget_min": 130,
+      "budget_max": 420,
+      "physical_level": "sportif",
+      "ambience_tags": [
+        "Sport & dépassement",
+        "Découverte locale",
+        "contemplatif"
+      ],
+      "compatibility_score": 78,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Mont Ventoux vélo et villages : séjour 2 jours autour de Mont Ventoux, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Balade provençale - Mont Ventoux",
+        "Dégustation locale - Mont Ventoux",
+        "Visite culturelle - Mont Ventoux",
+        "Marché et produits locaux - Mont Ventoux"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_ventoux",
+        "Point de rendez-vous: Gares Avignon/Carpentras",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.provenceguide.com/incontournables/mont-ventoux/"
+      ],
+      "matched_member_ids": [
+        "mehdi"
+      ],
+      "generated_activity_ids": [
+        "act_balade_provencale_mont_ventoux",
+        "act_degustation_locale_mont_ventoux",
+        "act_visite_culturelle_mont_ventoux",
+        "act_marche_et_produits_locaux_mont_ventoux"
+      ]
+    },
+    {
+      "id": "trip_gorges_de_la_nesque_road_trip_doux",
+      "title": "Gorges de la Nesque road trip doux",
+      "destination": "Gorges de la Nesque, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-31 -> 2026-11-01",
+      "duration": "2 jours",
+      "budget_min": 110,
+      "budget_max": 320,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Calme & déconnexion",
+        "contemplatif",
+        "road trip"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Gorges de la Nesque road trip doux : séjour 2 jours autour de Gorges de la Nesque, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée dans les gorges - Gorges de la Nesque",
+        "Canyoning encadré - Gorges de la Nesque",
+        "Rafting encadré - Gorges de la Nesque",
+        "Village et belvédères - Gorges de la Nesque"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_ventoux",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.provenceguide.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_randonnee_dans_les_gorges_gorges_de_la_nesque",
+        "act_canyoning_encadre_gorges_de_la_nesque",
+        "act_rafting_encadre_gorges_de_la_nesque",
+        "act_village_et_belvederes_gorges_de_la_nesque"
+      ]
+    },
+    {
+      "id": "trip_luberon_villages_et_marches",
+      "title": "Luberon villages et marchés",
+      "destination": "Luberon, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-25 -> 2026-09-27",
+      "duration": "3 jours",
+      "budget_min": 160,
+      "budget_max": 480,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Découverte locale",
+        "Calme & déconnexion",
+        "Premium & confort"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Luberon villages et marchés : séjour 3 jours autour de Luberon, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Luberon",
+        "Marché local - Luberon",
+        "Repas local - Luberon",
+        "Atelier artisanal - Luberon"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_luberon",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.luberoncoeurdeprovence.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_visite_du_village_luberon",
+        "act_marche_local_luberon",
+        "act_repas_local_luberon",
+        "act_atelier_artisanal_luberon"
+      ]
+    },
+    {
+      "id": "trip_gordes_premium_nature_et_patrimoine",
+      "title": "Gordes premium nature et patrimoine",
+      "destination": "Gordes, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-12 -> 2026-09-13",
+      "duration": "2 jours",
+      "budget_min": 220,
+      "budget_max": 700,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Premium & confort",
+        "contemplatif",
+        "Découverte locale"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Gordes premium nature et patrimoine : séjour 2 jours autour de Gordes, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Gordes",
+        "Marché local - Gordes",
+        "Repas local - Gordes",
+        "Atelier artisanal - Gordes"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_luberon",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.luberoncoeurdeprovence.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_visite_du_village_gordes",
+        "act_marche_local_gordes",
+        "act_repas_local_gordes",
+        "act_atelier_artisanal_gordes"
+      ]
+    },
+    {
+      "id": "trip_roussillon_ocres_et_photographie",
+      "title": "Roussillon ocres et photographie",
+      "destination": "Roussillon et Sentier des Ocres, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-03 -> 2026-10-04",
+      "duration": "2 jours",
+      "budget_min": 130,
+      "budget_max": 380,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "contemplatif",
+        "Découverte locale",
+        "Calme & déconnexion"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Roussillon ocres et photographie : séjour 2 jours autour de Roussillon et Sentier des Ocres, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Roussillon et Sentier des Ocres",
+        "Marché local - Roussillon et Sentier des Ocres",
+        "Repas local - Roussillon et Sentier des Ocres",
+        "Atelier artisanal - Roussillon et Sentier des Ocres"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_luberon",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.luberoncoeurdeprovence.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_visite_du_village_roussillon_et_sentier_de",
+        "act_marche_local_roussillon_et_sentier_de",
+        "act_repas_local_roussillon_et_sentier_de",
+        "act_atelier_artisanal_roussillon_et_sentier_de"
+      ]
+    },
+    {
+      "id": "trip_sainte_victoire_randonnee_cezanne",
+      "title": "Sainte-Victoire randonnée Cézanne",
+      "destination": "Sainte-Victoire, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-11-07 -> 2026-11-08",
+      "duration": "2 jours",
+      "budget_min": 120,
+      "budget_max": 360,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "Sport & dépassement",
+        "contemplatif",
+        "culture"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Sainte-Victoire randonnée Cézanne : séjour 2 jours autour de Sainte-Victoire, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Balade provençale - Sainte-Victoire",
+        "Dégustation locale - Sainte-Victoire",
+        "Visite culturelle - Sainte-Victoire",
+        "Marché et produits locaux - Sainte-Victoire"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_sainte_victoire",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.grandsitesaintevictoire.com/pratiquer/marcher-randonner/idees-de-randonnees/"
+      ],
+      "matched_member_ids": [
+        "mehdi"
+      ],
+      "generated_activity_ids": [
+        "act_balade_provencale_sainte_victoire",
+        "act_degustation_locale_sainte_victoire",
+        "act_visite_culturelle_sainte_victoire",
+        "act_marche_et_produits_locaux_sainte_victoire"
+      ]
+    },
+    {
+      "id": "trip_sainte_baume_marche_spirituelle",
+      "title": "Sainte-Baume marche spirituelle",
+      "destination": "Sainte-Baume, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-11-14 -> 2026-11-15",
+      "duration": "2 jours",
+      "budget_min": 110,
+      "budget_max": 340,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "spirituel introspectif",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Sainte-Baume marche spirituelle : séjour 2 jours autour de Sainte-Baume, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée en forêt - Sainte-Baume",
+        "Marche introspective - Sainte-Baume",
+        "Visite patrimoniale - Sainte-Baume",
+        "Photo nature - Sainte-Baume"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_sainte_baume",
+        "Point de rendez-vous: Bus à vérifier depuis Marseille/Aubagne",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.pnr-saintebaume.fr/"
+      ],
+      "matched_member_ids": [
+        "sofia"
+      ],
+      "generated_activity_ids": [
+        "act_randonnee_en_foret_sainte_baume",
+        "act_marche_introspective_sainte_baume",
+        "act_visite_patrimoniale_sainte_baume",
+        "act_photo_nature_sainte_baume"
+      ]
+    },
+    {
+      "id": "trip_la_ciotat_mer_et_falaises_accessibles",
+      "title": "La Ciotat mer et falaises accessibles",
+      "destination": "La Ciotat et Bec de l'Aigle, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-06 -> 2026-09-07",
+      "duration": "2 jours",
+      "budget_min": 120,
+      "budget_max": 420,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Calme & déconnexion",
+        "Fun & aventure douce",
+        "contemplatif"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "La Ciotat mer et falaises accessibles : séjour 2 jours autour de La Ciotat et Bec de l'Aigle, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Sentier littoral - La Ciotat et Bec de l'Aigle",
+        "Kayak de mer encadré - La Ciotat et Bec de l'Aigle",
+        "Baignade et criques - La Ciotat et Bec de l'Aigle",
+        "Photographie littorale - La Ciotat et Bec de l'Aigle"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_calanques",
+        "Point de rendez-vous: Gare de La Ciotat",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.calanques-parcnational.fr/fr"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_sentier_littoral_la_ciotat_et_bec_de_l_ai",
+        "act_kayak_de_mer_encadre_la_ciotat_et_bec_de_l_ai",
+        "act_baignade_et_criques_la_ciotat_et_bec_de_l_ai",
+        "act_photographie_littorale_la_ciotat_et_bec_de_l_ai"
+      ]
+    },
+    {
+      "id": "trip_porquerolles_velo_et_criques",
+      "title": "Porquerolles vélo et criques",
+      "destination": "Porquerolles, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-09-19 -> 2026-09-20",
+      "duration": "2 jours",
+      "budget_min": 190,
+      "budget_max": 650,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Calme & déconnexion",
+        "Premium & confort",
+        "Fun & aventure douce"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Porquerolles vélo et criques : séjour 2 jours autour de Porquerolles, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Sentier littoral - Porquerolles",
+        "Kayak de mer encadré - Porquerolles",
+        "Baignade et criques - Porquerolles",
+        "Photographie littorale - Porquerolles"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_hyeres_iles",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.provencemed.com/hyeres-porquerolles/porquerolles/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_sentier_littoral_porquerolles",
+        "act_kayak_de_mer_encadre_porquerolles",
+        "act_baignade_et_criques_porquerolles",
+        "act_photographie_littorale_porquerolles"
+      ]
+    },
+    {
+      "id": "trip_esterel_massif_rouge_et_mer",
+      "title": "Estérel massif rouge et mer",
+      "destination": "Massif de l'Estérel, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-18 -> 2026-10-19",
+      "duration": "2 jours",
+      "budget_min": 130,
+      "budget_max": 420,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "contemplatif",
+        "nature",
+        "Fun & aventure douce"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Estérel massif rouge et mer : séjour 2 jours autour de Massif de l'Estérel, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Sentier littoral - Massif de l'Estérel",
+        "Kayak de mer encadré - Massif de l'Estérel",
+        "Baignade et criques - Massif de l'Estérel",
+        "Photographie littorale - Massif de l'Estérel"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_esterel",
+        "Point de rendez-vous: Gares Saint-Raphaël/Théoule",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.esterel-cotedazur.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_sentier_littoral_massif_de_l_esterel",
+        "act_kayak_de_mer_encadre_massif_de_l_esterel",
+        "act_baignade_et_criques_massif_de_l_esterel",
+        "act_photographie_littorale_massif_de_l_esterel"
+      ]
+    },
+    {
+      "id": "trip_arriere_pays_nicois_villages_perches",
+      "title": "Arrière-pays niçois villages perchés",
+      "destination": "Arrière-pays niçois, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-10-25 -> 2026-10-26",
+      "duration": "2 jours",
+      "budget_min": 120,
+      "budget_max": 380,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Découverte locale",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Arrière-pays niçois villages perchés : séjour 2 jours autour de Arrière-pays niçois, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Arrière-pays niçois",
+        "Marché local - Arrière-pays niçois",
+        "Repas local - Arrière-pays niçois",
+        "Atelier artisanal - Arrière-pays niçois"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_arriere_pays_nicois",
+        "Point de rendez-vous: Nice",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.explorenicecotedazur.com/sortir/randonnees/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_visite_du_village_arriere_pays_nicois",
+        "act_marche_local_arriere_pays_nicois",
+        "act_repas_local_arriere_pays_nicois",
+        "act_atelier_artisanal_arriere_pays_nicois"
+      ]
+    },
+    {
+      "id": "trip_gorges_du_loup_canyoning_encadre",
+      "title": "Gorges du Loup canyoning encadré",
+      "destination": "Gorges du Loup, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-08-23 -> 2026-08-24",
+      "duration": "2 jours",
+      "budget_min": 150,
+      "budget_max": 460,
+      "physical_level": "intermédiaire",
+      "ambience_tags": [
+        "Fun & aventure douce",
+        "nature",
+        "petit groupe"
+      ],
+      "compatibility_score": 83,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "Gorges du Loup canyoning encadré : séjour 2 jours autour de Gorges du Loup, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Randonnée dans les gorges - Gorges du Loup",
+        "Canyoning encadré - Gorges du Loup",
+        "Rafting encadré - Gorges du Loup",
+        "Village et belvédères - Gorges du Loup"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_arriere_pays_nicois",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.explorenicecotedazur.com/sortir/randonnees/"
+      ],
+      "matched_member_ids": [
+        "jonathan"
+      ],
+      "generated_activity_ids": [
+        "act_randonnee_dans_les_gorges_gorges_du_loup",
+        "act_canyoning_encadre_gorges_du_loup",
+        "act_rafting_encadre_gorges_du_loup",
+        "act_village_et_belvederes_gorges_du_loup"
+      ]
+    },
+    {
+      "id": "trip_paca_debutant_train_et_nature",
+      "title": "PACA débutant train et nature",
+      "destination": "Embrun, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-11-21 -> 2026-11-22",
+      "duration": "2 jours",
+      "budget_min": 130,
+      "budget_max": 350,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "Calme & déconnexion",
+        "nature",
+        "petit groupe"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 8,
+      "status": "Trip publiée",
+      "description": "PACA débutant train et nature : séjour 2 jours autour de Embrun, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Balade autour du lac - Embrun",
+        "Kayak ou paddle - Embrun",
+        "Bivouac encadré - Embrun",
+        "Photographie au coucher du soleil - Embrun"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_serre_poncon",
+        "Point de rendez-vous: Gare d'Embrun",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.serreponcon.com/"
+      ],
+      "matched_member_ids": [
+        "sofia"
+      ],
+      "generated_activity_ids": [
+        "act_balade_autour_du_lac_embrun",
+        "act_kayak_ou_paddle_embrun",
+        "act_bivouac_encadre_embrun",
+        "act_photographie_au_coucher_du_soleil_embrun"
+      ]
+    },
+    {
+      "id": "trip_paca_women_only_nature_et_villages",
+      "title": "PACA women-only nature et villages",
+      "destination": "Luberon, Provence-Alpes-Côte d'Azur",
+      "image_url": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "dates": "2026-12-05 -> 2026-12-06",
+      "duration": "2 jours",
+      "budget_min": 140,
+      "budget_max": 420,
+      "physical_level": "facile",
+      "ambience_tags": [
+        "women-only",
+        "Calme & déconnexion",
+        "Découverte locale"
+      ],
+      "compatibility_score": 86,
+      "interested_count": 7,
+      "status": "Trip publiée",
+      "description": "PACA women-only nature et villages : séjour 2 jours autour de Luberon, pensé pour tester le matching social travel en PACA.",
+      "activities": [
+        "Visite du village - Luberon",
+        "Marché local - Luberon",
+        "Repas local - Luberon",
+        "Atelier artisanal - Luberon"
+      ],
+      "generation_reasons": [
+        "Importé du catalogue Excel PACA",
+        "Zone: zone_luberon",
+        "Point de rendez-vous: point de rendez-vous à définir",
+        "Plan B météo: visite village|marché local|repas local|atelier intérieur à vérifier",
+        "Source: https://www.luberoncoeurdeprovence.com/"
+      ],
+      "matched_member_ids": [],
+      "generated_activity_ids": [
+        "act_visite_du_village_luberon",
+        "act_marche_local_luberon",
+        "act_repas_local_luberon",
+        "act_atelier_artisanal_luberon"
+      ]
+    }
+  ],
+  "activities": [
+    {
+      "id": "act_randonnee_panoramique_parc_national_du_mercant",
+      "destinationId": "dest_parc_national_du_mercantour",
+      "lat": 44.11,
+      "lng": 7.28,
+      "name": "Randonnée panoramique - Parc national du Mercantour",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnee",
+        "panorama",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie montagne avec points de vue et rythme adaptable.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_nuit_en_refuge_parc_national_du_mercant",
+      "destinationId": "dest_parc_national_du_mercantour",
+      "lat": 44.11,
+      "lng": 7.28,
+      "name": "Nuit en refuge - Parc national du Mercantour",
+      "category": "refuge",
+      "duration": "24h",
+      "estimated_price": 70,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "itinerance",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Première expérience refuge ou étape d'itinérance.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_observation_etoiles_parc_national_du_mercant",
+      "destinationId": "dest_parc_national_du_mercantour",
+      "lat": 44.11,
+      "lng": 7.28,
+      "name": "Observation étoiles - Parc national du Mercantour",
+      "category": "observation étoiles",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "etoiles",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Soirée ciel étoilé loin des lumières urbaines.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_trail_decouverte_parc_national_du_mercant",
+      "destinationId": "dest_parc_national_du_mercantour",
+      "lat": 44.11,
+      "lng": 7.28,
+      "name": "Trail découverte - Parc national du Mercantour",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sporty",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours court pour tester le trail en montagne.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_randonnee_panoramique_vallee_des_merveilles",
+      "destinationId": "dest_vallee_des_merveilles",
+      "lat": 44.07,
+      "lng": 7.45,
+      "name": "Randonnée panoramique - Vallée des Merveilles",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnee",
+        "panorama",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie montagne avec points de vue et rythme adaptable.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_nuit_en_refuge_vallee_des_merveilles",
+      "destinationId": "dest_vallee_des_merveilles",
+      "lat": 44.07,
+      "lng": 7.45,
+      "name": "Nuit en refuge - Vallée des Merveilles",
+      "category": "refuge",
+      "duration": "24h",
+      "estimated_price": 70,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "itinerance",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Première expérience refuge ou étape d'itinérance.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_observation_etoiles_vallee_des_merveilles",
+      "destinationId": "dest_vallee_des_merveilles",
+      "lat": 44.07,
+      "lng": 7.45,
+      "name": "Observation étoiles - Vallée des Merveilles",
+      "category": "observation étoiles",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "etoiles",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Soirée ciel étoilé loin des lumières urbaines.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_trail_decouverte_vallee_des_merveilles",
+      "destinationId": "dest_vallee_des_merveilles",
+      "lat": 44.07,
+      "lng": 7.45,
+      "name": "Trail découverte - Vallée des Merveilles",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sporty",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours court pour tester le trail en montagne.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_randonnee_panoramique_saint_martin_vesubie",
+      "destinationId": "dest_saint_martin_vesubie",
+      "lat": 44.07,
+      "lng": 7.255,
+      "name": "Randonnée panoramique - Saint-Martin-Vésubie",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnee",
+        "panorama",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie montagne avec points de vue et rythme adaptable.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_nuit_en_refuge_saint_martin_vesubie",
+      "destinationId": "dest_saint_martin_vesubie",
+      "lat": 44.07,
+      "lng": 7.255,
+      "name": "Nuit en refuge - Saint-Martin-Vésubie",
+      "category": "refuge",
+      "duration": "24h",
+      "estimated_price": 70,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "itinerance",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Première expérience refuge ou étape d'itinérance.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_observation_etoiles_saint_martin_vesubie",
+      "destinationId": "dest_saint_martin_vesubie",
+      "lat": 44.07,
+      "lng": 7.255,
+      "name": "Observation étoiles - Saint-Martin-Vésubie",
+      "category": "observation étoiles",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "etoiles",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Soirée ciel étoilé loin des lumières urbaines.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_trail_decouverte_saint_martin_vesubie",
+      "destinationId": "dest_saint_martin_vesubie",
+      "lat": 44.07,
+      "lng": 7.255,
+      "name": "Trail découverte - Saint-Martin-Vésubie",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sporty",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours court pour tester le trail en montagne.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_randonnee_panoramique_valberg",
+      "destinationId": "dest_valberg",
+      "lat": 44.096,
+      "lng": 6.929,
+      "name": "Randonnée panoramique - Valberg",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnee",
+        "panorama",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie montagne avec points de vue et rythme adaptable.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_nuit_en_refuge_valberg",
+      "destinationId": "dest_valberg",
+      "lat": 44.096,
+      "lng": 6.929,
+      "name": "Nuit en refuge - Valberg",
+      "category": "refuge",
+      "duration": "24h",
+      "estimated_price": 70,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "itinerance",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Première expérience refuge ou étape d'itinérance.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_observation_etoiles_valberg",
+      "destinationId": "dest_valberg",
+      "lat": 44.096,
+      "lng": 6.929,
+      "name": "Observation étoiles - Valberg",
+      "category": "observation étoiles",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "etoiles",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Soirée ciel étoilé loin des lumières urbaines.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_trail_decouverte_valberg",
+      "destinationId": "dest_valberg",
+      "lat": 44.096,
+      "lng": 6.929,
+      "name": "Trail découverte - Valberg",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sporty",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours court pour tester le trail en montagne.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_randonnee_panoramique_col_de_la_bonette",
+      "destinationId": "dest_col_de_la_bonette",
+      "lat": 44.321,
+      "lng": 6.806,
+      "name": "Randonnée panoramique - Col de la Bonette",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnee",
+        "panorama",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie montagne avec points de vue et rythme adaptable.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ubaye.com/"
+    },
+    {
+      "id": "act_nuit_en_refuge_col_de_la_bonette",
+      "destinationId": "dest_col_de_la_bonette",
+      "lat": 44.321,
+      "lng": 6.806,
+      "name": "Nuit en refuge - Col de la Bonette",
+      "category": "refuge",
+      "duration": "24h",
+      "estimated_price": 70,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "itinerance",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Première expérience refuge ou étape d'itinérance.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ubaye.com/"
+    },
+    {
+      "id": "act_observation_etoiles_col_de_la_bonette",
+      "destinationId": "dest_col_de_la_bonette",
+      "lat": 44.321,
+      "lng": 6.806,
+      "name": "Observation étoiles - Col de la Bonette",
+      "category": "observation étoiles",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "etoiles",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Soirée ciel étoilé loin des lumières urbaines.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ubaye.com/"
+    },
+    {
+      "id": "act_trail_decouverte_col_de_la_bonette",
+      "destinationId": "dest_col_de_la_bonette",
+      "lat": 44.321,
+      "lng": 6.806,
+      "name": "Trail découverte - Col de la Bonette",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sporty",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours court pour tester le trail en montagne.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ubaye.com/"
+    },
+    {
+      "id": "act_visite_du_village_barcelonnette",
+      "destinationId": "dest_barcelonnette",
+      "lat": 44.386,
+      "lng": 6.652,
+      "name": "Visite du village - Barcelonnette",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ubaye.com/"
+    },
+    {
+      "id": "act_marche_local_barcelonnette",
+      "destinationId": "dest_barcelonnette",
+      "lat": 44.386,
+      "lng": 6.652,
+      "name": "Marché local - Barcelonnette",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "marche local",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment libre pour produits locaux et rencontre avec artisans.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ubaye.com/"
+    },
+    {
+      "id": "act_repas_local_barcelonnette",
+      "destinationId": "dest_barcelonnette",
+      "lat": 44.386,
+      "lng": 6.652,
+      "name": "Repas local - Barcelonnette",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "convivial",
+        "halal friendly possible"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas de groupe avec préférences alimentaires à vérifier.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ubaye.com/"
+    },
+    {
+      "id": "act_atelier_artisanal_barcelonnette",
+      "destinationId": "dest_barcelonnette",
+      "lat": 44.386,
+      "lng": 6.652,
+      "name": "Atelier artisanal - Barcelonnette",
+      "category": "atelier artisanal",
+      "duration": "2h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "artisanat",
+        "culture",
+        "local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Atelier simple pour enrichir un trip découverte.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ubaye.com/"
+    },
+    {
+      "id": "act_randonnee_panoramique_lac_d_allos",
+      "destinationId": "dest_lac_d_allos",
+      "lat": 44.235,
+      "lng": 6.704,
+      "name": "Randonnée panoramique - Lac d'Allos",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnee",
+        "panorama",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie montagne avec points de vue et rythme adaptable.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_nuit_en_refuge_lac_d_allos",
+      "destinationId": "dest_lac_d_allos",
+      "lat": 44.235,
+      "lng": 6.704,
+      "name": "Nuit en refuge - Lac d'Allos",
+      "category": "refuge",
+      "duration": "24h",
+      "estimated_price": 70,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "itinerance",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Première expérience refuge ou étape d'itinérance.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_observation_etoiles_lac_d_allos",
+      "destinationId": "dest_lac_d_allos",
+      "lat": 44.235,
+      "lng": 6.704,
+      "name": "Observation étoiles - Lac d'Allos",
+      "category": "observation étoiles",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "etoiles",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Soirée ciel étoilé loin des lumières urbaines.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_trail_decouverte_lac_d_allos",
+      "destinationId": "dest_lac_d_allos",
+      "lat": 44.235,
+      "lng": 6.704,
+      "name": "Trail découverte - Lac d'Allos",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sporty",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours court pour tester le trail en montagne.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_balade_autour_du_lac_lac_d_allos",
+      "destinationId": "dest_lac_d_allos",
+      "lat": 44.235,
+      "lng": 6.704,
+      "name": "Balade autour du lac - Lac d'Allos",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "marche douce",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade facile avec pauses photo et pique-nique.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.mercantour-parcnational.fr/"
+    },
+    {
+      "id": "act_visite_du_village_sisteron",
+      "destinationId": "dest_sisteron",
+      "lat": 44.194,
+      "lng": 5.943,
+      "name": "Visite du village - Sisteron",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://provence-alpes-cotedazur.com/"
+    },
+    {
+      "id": "act_marche_local_sisteron",
+      "destinationId": "dest_sisteron",
+      "lat": 44.194,
+      "lng": 5.943,
+      "name": "Marché local - Sisteron",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "marche local",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment libre pour produits locaux et rencontre avec artisans.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://provence-alpes-cotedazur.com/"
+    },
+    {
+      "id": "act_repas_local_sisteron",
+      "destinationId": "dest_sisteron",
+      "lat": 44.194,
+      "lng": 5.943,
+      "name": "Repas local - Sisteron",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "convivial",
+        "halal friendly possible"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas de groupe avec préférences alimentaires à vérifier.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://provence-alpes-cotedazur.com/"
+    },
+    {
+      "id": "act_atelier_artisanal_sisteron",
+      "destinationId": "dest_sisteron",
+      "lat": 44.194,
+      "lng": 5.943,
+      "name": "Atelier artisanal - Sisteron",
+      "category": "atelier artisanal",
+      "duration": "2h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "artisanat",
+        "culture",
+        "local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Atelier simple pour enrichir un trip découverte.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://provence-alpes-cotedazur.com/"
+    },
+    {
+      "id": "act_balade_autour_du_lac_gorges_du_verdon",
+      "destinationId": "dest_gorges_du_verdon",
+      "lat": 43.735,
+      "lng": 6.365,
+      "name": "Balade autour du lac - Gorges du Verdon",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "marche douce",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade facile avec pauses photo et pique-nique.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.parcduverdon.fr/"
+    },
+    {
+      "id": "act_kayak_ou_paddle_gorges_du_verdon",
+      "destinationId": "dest_gorges_du_verdon",
+      "lat": 43.735,
+      "lng": 6.365,
+      "name": "Kayak ou paddle - Gorges du Verdon",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 38,
+      "physical_level": "facile",
+      "ambience": [
+        "kayak",
+        "paddle",
+        "lac"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité nautique douce, réservation recommandée en saison.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.parcduverdon.fr/"
+    },
+    {
+      "id": "act_bivouac_encadre_gorges_du_verdon",
+      "destinationId": "dest_gorges_du_verdon",
+      "lat": 43.735,
+      "lng": 6.365,
+      "name": "Bivouac encadré - Gorges du Verdon",
+      "category": "bivouac",
+      "duration": "18h",
+      "estimated_price": 48,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "bivouac",
+        "nature",
+        "Calme & déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Nuit simple avec vérification de la réglementation locale.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.parcduverdon.fr/"
+    },
+    {
+      "id": "act_photographie_au_coucher_du_soleil_gorges_du_verdon",
+      "destinationId": "dest_gorges_du_verdon",
+      "lat": 43.735,
+      "lng": 6.365,
+      "name": "Photographie au coucher du soleil - Gorges du Verdon",
+      "category": "photographie",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "photo",
+        "sunset",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment photo accessible pour profils contemplatifs.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.parcduverdon.fr/"
+    },
+    {
+      "id": "act_randonnee_dans_les_gorges_gorges_du_verdon",
+      "destinationId": "dest_gorges_du_verdon",
+      "lat": 43.735,
+      "lng": 6.365,
+      "name": "Randonnée dans les gorges - Gorges du Verdon",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "gorges",
+        "randonnee",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Itinéraire à adapter selon chaleur, eau et niveau du groupe.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.parcduverdon.fr/"
+    },
+    {
+      "id": "act_balade_autour_du_lac_lac_de_sainte_croix",
+      "destinationId": "dest_lac_de_sainte_croix",
+      "lat": 43.79,
+      "lng": 6.2,
+      "name": "Balade autour du lac - Lac de Sainte-Croix",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "marche douce",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade facile avec pauses photo et pique-nique.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_kayak_ou_paddle_lac_de_sainte_croix",
+      "destinationId": "dest_lac_de_sainte_croix",
+      "lat": 43.79,
+      "lng": 6.2,
+      "name": "Kayak ou paddle - Lac de Sainte-Croix",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 38,
+      "physical_level": "facile",
+      "ambience": [
+        "kayak",
+        "paddle",
+        "lac"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité nautique douce, réservation recommandée en saison.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_bivouac_encadre_lac_de_sainte_croix",
+      "destinationId": "dest_lac_de_sainte_croix",
+      "lat": 43.79,
+      "lng": 6.2,
+      "name": "Bivouac encadré - Lac de Sainte-Croix",
+      "category": "bivouac",
+      "duration": "18h",
+      "estimated_price": 48,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "bivouac",
+        "nature",
+        "Calme & déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Nuit simple avec vérification de la réglementation locale.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_photographie_au_coucher_du_soleil_lac_de_sainte_croix",
+      "destinationId": "dest_lac_de_sainte_croix",
+      "lat": 43.79,
+      "lng": 6.2,
+      "name": "Photographie au coucher du soleil - Lac de Sainte-Croix",
+      "category": "photographie",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "photo",
+        "sunset",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment photo accessible pour profils contemplatifs.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_visite_du_village_lac_de_sainte_croix",
+      "destinationId": "dest_lac_de_sainte_croix",
+      "lat": 43.79,
+      "lng": 6.2,
+      "name": "Visite du village - Lac de Sainte-Croix",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_visite_du_village_plateau_de_valensole",
+      "destinationId": "dest_plateau_de_valensole",
+      "lat": 43.837,
+      "lng": 5.984,
+      "name": "Visite du village - Plateau de Valensole",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_marche_local_plateau_de_valensole",
+      "destinationId": "dest_plateau_de_valensole",
+      "lat": 43.837,
+      "lng": 5.984,
+      "name": "Marché local - Plateau de Valensole",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "marche local",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment libre pour produits locaux et rencontre avec artisans.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_repas_local_plateau_de_valensole",
+      "destinationId": "dest_plateau_de_valensole",
+      "lat": 43.837,
+      "lng": 5.984,
+      "name": "Repas local - Plateau de Valensole",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "convivial",
+        "halal friendly possible"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas de groupe avec préférences alimentaires à vérifier.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_atelier_artisanal_plateau_de_valensole",
+      "destinationId": "dest_plateau_de_valensole",
+      "lat": 43.837,
+      "lng": 5.984,
+      "name": "Atelier artisanal - Plateau de Valensole",
+      "category": "atelier artisanal",
+      "duration": "2h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "artisanat",
+        "culture",
+        "local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Atelier simple pour enrichir un trip découverte.",
+      "image": "https://images.unsplash.com/photo-1499002238440-d264edd596ec?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_randonnee_dans_les_gorges_castellane",
+      "destinationId": "dest_castellane",
+      "lat": 43.846,
+      "lng": 6.513,
+      "name": "Randonnée dans les gorges - Castellane",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "gorges",
+        "randonnee",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Itinéraire à adapter selon chaleur, eau et niveau du groupe.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_canyoning_encadre_castellane",
+      "destinationId": "dest_castellane",
+      "lat": 43.846,
+      "lng": 6.513,
+      "name": "Canyoning encadré - Castellane",
+      "category": "canyoning",
+      "duration": "3h",
+      "estimated_price": 75,
+      "physical_level": "sportif",
+      "ambience": [
+        "canyoning",
+        "water",
+        "adventure"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité d'eau vive avec professionnel recommandé.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_rafting_encadre_castellane",
+      "destinationId": "dest_castellane",
+      "lat": 43.846,
+      "lng": 6.513,
+      "name": "Rafting encadré - Castellane",
+      "category": "rafting",
+      "duration": "3h",
+      "estimated_price": 65,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "rafting",
+        "fun",
+        "group"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Descente conviviale avec prestataire local.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_village_et_belvederes_castellane",
+      "destinationId": "dest_castellane",
+      "lat": 43.846,
+      "lng": 6.513,
+      "name": "Village et belvédères - Castellane",
+      "category": "village",
+      "duration": "3h",
+      "estimated_price": 12,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "belvedere",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte douce entre panorama et patrimoine local.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_visite_du_village_castellane",
+      "destinationId": "dest_castellane",
+      "lat": 43.846,
+      "lng": 6.513,
+      "name": "Visite du village - Castellane",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.verdontourisme.com/"
+    },
+    {
+      "id": "act_randonnee_panoramique_serre_poncon",
+      "destinationId": "dest_serre_poncon",
+      "lat": 44.497,
+      "lng": 6.353,
+      "name": "Randonnée panoramique - Serre-Ponçon",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnee",
+        "panorama",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie montagne avec points de vue et rythme adaptable.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_nuit_en_refuge_serre_poncon",
+      "destinationId": "dest_serre_poncon",
+      "lat": 44.497,
+      "lng": 6.353,
+      "name": "Nuit en refuge - Serre-Ponçon",
+      "category": "refuge",
+      "duration": "24h",
+      "estimated_price": 70,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "itinerance",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Première expérience refuge ou étape d'itinérance.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_observation_etoiles_serre_poncon",
+      "destinationId": "dest_serre_poncon",
+      "lat": 44.497,
+      "lng": 6.353,
+      "name": "Observation étoiles - Serre-Ponçon",
+      "category": "observation étoiles",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "etoiles",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Soirée ciel étoilé loin des lumières urbaines.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_trail_decouverte_serre_poncon",
+      "destinationId": "dest_serre_poncon",
+      "lat": 44.497,
+      "lng": 6.353,
+      "name": "Trail découverte - Serre-Ponçon",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sporty",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours court pour tester le trail en montagne.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_balade_autour_du_lac_serre_poncon",
+      "destinationId": "dest_serre_poncon",
+      "lat": 44.497,
+      "lng": 6.353,
+      "name": "Balade autour du lac - Serre-Ponçon",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "marche douce",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade facile avec pauses photo et pique-nique.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_balade_autour_du_lac_embrun",
+      "destinationId": "dest_embrun",
+      "lat": 44.565,
+      "lng": 6.496,
+      "name": "Balade autour du lac - Embrun",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "marche douce",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade facile avec pauses photo et pique-nique.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_kayak_ou_paddle_embrun",
+      "destinationId": "dest_embrun",
+      "lat": 44.565,
+      "lng": 6.496,
+      "name": "Kayak ou paddle - Embrun",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 38,
+      "physical_level": "facile",
+      "ambience": [
+        "kayak",
+        "paddle",
+        "lac"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité nautique douce, réservation recommandée en saison.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_bivouac_encadre_embrun",
+      "destinationId": "dest_embrun",
+      "lat": 44.565,
+      "lng": 6.496,
+      "name": "Bivouac encadré - Embrun",
+      "category": "bivouac",
+      "duration": "18h",
+      "estimated_price": 48,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "bivouac",
+        "nature",
+        "Calme & déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Nuit simple avec vérification de la réglementation locale.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_photographie_au_coucher_du_soleil_embrun",
+      "destinationId": "dest_embrun",
+      "lat": 44.565,
+      "lng": 6.496,
+      "name": "Photographie au coucher du soleil - Embrun",
+      "category": "photographie",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "photo",
+        "sunset",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment photo accessible pour profils contemplatifs.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_visite_du_village_embrun",
+      "destinationId": "dest_embrun",
+      "lat": 44.565,
+      "lng": 6.496,
+      "name": "Visite du village - Embrun",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.serreponcon.com/"
+    },
+    {
+      "id": "act_randonnee_panoramique_queyras",
+      "destinationId": "dest_queyras",
+      "lat": 44.7,
+      "lng": 6.84,
+      "name": "Randonnée panoramique - Queyras",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnee",
+        "panorama",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie montagne avec points de vue et rythme adaptable.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://lequeyras.com/"
+    },
+    {
+      "id": "act_nuit_en_refuge_queyras",
+      "destinationId": "dest_queyras",
+      "lat": 44.7,
+      "lng": 6.84,
+      "name": "Nuit en refuge - Queyras",
+      "category": "refuge",
+      "duration": "24h",
+      "estimated_price": 70,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "itinerance",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Première expérience refuge ou étape d'itinérance.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://lequeyras.com/"
+    },
+    {
+      "id": "act_observation_etoiles_queyras",
+      "destinationId": "dest_queyras",
+      "lat": 44.7,
+      "lng": 6.84,
+      "name": "Observation étoiles - Queyras",
+      "category": "observation étoiles",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "etoiles",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Soirée ciel étoilé loin des lumières urbaines.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://lequeyras.com/"
+    },
+    {
+      "id": "act_trail_decouverte_queyras",
+      "destinationId": "dest_queyras",
+      "lat": 44.7,
+      "lng": 6.84,
+      "name": "Trail découverte - Queyras",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sporty",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours court pour tester le trail en montagne.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://lequeyras.com/"
+    },
+    {
+      "id": "act_visite_du_village_saint_veran",
+      "destinationId": "dest_saint_veran",
+      "lat": 44.7,
+      "lng": 6.87,
+      "name": "Visite du village - Saint-Véran",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://lequeyras.com/"
+    },
+    {
+      "id": "act_marche_local_saint_veran",
+      "destinationId": "dest_saint_veran",
+      "lat": 44.7,
+      "lng": 6.87,
+      "name": "Marché local - Saint-Véran",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "marche local",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment libre pour produits locaux et rencontre avec artisans.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://lequeyras.com/"
+    },
+    {
+      "id": "act_repas_local_saint_veran",
+      "destinationId": "dest_saint_veran",
+      "lat": 44.7,
+      "lng": 6.87,
+      "name": "Repas local - Saint-Véran",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "convivial",
+        "halal friendly possible"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas de groupe avec préférences alimentaires à vérifier.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://lequeyras.com/"
+    },
+    {
+      "id": "act_atelier_artisanal_saint_veran",
+      "destinationId": "dest_saint_veran",
+      "lat": 44.7,
+      "lng": 6.87,
+      "name": "Atelier artisanal - Saint-Véran",
+      "category": "atelier artisanal",
+      "duration": "2h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "artisanat",
+        "culture",
+        "local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Atelier simple pour enrichir un trip découverte.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://lequeyras.com/"
+    },
+    {
+      "id": "act_randonnee_panoramique_briancon",
+      "destinationId": "dest_briancon",
+      "lat": 44.899,
+      "lng": 6.643,
+      "name": "Randonnée panoramique - Briançon",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "randonnee",
+        "panorama",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Sortie montagne avec points de vue et rythme adaptable.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_nuit_en_refuge_briancon",
+      "destinationId": "dest_briancon",
+      "lat": 44.899,
+      "lng": 6.643,
+      "name": "Nuit en refuge - Briançon",
+      "category": "refuge",
+      "duration": "24h",
+      "estimated_price": 70,
+      "physical_level": "sportif",
+      "ambience": [
+        "refuge",
+        "itinerance",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Première expérience refuge ou étape d'itinérance.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_observation_etoiles_briancon",
+      "destinationId": "dest_briancon",
+      "lat": 44.899,
+      "lng": 6.643,
+      "name": "Observation étoiles - Briançon",
+      "category": "observation étoiles",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "etoiles",
+        "Calme & déconnexion",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Soirée ciel étoilé loin des lumières urbaines.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_trail_decouverte_briancon",
+      "destinationId": "dest_briancon",
+      "lat": 44.899,
+      "lng": 6.643,
+      "name": "Trail découverte - Briançon",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "sportif",
+      "ambience": [
+        "trail",
+        "sporty",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Parcours court pour tester le trail en montagne.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_balade_autour_du_lac_vallee_de_la_claree",
+      "destinationId": "dest_vallee_de_la_claree",
+      "lat": 45.02,
+      "lng": 6.62,
+      "name": "Balade autour du lac - Vallée de la Clarée",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "lac",
+        "marche douce",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade facile avec pauses photo et pique-nique.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_kayak_ou_paddle_vallee_de_la_claree",
+      "destinationId": "dest_vallee_de_la_claree",
+      "lat": 45.02,
+      "lng": 6.62,
+      "name": "Kayak ou paddle - Vallée de la Clarée",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 38,
+      "physical_level": "facile",
+      "ambience": [
+        "kayak",
+        "paddle",
+        "lac"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité nautique douce, réservation recommandée en saison.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_bivouac_encadre_vallee_de_la_claree",
+      "destinationId": "dest_vallee_de_la_claree",
+      "lat": 45.02,
+      "lng": 6.62,
+      "name": "Bivouac encadré - Vallée de la Clarée",
+      "category": "bivouac",
+      "duration": "18h",
+      "estimated_price": 48,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "bivouac",
+        "nature",
+        "Calme & déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Nuit simple avec vérification de la réglementation locale.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_photographie_au_coucher_du_soleil_vallee_de_la_claree",
+      "destinationId": "dest_vallee_de_la_claree",
+      "lat": 45.02,
+      "lng": 6.62,
+      "name": "Photographie au coucher du soleil - Vallée de la Clarée",
+      "category": "photographie",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "photo",
+        "sunset",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment photo accessible pour profils contemplatifs.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_ski_alpin_ou_nordique_orcieres_merlette",
+      "destinationId": "dest_orcieres_merlette",
+      "lat": 44.697,
+      "lng": 6.325,
+      "name": "Ski alpin ou nordique - Orcières-Merlette",
+      "category": "ski",
+      "duration": "4h",
+      "estimated_price": 60,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "ski",
+        "hiver",
+        "station"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Session neige selon domaine et niveau.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_raquettes_encadrees_orcieres_merlette",
+      "destinationId": "dest_orcieres_merlette",
+      "lat": 44.697,
+      "lng": 6.325,
+      "name": "Raquettes encadrées - Orcières-Merlette",
+      "category": "raquettes",
+      "duration": "3h",
+      "estimated_price": 38,
+      "physical_level": "facile",
+      "ambience": [
+        "raquettes",
+        "hiver",
+        "nature"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie hivernale accessible avec accompagnement possible.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_vtt_station_orcieres_merlette",
+      "destinationId": "dest_orcieres_merlette",
+      "lat": 44.697,
+      "lng": 6.325,
+      "name": "Vtt station - Orcières-Merlette",
+      "category": "trail",
+      "duration": "3h",
+      "estimated_price": 52,
+      "physical_level": "sportif",
+      "ambience": [
+        "vtt",
+        "sporty",
+        "station"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité sportive à encadrer selon expérience.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_balade_station_famille_orcieres_merlette",
+      "destinationId": "dest_orcieres_merlette",
+      "lat": 44.697,
+      "lng": 6.325,
+      "name": "Balade station famille - Orcières-Merlette",
+      "category": "randonnée",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "family",
+        "easy",
+        "montagne"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade simple avec vue montagne.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.hautes-alpes.net/"
+    },
+    {
+      "id": "act_balade_provencale_vallouise_pays_des_ecrin",
+      "destinationId": "dest_vallouise_pays_des_ecrins",
+      "lat": 44.846,
+      "lng": 6.488,
+      "name": "Balade provençale - Vallouise-Pays des Écrins",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "provence",
+        "marche douce",
+        "nature"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade accessible entre collines, champs ou sentiers.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ecrins-parcnational.fr/parc-national-des-ecrins"
+    },
+    {
+      "id": "act_degustation_locale_vallouise_pays_des_ecrin",
+      "destinationId": "dest_vallouise_pays_des_ecrins",
+      "lat": 44.846,
+      "lng": 6.488,
+      "name": "Dégustation locale - Vallouise-Pays des Écrins",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte gastronomique locale à adapter aux préférences.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ecrins-parcnational.fr/parc-national-des-ecrins"
+    },
+    {
+      "id": "act_visite_culturelle_vallouise_pays_des_ecrin",
+      "destinationId": "dest_vallouise_pays_des_ecrins",
+      "lat": 44.846,
+      "lng": 6.488,
+      "name": "Visite culturelle - Vallouise-Pays des Écrins",
+      "category": "visite culturelle",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "culture",
+        "patrimoine",
+        "village"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Visite courte pour compléter un séjour nature.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ecrins-parcnational.fr/parc-national-des-ecrins"
+    },
+    {
+      "id": "act_marche_et_produits_locaux_vallouise_pays_des_ecrin",
+      "destinationId": "dest_vallouise_pays_des_ecrins",
+      "lat": 44.846,
+      "lng": 6.488,
+      "name": "Marché et produits locaux - Vallouise-Pays des Écrins",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "marche local",
+        "artisanat",
+        "local food"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marché local avant départ en balade.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.ecrins-parcnational.fr/parc-national-des-ecrins"
+    },
+    {
+      "id": "act_balade_provencale_mont_ventoux",
+      "destinationId": "dest_mont_ventoux",
+      "lat": 44.174,
+      "lng": 5.278,
+      "name": "Balade provençale - Mont Ventoux",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "provence",
+        "marche douce",
+        "nature"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade accessible entre collines, champs ou sentiers.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provenceguide.com/incontournables/mont-ventoux/"
+    },
+    {
+      "id": "act_degustation_locale_mont_ventoux",
+      "destinationId": "dest_mont_ventoux",
+      "lat": 44.174,
+      "lng": 5.278,
+      "name": "Dégustation locale - Mont Ventoux",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte gastronomique locale à adapter aux préférences.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provenceguide.com/incontournables/mont-ventoux/"
+    },
+    {
+      "id": "act_visite_culturelle_mont_ventoux",
+      "destinationId": "dest_mont_ventoux",
+      "lat": 44.174,
+      "lng": 5.278,
+      "name": "Visite culturelle - Mont Ventoux",
+      "category": "visite culturelle",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "culture",
+        "patrimoine",
+        "village"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Visite courte pour compléter un séjour nature.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provenceguide.com/incontournables/mont-ventoux/"
+    },
+    {
+      "id": "act_marche_et_produits_locaux_mont_ventoux",
+      "destinationId": "dest_mont_ventoux",
+      "lat": 44.174,
+      "lng": 5.278,
+      "name": "Marché et produits locaux - Mont Ventoux",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "marche local",
+        "artisanat",
+        "local food"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marché local avant départ en balade.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provenceguide.com/incontournables/mont-ventoux/"
+    },
+    {
+      "id": "act_randonnee_dans_les_gorges_gorges_de_la_nesque",
+      "destinationId": "dest_gorges_de_la_nesque",
+      "lat": 44.058,
+      "lng": 5.321,
+      "name": "Randonnée dans les gorges - Gorges de la Nesque",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "gorges",
+        "randonnee",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Itinéraire à adapter selon chaleur, eau et niveau du groupe.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provenceguide.com/"
+    },
+    {
+      "id": "act_canyoning_encadre_gorges_de_la_nesque",
+      "destinationId": "dest_gorges_de_la_nesque",
+      "lat": 44.058,
+      "lng": 5.321,
+      "name": "Canyoning encadré - Gorges de la Nesque",
+      "category": "canyoning",
+      "duration": "3h",
+      "estimated_price": 75,
+      "physical_level": "sportif",
+      "ambience": [
+        "canyoning",
+        "water",
+        "adventure"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité d'eau vive avec professionnel recommandé.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provenceguide.com/"
+    },
+    {
+      "id": "act_rafting_encadre_gorges_de_la_nesque",
+      "destinationId": "dest_gorges_de_la_nesque",
+      "lat": 44.058,
+      "lng": 5.321,
+      "name": "Rafting encadré - Gorges de la Nesque",
+      "category": "rafting",
+      "duration": "3h",
+      "estimated_price": 65,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "rafting",
+        "fun",
+        "group"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Descente conviviale avec prestataire local.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provenceguide.com/"
+    },
+    {
+      "id": "act_village_et_belvederes_gorges_de_la_nesque",
+      "destinationId": "dest_gorges_de_la_nesque",
+      "lat": 44.058,
+      "lng": 5.321,
+      "name": "Village et belvédères - Gorges de la Nesque",
+      "category": "village",
+      "duration": "3h",
+      "estimated_price": 12,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "belvedere",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte douce entre panorama et patrimoine local.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provenceguide.com/"
+    },
+    {
+      "id": "act_balade_provencale_gorges_de_la_nesque",
+      "destinationId": "dest_gorges_de_la_nesque",
+      "lat": 44.058,
+      "lng": 5.321,
+      "name": "Balade provençale - Gorges de la Nesque",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "provence",
+        "marche douce",
+        "nature"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade accessible entre collines, champs ou sentiers.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provenceguide.com/"
+    },
+    {
+      "id": "act_visite_du_village_luberon",
+      "destinationId": "dest_luberon",
+      "lat": 43.856,
+      "lng": 5.14,
+      "name": "Visite du village - Luberon",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_marche_local_luberon",
+      "destinationId": "dest_luberon",
+      "lat": 43.856,
+      "lng": 5.14,
+      "name": "Marché local - Luberon",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "marche local",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment libre pour produits locaux et rencontre avec artisans.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_repas_local_luberon",
+      "destinationId": "dest_luberon",
+      "lat": 43.856,
+      "lng": 5.14,
+      "name": "Repas local - Luberon",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "convivial",
+        "halal friendly possible"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas de groupe avec préférences alimentaires à vérifier.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_atelier_artisanal_luberon",
+      "destinationId": "dest_luberon",
+      "lat": 43.856,
+      "lng": 5.14,
+      "name": "Atelier artisanal - Luberon",
+      "category": "atelier artisanal",
+      "duration": "2h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "artisanat",
+        "culture",
+        "local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Atelier simple pour enrichir un trip découverte.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_visite_du_village_gordes",
+      "destinationId": "dest_gordes",
+      "lat": 43.912,
+      "lng": 5.2,
+      "name": "Visite du village - Gordes",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_marche_local_gordes",
+      "destinationId": "dest_gordes",
+      "lat": 43.912,
+      "lng": 5.2,
+      "name": "Marché local - Gordes",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "marche local",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment libre pour produits locaux et rencontre avec artisans.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_repas_local_gordes",
+      "destinationId": "dest_gordes",
+      "lat": 43.912,
+      "lng": 5.2,
+      "name": "Repas local - Gordes",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "convivial",
+        "halal friendly possible"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas de groupe avec préférences alimentaires à vérifier.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_atelier_artisanal_gordes",
+      "destinationId": "dest_gordes",
+      "lat": 43.912,
+      "lng": 5.2,
+      "name": "Atelier artisanal - Gordes",
+      "category": "atelier artisanal",
+      "duration": "2h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "artisanat",
+        "culture",
+        "local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Atelier simple pour enrichir un trip découverte.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_visite_du_village_roussillon_et_sentier_de",
+      "destinationId": "dest_roussillon_et_sentier_des_ocres",
+      "lat": 43.902,
+      "lng": 5.292,
+      "name": "Visite du village - Roussillon et Sentier des Ocres",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_marche_local_roussillon_et_sentier_de",
+      "destinationId": "dest_roussillon_et_sentier_des_ocres",
+      "lat": 43.902,
+      "lng": 5.292,
+      "name": "Marché local - Roussillon et Sentier des Ocres",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "marche local",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment libre pour produits locaux et rencontre avec artisans.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_repas_local_roussillon_et_sentier_de",
+      "destinationId": "dest_roussillon_et_sentier_des_ocres",
+      "lat": 43.902,
+      "lng": 5.292,
+      "name": "Repas local - Roussillon et Sentier des Ocres",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "convivial",
+        "halal friendly possible"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas de groupe avec préférences alimentaires à vérifier.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_atelier_artisanal_roussillon_et_sentier_de",
+      "destinationId": "dest_roussillon_et_sentier_des_ocres",
+      "lat": 43.902,
+      "lng": 5.292,
+      "name": "Atelier artisanal - Roussillon et Sentier des Ocres",
+      "category": "atelier artisanal",
+      "duration": "2h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "artisanat",
+        "culture",
+        "local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Atelier simple pour enrichir un trip découverte.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.luberoncoeurdeprovence.com/"
+    },
+    {
+      "id": "act_balade_provencale_sainte_victoire",
+      "destinationId": "dest_sainte_victoire",
+      "lat": 43.536,
+      "lng": 5.612,
+      "name": "Balade provençale - Sainte-Victoire",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "provence",
+        "marche douce",
+        "nature"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Balade accessible entre collines, champs ou sentiers.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.grandsitesaintevictoire.com/pratiquer/marcher-randonner/idees-de-randonnees/"
+    },
+    {
+      "id": "act_degustation_locale_sainte_victoire",
+      "destinationId": "dest_sainte_victoire",
+      "lat": 43.536,
+      "lng": 5.612,
+      "name": "Dégustation locale - Sainte-Victoire",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Découverte gastronomique locale à adapter aux préférences.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.grandsitesaintevictoire.com/pratiquer/marcher-randonner/idees-de-randonnees/"
+    },
+    {
+      "id": "act_visite_culturelle_sainte_victoire",
+      "destinationId": "dest_sainte_victoire",
+      "lat": 43.536,
+      "lng": 5.612,
+      "name": "Visite culturelle - Sainte-Victoire",
+      "category": "visite culturelle",
+      "duration": "2h",
+      "estimated_price": 15,
+      "physical_level": "facile",
+      "ambience": [
+        "culture",
+        "patrimoine",
+        "village"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Visite courte pour compléter un séjour nature.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.grandsitesaintevictoire.com/pratiquer/marcher-randonner/idees-de-randonnees/"
+    },
+    {
+      "id": "act_marche_et_produits_locaux_sainte_victoire",
+      "destinationId": "dest_sainte_victoire",
+      "lat": 43.536,
+      "lng": 5.612,
+      "name": "Marché et produits locaux - Sainte-Victoire",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "marche local",
+        "artisanat",
+        "local food"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marché local avant départ en balade.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.grandsitesaintevictoire.com/pratiquer/marcher-randonner/idees-de-randonnees/"
+    },
+    {
+      "id": "act_randonnee_en_foret_sainte_baume",
+      "destinationId": "dest_sainte_baume",
+      "lat": 43.329,
+      "lng": 5.768,
+      "name": "Randonnée en forêt - Sainte-Baume",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "foret",
+        "Calme & déconnexion",
+        "nature"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche ombragée et ressourçante.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.pnr-saintebaume.fr/"
+    },
+    {
+      "id": "act_marche_introspective_sainte_baume",
+      "destinationId": "dest_sainte_baume",
+      "lat": 43.329,
+      "lng": 5.768,
+      "name": "Marche introspective - Sainte-Baume",
+      "category": "randonnée",
+      "duration": "2h",
+      "estimated_price": 5,
+      "physical_level": "facile",
+      "ambience": [
+        "spirituel",
+        "Calme & déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Temps calme avec rythme lent.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.pnr-saintebaume.fr/"
+    },
+    {
+      "id": "act_visite_patrimoniale_sainte_baume",
+      "destinationId": "dest_sainte_baume",
+      "lat": 43.329,
+      "lng": 5.768,
+      "name": "Visite patrimoniale - Sainte-Baume",
+      "category": "visite culturelle",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "patrimoine",
+        "culture",
+        "spirituel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte du patrimoine spirituel ou local.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.pnr-saintebaume.fr/"
+    },
+    {
+      "id": "act_photo_nature_sainte_baume",
+      "destinationId": "dest_sainte_baume",
+      "lat": 43.329,
+      "lng": 5.768,
+      "name": "Photo nature - Sainte-Baume",
+      "category": "photographie",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "photo",
+        "foret",
+        "contemplatif"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Atelier photo simple dans les sous-bois.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.pnr-saintebaume.fr/"
+    },
+    {
+      "id": "act_sentier_littoral_calanques_marseille_cass",
+      "destinationId": "dest_calanques_marseille_cassis",
+      "lat": 43.214,
+      "lng": 5.447,
+      "name": "Sentier littoral - Calanques Marseille-Cassis",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "mer",
+        "sentier littoral",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche côtière avec vues mer.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.calanques-parcnational.fr/fr"
+    },
+    {
+      "id": "act_kayak_de_mer_encadre_calanques_marseille_cass",
+      "destinationId": "dest_calanques_marseille_cassis",
+      "lat": 43.214,
+      "lng": 5.447,
+      "name": "Kayak de mer encadré - Calanques Marseille-Cassis",
+      "category": "kayak",
+      "duration": "3h",
+      "estimated_price": 65,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "kayak",
+        "mer",
+        "fun"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie mer à confirmer selon météo marine.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.calanques-parcnational.fr/fr"
+    },
+    {
+      "id": "act_baignade_et_criques_calanques_marseille_cass",
+      "destinationId": "dest_calanques_marseille_cassis",
+      "lat": 43.214,
+      "lng": 5.447,
+      "name": "Baignade et criques - Calanques Marseille-Cassis",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "plage",
+        "crique",
+        "Calme & déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Temps libre détente, vigilance météo et baignade.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.calanques-parcnational.fr/fr"
+    },
+    {
+      "id": "act_photographie_littorale_calanques_marseille_cass",
+      "destinationId": "dest_calanques_marseille_cassis",
+      "lat": 43.214,
+      "lng": 5.447,
+      "name": "Photographie littorale - Calanques Marseille-Cassis",
+      "category": "photographie",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "photo",
+        "mer",
+        "sunset"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Spot photo pour coucher de soleil ou falaises.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.calanques-parcnational.fr/fr"
+    },
+    {
+      "id": "act_visite_du_village_cassis",
+      "destinationId": "dest_cassis",
+      "lat": 43.214,
+      "lng": 5.539,
+      "name": "Visite du village - Cassis",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.marseille-tourisme.com/decouvrez-marseille/calanques-plages-et-nature/les-calanques-de-marseille/"
+    },
+    {
+      "id": "act_marche_local_cassis",
+      "destinationId": "dest_cassis",
+      "lat": 43.214,
+      "lng": 5.539,
+      "name": "Marché local - Cassis",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "marche local",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment libre pour produits locaux et rencontre avec artisans.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.marseille-tourisme.com/decouvrez-marseille/calanques-plages-et-nature/les-calanques-de-marseille/"
+    },
+    {
+      "id": "act_repas_local_cassis",
+      "destinationId": "dest_cassis",
+      "lat": 43.214,
+      "lng": 5.539,
+      "name": "Repas local - Cassis",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "convivial",
+        "halal friendly possible"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas de groupe avec préférences alimentaires à vérifier.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.marseille-tourisme.com/decouvrez-marseille/calanques-plages-et-nature/les-calanques-de-marseille/"
+    },
+    {
+      "id": "act_atelier_artisanal_cassis",
+      "destinationId": "dest_cassis",
+      "lat": 43.214,
+      "lng": 5.539,
+      "name": "Atelier artisanal - Cassis",
+      "category": "atelier artisanal",
+      "duration": "2h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "artisanat",
+        "culture",
+        "local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Atelier simple pour enrichir un trip découverte.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.marseille-tourisme.com/decouvrez-marseille/calanques-plages-et-nature/les-calanques-de-marseille/"
+    },
+    {
+      "id": "act_sentier_littoral_cassis",
+      "destinationId": "dest_cassis",
+      "lat": 43.214,
+      "lng": 5.539,
+      "name": "Sentier littoral - Cassis",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "mer",
+        "sentier littoral",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche côtière avec vues mer.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.marseille-tourisme.com/decouvrez-marseille/calanques-plages-et-nature/les-calanques-de-marseille/"
+    },
+    {
+      "id": "act_sentier_littoral_la_ciotat_et_bec_de_l_ai",
+      "destinationId": "dest_la_ciotat_et_bec_de_l_aigle",
+      "lat": 43.174,
+      "lng": 5.604,
+      "name": "Sentier littoral - La Ciotat et Bec de l'Aigle",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "mer",
+        "sentier littoral",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche côtière avec vues mer.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.calanques-parcnational.fr/fr"
+    },
+    {
+      "id": "act_kayak_de_mer_encadre_la_ciotat_et_bec_de_l_ai",
+      "destinationId": "dest_la_ciotat_et_bec_de_l_aigle",
+      "lat": 43.174,
+      "lng": 5.604,
+      "name": "Kayak de mer encadré - La Ciotat et Bec de l'Aigle",
+      "category": "kayak",
+      "duration": "3h",
+      "estimated_price": 65,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "kayak",
+        "mer",
+        "fun"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie mer à confirmer selon météo marine.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.calanques-parcnational.fr/fr"
+    },
+    {
+      "id": "act_baignade_et_criques_la_ciotat_et_bec_de_l_ai",
+      "destinationId": "dest_la_ciotat_et_bec_de_l_aigle",
+      "lat": 43.174,
+      "lng": 5.604,
+      "name": "Baignade et criques - La Ciotat et Bec de l'Aigle",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "plage",
+        "crique",
+        "Calme & déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Temps libre détente, vigilance météo et baignade.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.calanques-parcnational.fr/fr"
+    },
+    {
+      "id": "act_photographie_littorale_la_ciotat_et_bec_de_l_ai",
+      "destinationId": "dest_la_ciotat_et_bec_de_l_aigle",
+      "lat": 43.174,
+      "lng": 5.604,
+      "name": "Photographie littorale - La Ciotat et Bec de l'Aigle",
+      "category": "photographie",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "photo",
+        "mer",
+        "sunset"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Spot photo pour coucher de soleil ou falaises.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.calanques-parcnational.fr/fr"
+    },
+    {
+      "id": "act_sentier_littoral_porquerolles",
+      "destinationId": "dest_porquerolles",
+      "lat": 43.0,
+      "lng": 6.208,
+      "name": "Sentier littoral - Porquerolles",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "mer",
+        "sentier littoral",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche côtière avec vues mer.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provencemed.com/hyeres-porquerolles/porquerolles/"
+    },
+    {
+      "id": "act_kayak_de_mer_encadre_porquerolles",
+      "destinationId": "dest_porquerolles",
+      "lat": 43.0,
+      "lng": 6.208,
+      "name": "Kayak de mer encadré - Porquerolles",
+      "category": "kayak",
+      "duration": "3h",
+      "estimated_price": 65,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "kayak",
+        "mer",
+        "fun"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie mer à confirmer selon météo marine.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provencemed.com/hyeres-porquerolles/porquerolles/"
+    },
+    {
+      "id": "act_baignade_et_criques_porquerolles",
+      "destinationId": "dest_porquerolles",
+      "lat": 43.0,
+      "lng": 6.208,
+      "name": "Baignade et criques - Porquerolles",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "plage",
+        "crique",
+        "Calme & déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Temps libre détente, vigilance météo et baignade.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provencemed.com/hyeres-porquerolles/porquerolles/"
+    },
+    {
+      "id": "act_photographie_littorale_porquerolles",
+      "destinationId": "dest_porquerolles",
+      "lat": 43.0,
+      "lng": 6.208,
+      "name": "Photographie littorale - Porquerolles",
+      "category": "photographie",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "photo",
+        "mer",
+        "sunset"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Spot photo pour coucher de soleil ou falaises.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.provencemed.com/hyeres-porquerolles/porquerolles/"
+    },
+    {
+      "id": "act_sentier_littoral_massif_de_l_esterel",
+      "destinationId": "dest_massif_de_l_esterel",
+      "lat": 43.468,
+      "lng": 6.85,
+      "name": "Sentier littoral - Massif de l'Estérel",
+      "category": "randonnée",
+      "duration": "3h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "mer",
+        "sentier littoral",
+        "photo"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Marche côtière avec vues mer.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.esterel-cotedazur.com/"
+    },
+    {
+      "id": "act_kayak_de_mer_encadre_massif_de_l_esterel",
+      "destinationId": "dest_massif_de_l_esterel",
+      "lat": 43.468,
+      "lng": 6.85,
+      "name": "Kayak de mer encadré - Massif de l'Estérel",
+      "category": "kayak",
+      "duration": "3h",
+      "estimated_price": 65,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "kayak",
+        "mer",
+        "fun"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Sortie mer à confirmer selon météo marine.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.esterel-cotedazur.com/"
+    },
+    {
+      "id": "act_baignade_et_criques_massif_de_l_esterel",
+      "destinationId": "dest_massif_de_l_esterel",
+      "lat": 43.468,
+      "lng": 6.85,
+      "name": "Baignade et criques - Massif de l'Estérel",
+      "category": "lac",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "plage",
+        "crique",
+        "Calme & déconnexion"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Temps libre détente, vigilance météo et baignade.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.esterel-cotedazur.com/"
+    },
+    {
+      "id": "act_photographie_littorale_massif_de_l_esterel",
+      "destinationId": "dest_massif_de_l_esterel",
+      "lat": 43.468,
+      "lng": 6.85,
+      "name": "Photographie littorale - Massif de l'Estérel",
+      "category": "photographie",
+      "duration": "2h",
+      "estimated_price": 10,
+      "physical_level": "facile",
+      "ambience": [
+        "photo",
+        "mer",
+        "sunset"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Spot photo pour coucher de soleil ou falaises.",
+      "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.esterel-cotedazur.com/"
+    },
+    {
+      "id": "act_visite_du_village_arriere_pays_nicois",
+      "destinationId": "dest_arriere_pays_nicois",
+      "lat": 43.85,
+      "lng": 7.1,
+      "name": "Visite du village - Arrière-pays niçois",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_marche_local_arriere_pays_nicois",
+      "destinationId": "dest_arriere_pays_nicois",
+      "lat": 43.85,
+      "lng": 7.1,
+      "name": "Marché local - Arrière-pays niçois",
+      "category": "marché local",
+      "duration": "2h",
+      "estimated_price": 20,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "marche local",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Moment libre pour produits locaux et rencontre avec artisans.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_repas_local_arriere_pays_nicois",
+      "destinationId": "dest_arriere_pays_nicois",
+      "lat": 43.85,
+      "lng": 7.1,
+      "name": "Repas local - Arrière-pays niçois",
+      "category": "repas local",
+      "duration": "2h",
+      "estimated_price": 32,
+      "physical_level": "facile",
+      "ambience": [
+        "local food",
+        "convivial",
+        "halal friendly possible"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Repas de groupe avec préférences alimentaires à vérifier.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_atelier_artisanal_arriere_pays_nicois",
+      "destinationId": "dest_arriere_pays_nicois",
+      "lat": 43.85,
+      "lng": 7.1,
+      "name": "Atelier artisanal - Arrière-pays niçois",
+      "category": "atelier artisanal",
+      "duration": "2h",
+      "estimated_price": 35,
+      "physical_level": "facile",
+      "ambience": [
+        "artisanat",
+        "culture",
+        "local"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux",
+        "pluie"
+      ],
+      "risk": "faible",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Atelier simple pour enrichir un trip découverte.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_randonnee_dans_les_gorges_gorges_du_loup",
+      "destinationId": "dest_gorges_du_loup",
+      "lat": 43.76,
+      "lng": 6.98,
+      "name": "Randonnée dans les gorges - Gorges du Loup",
+      "category": "randonnée",
+      "duration": "4h",
+      "estimated_price": 12,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "gorges",
+        "randonnee",
+        "panorama"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Itinéraire à adapter selon chaleur, eau et niveau du groupe.",
+      "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_canyoning_encadre_gorges_du_loup",
+      "destinationId": "dest_gorges_du_loup",
+      "lat": 43.76,
+      "lng": 6.98,
+      "name": "Canyoning encadré - Gorges du Loup",
+      "category": "canyoning",
+      "duration": "3h",
+      "estimated_price": 75,
+      "physical_level": "sportif",
+      "ambience": [
+        "canyoning",
+        "water",
+        "adventure"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Activité d'eau vive avec professionnel recommandé.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_rafting_encadre_gorges_du_loup",
+      "destinationId": "dest_gorges_du_loup",
+      "lat": 43.76,
+      "lng": 6.98,
+      "name": "Rafting encadré - Gorges du Loup",
+      "category": "rafting",
+      "duration": "3h",
+      "estimated_price": 65,
+      "physical_level": "intermédiaire",
+      "ambience": [
+        "rafting",
+        "fun",
+        "group"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "moyen",
+      "booking_required": true,
+      "group_friendly": true,
+      "description": "Descente conviviale avec prestataire local.",
+      "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_village_et_belvederes_gorges_du_loup",
+      "destinationId": "dest_gorges_du_loup",
+      "lat": 43.76,
+      "lng": 6.98,
+      "name": "Village et belvédères - Gorges du Loup",
+      "category": "village",
+      "duration": "3h",
+      "estimated_price": 12,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "belvedere",
+        "culture"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Découverte douce entre panorama et patrimoine local.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    },
+    {
+      "id": "act_visite_du_village_gorges_du_loup",
+      "destinationId": "dest_gorges_du_loup",
+      "lat": 43.76,
+      "lng": 6.98,
+      "name": "Visite du village - Gorges du Loup",
+      "category": "village",
+      "duration": "2h",
+      "estimated_price": 8,
+      "physical_level": "facile",
+      "ambience": [
+        "village",
+        "culture",
+        "slow travel"
+      ],
+      "weather_compatible": [
+        "soleil",
+        "nuageux"
+      ],
+      "risk": "faible",
+      "booking_required": false,
+      "group_friendly": true,
+      "description": "Flânerie dans le centre historique ou les ruelles.",
+      "image": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1600&q=80",
+      "source": "mock",
+      "external_url": "https://www.explorenicecotedazur.com/sortir/randonnees/"
+    }
+  ]
+}
