@@ -88,7 +88,7 @@ import {
   type TribeMessage,
   type TribeRequestBundle
 } from "./services/tribeService";
-import { uploadProfileAvatar, validateProfileAvatarFile } from "./services/profileService";
+import { resolveProfileAvatarUrl, uploadProfileAvatar, validateProfileAvatarFile } from "./services/profileService";
 import type { Activity, MockLocalActivity, OnboardingProfile, Trip, UserProfile } from "./types";
 
 type Page = "landing" | "dashboard" | "create-trip" | "trip" | "conversation" | "communaute" | "profil" | "prestataires" | "securite";
@@ -458,12 +458,13 @@ function mockMemberToUserProfile(member: (typeof mockMembers)[number]): UserProf
 }
 
 function profileRecordToUserProfile(profile: UserProfileRecord): UserProfile {
+  const avatarUrl = resolveProfileAvatarUrl(profile.avatar_url, profile.avatar_path);
   return {
     id: profile.id,
     name: profile.display_name,
     age_range: profile.age_range ?? "Membre",
     city: profile.city ?? "Ville à préciser",
-    photo_url: profile.avatar_url ?? "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=80",
+    photo_url: avatarUrl ?? "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=80",
     bio: profile.bio ?? "Profil Tribu Nature en construction.",
     verified: Boolean(profile.verified ?? true),
     physical_level: profile.physical_level ?? "À préciser",
@@ -5259,7 +5260,7 @@ type ProfileFormState = {
 function profileRecordToForm(profile: UserProfileRecord): ProfileFormState {
   return {
     display_name: profile.display_name ?? "",
-    avatar_url: profile.avatar_url ?? "",
+    avatar_url: resolveProfileAvatarUrl(profile.avatar_url, profile.avatar_path) ?? "",
     city: profile.city ?? "",
     bio: profile.bio ?? "",
     age_range: profile.age_range ?? "",
@@ -5326,7 +5327,7 @@ function ProfilePublicCard({
 
   useEffect(() => {
     if (!isEditing) setForm(profileRecordToForm(profileRecord));
-  }, [isEditing, profileRecord.id, profileRecord.updated_at]);
+  }, [isEditing, profileRecord.avatar_path, profileRecord.avatar_url, profileRecord.id, profileRecord.updated_at]);
 
   useEffect(() => {
     setAvatarFile(null);

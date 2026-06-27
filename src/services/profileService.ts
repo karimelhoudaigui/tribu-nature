@@ -10,6 +10,15 @@ export type UploadedProfileAvatar = {
   avatar_path: string;
 };
 
+export function resolveProfileAvatarUrl(avatarUrl?: string | null, avatarPath?: string | null) {
+  const storedUrl = avatarUrl?.trim();
+  if (storedUrl) return storedUrl;
+
+  const storedPath = avatarPath?.trim();
+  if (!storedPath || !supabaseUrl) return null;
+  return `${supabaseUrl}/storage/v1/object/public/${avatarBucket}/${encodeStoragePath(storedPath)}`;
+}
+
 export function validateProfileAvatarFile(file: File) {
   if (!allowedAvatarMimeTypes.has(file.type)) {
     return "Choisis une image JPG, PNG ou WebP.";
@@ -50,7 +59,7 @@ export async function uploadProfileAvatar(userId: string, file: File, accessToke
 
   return {
     avatar_path: avatarPath,
-    avatar_url: `${getSupabaseUrl()}/storage/v1/object/public/${avatarBucket}/${encodedPath}`
+    avatar_url: resolveProfileAvatarUrl(null, avatarPath) ?? ""
   };
 }
 

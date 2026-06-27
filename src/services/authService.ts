@@ -234,7 +234,7 @@ export async function upsertCurrentProfile(session: AuthSession, displayName?: s
     headers: {
       ...getRestHeaders(session.access_token),
       "Content-Type": "application/json",
-      Prefer: "resolution=merge-duplicates,return=representation"
+      Prefer: "resolution=ignore-duplicates,return=representation"
     },
     body: JSON.stringify(row)
   });
@@ -244,7 +244,11 @@ export async function upsertCurrentProfile(session: AuthSession, displayName?: s
   }
 
   const rows = (await response.json()) as UserProfileRecord[];
-  return rows[0];
+  if (rows[0]) return rows[0];
+
+  const existingProfile = await getProfileById(session.user.id, session.access_token);
+  if (existingProfile) return existingProfile;
+  throw new Error("Profil introuvable après la connexion.");
 }
 
 async function refreshSession(refreshToken: string): Promise<AuthSession> {
