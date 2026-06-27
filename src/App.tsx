@@ -1480,6 +1480,8 @@ function App() {
             userTripActions={userTripActions}
             favoriteTripIds={favoriteTripIds}
             onToggleFavorite={toggleTripFavorite}
+            getCreatorProfile={getKnownProfileRecord}
+            onViewProfile={openProfile}
           />
         )}
         {page === "create-trip" && <CreateTripPage proposerName={currentUser.name} initialTrip={createTripSeed} onPublish={publishCommunityTrip} />}
@@ -3111,7 +3113,9 @@ function Dashboard({
   onCreateTrip,
   userTripActions,
   favoriteTripIds,
-  onToggleFavorite
+  onToggleFavorite,
+  getCreatorProfile,
+  onViewProfile
 }: {
   trips: Trip[];
   generatedMode: boolean;
@@ -3122,6 +3126,8 @@ function Dashboard({
   userTripActions: UserTripActions | null;
   favoriteTripIds: string[];
   onToggleFavorite: (trip: Trip) => void | Promise<void>;
+  getCreatorProfile: (profileId?: string | null) => UserProfileRecord | null;
+  onViewProfile: (profileId: string) => void;
 }) {
   const [activeSection, setActiveSection] = useState<"trips" | "explore">("trips");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -3244,7 +3250,7 @@ function Dashboard({
             </div>
           </div>
         ) : (
-          <TripGrid trips={filteredTrips} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} />
+          <TripGrid trips={filteredTrips} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} getCreatorProfile={getCreatorProfile} onViewProfile={onViewProfile} />
         )
       )}
     </section>
@@ -3518,7 +3524,9 @@ function TripGrid({
   onTripAction,
   userTripActions,
   favoriteTripIds,
-  onToggleFavorite
+  onToggleFavorite,
+  getCreatorProfile,
+  onViewProfile
 }: {
   trips: Trip[];
   openTrip: (id: string) => void;
@@ -3526,6 +3534,8 @@ function TripGrid({
   userTripActions: UserTripActions | null;
   favoriteTripIds: string[];
   onToggleFavorite: (trip: Trip) => void | Promise<void>;
+  getCreatorProfile?: (profileId?: string | null) => UserProfileRecord | null;
+  onViewProfile?: (profileId: string) => void;
 }) {
   if (tripList.length === 0) {
     return (
@@ -3541,6 +3551,14 @@ function TripGrid({
       {tripList.map((trip) => {
         const actionState = getTripActionState(trip, userTripActions);
         const isFavorite = favoriteTripIds.includes(trip.id);
+        const isUserProject = getTripCardType(trip) === "user_project";
+        const creatorProfile = isUserProject ? getCreatorProfile?.(trip.creator_id) : null;
+        const creatorUser = isUserProject
+          ? profileRecordToUserProfile(creatorProfile ?? {
+              ...fallbackProfileRecord(trip.creator_id ?? `creator-${trip.id}`),
+              display_name: trip.creator_name ?? trip.created_by ?? "Membre Tribu"
+            })
+          : null;
         return (
         <article className="group relative overflow-hidden rounded-[1.5rem] bg-white shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-xl" key={trip.id}>
           <button
@@ -3568,7 +3586,23 @@ function TripGrid({
             </div>
           </button>
           <div className="p-5">
-            <p className="mb-3 text-sm font-semibold text-forest-700">{getTripContextText(trip)}</p>
+            {creatorUser ? (
+              <button
+                className="mb-4 flex w-full items-center gap-3 rounded-xl bg-forest-50 p-3 text-left transition hover:bg-forest-100 disabled:cursor-default"
+                disabled={!trip.creator_id || !onViewProfile}
+                onClick={() => trip.creator_id && onViewProfile?.(trip.creator_id)}
+                aria-label={`Voir le profil de ${creatorUser.name}`}
+              >
+                <img className="h-11 w-11 shrink-0 rounded-full object-cover" src={creatorUser.photo_url} alt={creatorUser.name} />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-xs font-semibold text-forest-600">Proposé par</span>
+                  <span className="block truncate font-bold text-forest-900">{creatorUser.name}</span>
+                </span>
+                {trip.creator_id && onViewProfile && <span className="text-xs font-bold text-forest-700">Voir le profil</span>}
+              </button>
+            ) : (
+              <p className="mb-3 text-sm font-semibold text-forest-700">{getTripContextText(trip)}</p>
+            )}
             <div className="flex items-center justify-between gap-3">
               <div className="flex -space-x-3">
                 {getTripMembers(trip).slice(0, 3).map((member) => (
