@@ -54,6 +54,32 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
       badges: ["test", "fiable"]
     });
 
+    const ownerPreferences = await rest("travel_preferences?on_conflict=user_id&select=*", {
+      method: "POST",
+      token: owner.access_token,
+      prefer: "resolution=merge-duplicates,return=representation",
+      body: {
+        user_id: owner.user.id,
+        preferred_destinations: ["Valais"],
+        preferred_activities: ["Randonnée"],
+        preferred_accommodation: ["Refuge"],
+        food_preferences: ["Végétarien"],
+        group_preferences: ["Petit groupe"],
+        personal_values: ["Groupe calme"],
+        availability_periods: ["Week-end"],
+        max_distance_km: 500,
+        preferred_group_size_min: 3,
+        preferred_group_size_max: 6
+      }
+    });
+    assert.equal(ownerPreferences[0].user_id, owner.user.id);
+    assert.deepEqual(ownerPreferences[0].preferred_activities, ["Randonnée"]);
+
+    const privatePreferences = await rest(`travel_preferences?user_id=eq.${encodeURIComponent(owner.user.id)}&select=*`, {
+      token: requester.access_token
+    });
+    assert.equal(privatePreferences.length, 0);
+
     const updatedProfile = await rest("profiles?id=eq." + encodeURIComponent(owner.user.id) + "&select=*", {
       method: "PATCH",
       token: owner.access_token,

@@ -89,7 +89,13 @@ import {
   type TribeRequestBundle
 } from "./services/tribeService";
 import { resolveProfileAvatarUrl, uploadProfileAvatar, validateProfileAvatarFile } from "./services/profileService";
-import type { Activity, MockLocalActivity, OnboardingProfile, Trip, UserProfile } from "./types";
+import { calculateTripMatch, type TripMatchResult } from "./services/matchService";
+import {
+  getTravelPreferences,
+  upsertTravelPreferences,
+  type TravelPreferencesUpdate
+} from "./services/travelPreferenceService";
+import type { Activity, MockLocalActivity, OnboardingProfile, TravelPreferences, Trip, UserProfile } from "./types";
 
 type Page = "landing" | "dashboard" | "create-trip" | "trip" | "conversation" | "communaute" | "profil" | "prestataires" | "securite";
 type CommunityTab = "compatibles" | "tribe" | "requests";
@@ -244,6 +250,23 @@ const moreFilterGroups = [
     options: ["Dates flexibles", "Budget flexible", "Transport partagé", "Départ depuis ma ville", "Organisation collective", "Trip déjà planifié"]
   }
 ];
+
+const unsupportedResultFilters = new Set([
+  "30 km max",
+  "100 km max",
+  "300 km max",
+  "Très encadré",
+  "Autonome",
+  "Activités à faible risque",
+  "Activités encadrées par un professionnel",
+  ...moreFilterGroups
+    .filter((group) => ["Alimentation", "Valeurs et pratiques personnelles", "Hébergement", "Sécurité et confiance"].includes(group.title))
+    .flatMap((group) => group.options),
+  "Budget flexible",
+  "Transport partagé",
+  "Départ depuis ma ville",
+  "Organisation collective"
+]);
 
 const resultFilterOptions: Record<Exclude<ResultFilterKey, "dates" | "destination">, string[]> = {
   localisation: ["Départ Bordeaux", "Départ Paris", "Départ Lyon", "Départ Toulouse", "30 km max", "100 km max", "300 km max"],
@@ -457,7 +480,7 @@ function mockMemberToUserProfile(member: (typeof mockMembers)[number]): UserProf
   };
 }
 
-function profileRecordToUserProfile(profile: UserProfileRecord): UserProfile {
+function profileRecordToUserProfile(profile: UserProfileRecord, travelPreferences?: TravelPreferences | null): UserProfile {
   const avatarUrl = resolveProfileAvatarUrl(profile.avatar_url, profile.avatar_path);
   return {
     id: profile.id,
@@ -473,7 +496,8 @@ function profileRecordToUserProfile(profile: UserProfileRecord): UserProfile {
     preferred_ambiences: profile.preferred_ambiences?.length ? profile.preferred_ambiences : ["Nature", "Découverte locale"],
     safety_preferences: profile.safety_preferences?.length ? profile.safety_preferences : ["Profil connecté"],
     past_trips: profile.past_trips ?? 0,
-    badges: profile.badges?.length ? profile.badges : ["profil connecté"]
+    badges: profile.badges?.length ? profile.badges : ["profil connecté"],
+    travel_preferences: travelPreferences ?? null
   };
 }
 
@@ -665,6 +689,7 @@ function App() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [tribeProfiles, setTribeProfiles] = useState<UserProfileRecord[]>([]);
   const [tribeRequests, setTribeRequests] = useState<TribeRequestBundle>({ received: [], sent: [], accepted: [] });
+  const [currentTravelPreferences, setCurrentTravelPreferences] = useState<TravelPreferences | null>(null);
   const [tripInvitations, setTripInvitations] = useState<TripInvitation[]>([]);
   const [createTripSeed, setCreateTripSeed] = useState<Trip | null>(null);
   const [shareTrip, setShareTrip] = useState<Trip | null>(null);
@@ -768,6 +793,7 @@ function App() {
       setTribeProfiles([]);
       setTribeRequests({ received: [], sent: [], accepted: [] });
       setTripInvitations([]);
+      setCurrentTravelPreferences(null);
       setTribeUnreadMessageCounts({});
       return;
     }
@@ -778,6 +804,24 @@ function App() {
         if (!mounted) return;
       })
       .catch((error) => console.warn("Actions utilisateur indisponibles.", error));
+
+    return () => {
+      mounted = false;
+    };
+  }, [authSession]);
+
+  useEffect(() => {
+    if (!authSession) {
+      setCurrentTravelPreferences(null);
+      return;
+    }
+
+    let mounted = true;
+    getTravelPreferences(authSession.user.id, authSession.access_token)
+      .then((preferences) => {
+        if (mounted) setCurrentTravelPreferences(preferences);
+      })
+      .catch((error) => console.warn("Préférences de matching indisponibles.", error));
 
     return () => {
       mounted = false;
@@ -839,7 +883,7 @@ function App() {
   const availableTrips = [...communityTrips, ...visibleCatalogTrips];
   const favoriteTrips = availableTrips.filter((trip) => favoriteTripIds.includes(trip.id));
   const selectedTrip = availableTrips.find((trip) => trip.id === selectedTripId) ?? availableTrips[0] ?? catalog.trips[0];
-  const currentUser = currentProfile ? profileRecordToUserProfile(currentProfile) : members[0];
+  const currentUser = currentProfile ? profileRecordToUserProfile(currentProfile, currentTravelPreferences) : members[0];
   const isAuthenticated = Boolean(authSession && currentProfile);
   const pendingReceivedJoinRequests = userTripActions?.joinRequests.filter((request) => request.creator_id === currentProfile?.id && request.status === "pending") ?? [];
   const notifiedJoinRequestIds = new Set(
@@ -850,6 +894,7 @@ function App() {
   const pendingReceivedJoinRequestsWithoutNotification = pendingReceivedJoinRequests.filter((request) => !notifiedJoinRequestIds.has(request.id));
   const unreadNotificationCount = notifications.filter((notification) => !notification.read_at).length + pendingReceivedJoinRequestsWithoutNotification.length;
   const tribeUnreadMessageCount = Object.values(tribeUnreadMessageCounts).reduce((total, count) => total + count, 0);
+  const selectedTripMatch = calculateTripMatch(isAuthenticated ? currentUser : null, selectedTrip);
   const profilePageRecord = selectedProfileId ? viewedProfile ?? fallbackProfileRecord(selectedProfileId) : currentProfile;
   const profilePageUser = profilePageRecord ? profileRecordToUserProfile(profilePageRecord) : currentUser;
   const isOwnProfilePage = !selectedProfileId || selectedProfileId === currentProfile?.id;
@@ -860,7 +905,7 @@ function App() {
   const tribeShareMembers = useMemo(
     () => tribeProfiles
       .filter((profile) => acceptedTribeMemberIds.has(profile.id))
-      .map(profileRecordToUserProfile),
+      .map((profile) => profileRecordToUserProfile(profile)),
     [acceptedTribeMemberIds, tribeProfiles]
   );
   const getAcceptedTribeConnection = (memberId: string) => tribeRequests.accepted.find((request) =>
@@ -995,6 +1040,7 @@ function App() {
     setTribeProfiles([]);
     setTribeRequests({ received: [], sent: [], accepted: [] });
     setTripInvitations([]);
+    setCurrentTravelPreferences(null);
     setTribeUnreadMessageCounts({});
     setSocialNotice("");
   };
@@ -1029,6 +1075,14 @@ function App() {
     }
     setSocialNotice("Photo de profil mise à jour.");
     return nextProfile;
+  };
+  const updateTravelPreferencesFlow = async (updates: TravelPreferencesUpdate) => {
+    const session = requireAuth("Connecte-toi pour modifier tes préférences de voyage.");
+    if (!session || !currentProfile) throw new Error("Connexion nécessaire pour modifier les préférences.");
+    const nextPreferences = await upsertTravelPreferences(currentProfile.id, updates, session.access_token);
+    setCurrentTravelPreferences(nextPreferences);
+    setSocialNotice("Préférences de matching mises à jour.");
+    return nextPreferences;
   };
   const refreshUserTripActions = async (session: AuthSession) => {
     await refreshSocialData(session);
@@ -1483,10 +1537,11 @@ function App() {
             onToggleFavorite={toggleTripFavorite}
             getCreatorProfile={getKnownProfileRecord}
             onViewProfile={openProfile}
+            matchProfile={isAuthenticated ? currentUser : null}
           />
         )}
         {page === "create-trip" && <CreateTripPage proposerName={currentUser.name} initialTrip={createTripSeed} onPublish={publishCommunityTrip} />}
-        {page === "trip" && <TripDetail trip={selectedTrip} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} onShareTrip={setShareTrip} creatorProfile={getKnownProfileRecord(selectedTrip.creator_id)} onViewProfile={openProfile} />}
+        {page === "trip" && <TripDetail trip={selectedTrip} match={selectedTripMatch} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} onShareTrip={setShareTrip} creatorProfile={getKnownProfileRecord(selectedTrip.creator_id)} onViewProfile={openProfile} />}
         {page === "conversation" && <ConversationPage conversation={conversation} go={go} currentUser={currentUser} accessToken={authSession?.access_token} isAuthenticated={isAuthenticated} onRequireAuth={() => openAuthModal("Connecte-toi pour écrire dans la conversation.")} onFormalizeTrip={formalizeCatalogTrip} />}
         {page === "communaute" && (
           <Community
@@ -1522,6 +1577,8 @@ function App() {
             onAuthClick={() => openAuthModal("Connecte-toi pour voir ton profil.")}
             onShowOwnProfile={() => openProfile(null)}
             onUpdateProfile={updateProfileFlow}
+            travelPreferences={currentTravelPreferences}
+            onUpdateTravelPreferences={updateTravelPreferencesFlow}
             onUploadAvatar={uploadProfileAvatarFlow}
             onOpenTrip={openTripFromProfile}
             trips={availableTrips}
@@ -3028,6 +3085,7 @@ function buildCommunityTrip({
   const destinationLabel = [selectedZones.join(" > "), destinationText.trim()].filter(Boolean).join(" > ") || "Destination à préciser";
   const displayName = creatorName.trim() || proposerName;
   const maxParticipants = maxParticipantsFromGroupSize(groupSize);
+  const normalizedGroupPreferences = groupPreferences.map((preference) => normalizeUiText(preference));
   return {
     id: `community-${Date.now()}`,
     title: title.trim() || "Nouveau Trip communautaire",
@@ -3056,7 +3114,13 @@ function buildCommunityTrip({
     moderation_status: "approved",
     creator_name: displayName,
     max_participants: maxParticipants,
-    current_participants: 1
+    current_participants: 1,
+    region: selectedZones.find((zone) => zone !== "Peu m'importe"),
+    activity_tags: activitiesWanted,
+    group_tags: [groupType, groupSize, ...groupPreferences.filter((_, index) => ["groupe", "calme", "pause"].some((keyword) => normalizedGroupPreferences[index].includes(keyword)))],
+    food_tags: groupPreferences.filter((_, index) => ["halal", "vegetarien", "alcool", "repas"].some((keyword) => normalizedGroupPreferences[index].includes(keyword))),
+    safety_tags: groupPreferences.filter((_, index) => ["verifie", "encadre", "niveau"].some((keyword) => normalizedGroupPreferences[index].includes(keyword))),
+    value_tags: groupPreferences.filter((_, index) => ["respect", "calme", "pause", "alcool"].some((keyword) => normalizedGroupPreferences[index].includes(keyword)))
   };
 }
 
@@ -3116,7 +3180,8 @@ function Dashboard({
   favoriteTripIds,
   onToggleFavorite,
   getCreatorProfile,
-  onViewProfile
+  onViewProfile,
+  matchProfile
 }: {
   trips: Trip[];
   generatedMode: boolean;
@@ -3129,6 +3194,7 @@ function Dashboard({
   onToggleFavorite: (trip: Trip) => void | Promise<void>;
   getCreatorProfile: (profileId?: string | null) => UserProfileRecord | null;
   onViewProfile: (profileId: string) => void;
+  matchProfile: UserProfile | null;
 }) {
   const [activeSection, setActiveSection] = useState<"trips" | "explore">("trips");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -3251,7 +3317,7 @@ function Dashboard({
             </div>
           </div>
         ) : (
-          <TripGrid trips={filteredTrips} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} getCreatorProfile={getCreatorProfile} onViewProfile={onViewProfile} />
+          <TripGrid trips={filteredTrips} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} getCreatorProfile={getCreatorProfile} onViewProfile={onViewProfile} matchProfile={matchProfile} />
         )
       )}
     </section>
@@ -3380,13 +3446,15 @@ function ResultFilterPanel({
             <div className="mt-3 flex flex-wrap gap-2">
               {group.options.map((option) => {
                 const active = activeFilters.includes(option);
+                const unsupported = unsupportedResultFilters.has(option);
                 return (
                   <button
-                    className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${active ? "bg-forest-800 text-white" : "bg-white text-forest-800 hover:bg-forest-100"}`}
+                    className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${unsupported ? "cursor-not-allowed bg-white/60 text-forest-400" : active ? "bg-forest-800 text-white" : "bg-white text-forest-800 hover:bg-forest-100"}`}
                     key={option}
+                    disabled={unsupported}
                     onClick={() => onToggle(option)}
                   >
-                    {option}
+                    {option}{unsupported ? " · Bientôt" : ""}
                   </button>
                 );
               })}
@@ -3403,13 +3471,15 @@ function ResultFilterPanel({
       <div className="flex flex-wrap gap-2">
         {options.map((option) => {
           const active = activeFilters.includes(option);
+          const unsupported = unsupportedResultFilters.has(option);
           return (
             <button
-              className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${active ? "bg-forest-800 text-white" : "bg-forest-50 text-forest-800 hover:bg-forest-100"}`}
+              className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${unsupported ? "cursor-not-allowed bg-forest-50/60 text-forest-400" : active ? "bg-forest-800 text-white" : "bg-forest-50 text-forest-800 hover:bg-forest-100"}`}
               key={option}
+              disabled={unsupported}
               onClick={() => onToggle(option)}
             >
-              {option}
+              {option}{unsupported ? " · Bientôt" : ""}
             </button>
           );
         })}
@@ -3447,15 +3517,18 @@ function tripMatchesResultFilter(trip: Trip, filter: string) {
     trip.created_by ?? "",
     trip.status,
     ...trip.ambience_tags,
-    ...trip.activities
+    ...trip.activities,
+    ...(trip.activity_tags ?? []),
+    ...(trip.group_tags ?? []),
+    ...(trip.accommodation_tags ?? []),
+    ...(trip.food_tags ?? []),
+    ...(trip.safety_tags ?? []),
+    ...(trip.value_tags ?? [])
   ].join(" "));
-  const declarativeFilters = moreFilterGroups.flatMap((group) => group.options).map(normalizeUiText);
-
-  if (declarativeFilters.includes(normalizedFilter)) return true;
-
-  if (isIsoDate(filter)) return true;
-  if (["30 km max", "100 km max", "300 km max", "depart bordeaux", "depart paris", "depart lyon", "depart toulouse"].includes(normalizedFilter)) {
-    return true;
+  if (unsupportedResultFilters.has(filter)) return false;
+  if (isIsoDate(filter)) return getTripCardType(trip) === "catalog" || trip.dates.includes(filter);
+  if (["depart bordeaux", "depart paris", "depart lyon", "depart toulouse"].includes(normalizedFilter)) {
+    return normalizeUiText(trip.departure_city ?? "") === normalizedFilter.replace("depart ", "");
   }
   if (normalizedFilter === "tous") return true;
   if (normalizedFilter === "idees de voyage") return getTripCardType(trip) === "catalog";
@@ -3483,16 +3556,13 @@ function tripMatchesResultFilter(trip: Trip, filter: string) {
   if (normalizedFilter === "fun & aventure douce") return searchable.includes("fun") || searchable.includes("aventure douce");
   if (normalizedFilter === "premium/confort") return searchable.includes("premium") || searchable.includes("confort");
   if (normalizedFilter === "premium & confort") return searchable.includes("premium") || searchable.includes("confort");
-  if (normalizedFilter === "spirituel / introspectif") return true;
+  if (normalizedFilter === "spirituel / introspectif") return searchable.includes("spirituel") || searchable.includes("introspectif");
   if (normalizedFilter === "debutant") return searchable.includes("facile") || searchable.includes("debutant") || searchable.includes("tres facile");
-  if (normalizedFilter === "activites a faible risque") return true;
-  if (normalizedFilter === "activites encadrees par un professionnel") return searchable.includes("encadre") || trip.compatibility_score >= 80;
   if (normalizedFilter === "parc naturel") return searchable.includes("parc") || searchable.includes("vercors");
   if (normalizedFilter === "village / patrimoine local") return searchable.includes("village") || searchable.includes("patrimoine") || searchable.includes("local");
-  if (normalizedFilter === "destination depaysante") return trip.compatibility_score >= 85;
-  if (["repas halal souhaite", "repas vegetarien souhaite", "pas d'alcool dans le groupe", "pauses personnelles respectees", "valeurs similaires", "groupe calme et respectueux", "hebergement simple", "gite / refuge", "hotel confortable", "tente / bivouac", "securite renforcee", "profils verifies uniquement"].includes(normalizedFilter)) {
-    return true;
-  }
+  if (normalizedFilter === "destination depaysante") return searchable.includes("depays") || searchable.includes("etranger");
+  if (normalizedFilter === "dates flexibles") return getTripCardType(trip) === "catalog" || searchable.includes("flexible");
+  if (normalizedFilter === "trip deja planifie") return ["planned", "confirmed"].includes(trip.planning_status ?? "");
 
   const zoneAliases: Record<string, string[]> = {
     "nouvelle-aquitaine": ["pyrenees", "aspe", "basque", "dordogne", "gironde", "arcachon", "nouvelle-aquitaine"],
@@ -3527,7 +3597,8 @@ function TripGrid({
   favoriteTripIds,
   onToggleFavorite,
   getCreatorProfile,
-  onViewProfile
+  onViewProfile,
+  matchProfile = null
 }: {
   trips: Trip[];
   openTrip: (id: string) => void;
@@ -3537,8 +3608,20 @@ function TripGrid({
   onToggleFavorite: (trip: Trip) => void | Promise<void>;
   getCreatorProfile?: (profileId?: string | null) => UserProfileRecord | null;
   onViewProfile?: (profileId: string) => void;
+  matchProfile?: UserProfile | null;
 }) {
-  if (tripList.length === 0) {
+  const matchByTripId = useMemo(
+    () => new Map(tripList.map((trip) => [trip.id, calculateTripMatch(matchProfile, trip)])),
+    [matchProfile, tripList]
+  );
+  const rankedTrips = useMemo(
+    () => matchProfile
+      ? [...tripList].sort((left, right) => (matchByTripId.get(right.id)?.score ?? 0) - (matchByTripId.get(left.id)?.score ?? 0))
+      : tripList,
+    [matchByTripId, matchProfile, tripList]
+  );
+
+  if (rankedTrips.length === 0) {
     return (
       <div className="mt-8 rounded-[1.5rem] bg-white p-8 text-center shadow-soft">
         <h2 className="text-2xl font-semibold">Aucun Trip ne correspond exactement à ces filtres.</h2>
@@ -3549,9 +3632,10 @@ function TripGrid({
 
   return (
     <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-      {tripList.map((trip) => {
+      {rankedTrips.map((trip) => {
         const actionState = getTripActionState(trip, userTripActions);
         const isFavorite = favoriteTripIds.includes(trip.id);
+        const match = matchByTripId.get(trip.id) ?? calculateTripMatch(matchProfile, trip);
         const isUserProject = getTripCardType(trip) === "user_project";
         const creatorProfile = isUserProject ? getCreatorProfile?.(trip.creator_id) : null;
         const creatorUser = isUserProject
@@ -3572,7 +3656,14 @@ function TripGrid({
           <button className="relative block h-80 w-full overflow-hidden text-left" onClick={() => openTrip(trip.id)} aria-label={`Voir le détail de ${trip.title}`}>
             <img className="h-full w-full object-cover transition duration-700 group-hover:scale-105" src={trip.image_url} alt={trip.destination} />
             <div className="absolute inset-0 bg-gradient-to-t from-forest-900/90 via-forest-900/25 to-transparent" />
-            <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-2 text-xs font-bold text-forest-900 backdrop-blur">{trip.compatibility_score}% match</span>
+            <span
+              className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-2 text-xs font-bold text-forest-900 backdrop-blur"
+              title={match.reasons.join(" · ")}
+            >
+              {matchProfile
+                ? match.confidence === "élevée" ? `${match.score}% match avec toi` : `Match estimé : ${match.score}%`
+                : `Score estimé : ${match.score}%`}
+            </span>
             <span className={`absolute right-4 top-4 rounded-full px-3 py-2 text-xs font-bold shadow-sm ${getTripCardType(trip) === "user_project" ? "bg-sun text-white" : "bg-white/90 text-forest-900 backdrop-blur"}`}>
               {getTripTypeLabel(trip)}
             </span>
@@ -3620,6 +3711,9 @@ function TripGrid({
             <div className="mt-3 flex flex-wrap gap-2">
               {trip.ambience_tags.slice(0, 2).map((tag) => <span className="pill text-xs" key={tag}>{tag}</span>)}
             </div>
+            {matchProfile && match.confidence !== "élevée" && match.missingCriteria.length > 0 && (
+              <p className="mt-3 text-xs font-semibold text-forest-600">Complète ton profil pour affiner ce match.</p>
+            )}
             <div className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto]">
               <button className="btn-primary w-full" onClick={() => onTripAction(trip)}>{getTripActionLabel(trip, actionState)}</button>
               <button className="btn-secondary w-full py-3 sm:w-auto" onClick={() => openTrip(trip.id)}>Détails</button>
@@ -3643,6 +3737,7 @@ function MiniFact({ label, value }: { label: string; value: string }) {
 
 function TripDetail({
   trip,
+  match,
   catalogActivities,
   validatedMembers,
   joinTrip,
@@ -3654,6 +3749,7 @@ function TripDetail({
   onViewProfile
 }: {
   trip: Trip;
+  match: TripMatchResult;
   catalogActivities: MockLocalActivity[];
   validatedMembers: UserProfile[];
   joinTrip: (trip: Trip) => void | Promise<void>;
@@ -3695,6 +3791,7 @@ function TripDetail({
 
       <section className="container-page space-y-10 py-10">
         <TripTypeSection trip={trip} creatorProfile={creatorProfile} onViewProfile={onViewProfile} />
+        <TripMatchSection match={match} />
         {trip.community && (
           <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -3718,6 +3815,59 @@ function TripDetail({
         </div>
       </section>
     </>
+  );
+}
+
+function TripMatchSection({ match }: { match: TripMatchResult }) {
+  const requiresConnection = match.missingCriteria.includes("Connexion au profil");
+  const confidenceLabel = match.confidence === "élevée" ? "Précision élevée" : match.confidence === "moyenne" ? "Précision moyenne" : "Match estimé";
+
+  return (
+    <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className="pill">Match personnalisé</p>
+          <h2 className="mt-3 text-3xl font-semibold">
+            {requiresConnection
+              ? `${match.score}% score catalogue`
+              : match.confidence === "élevée" ? `${match.score}% match avec toi` : `Match estimé : ${match.score}%`}
+          </h2>
+          <p className="mt-2 text-sm font-semibold text-forest-600">{confidenceLabel}</p>
+        </div>
+        <div className="rounded-[1.25rem] bg-forest-900 px-6 py-4 text-center text-white">
+          <span className="text-4xl font-semibold">{match.score}%</span>
+          <span className="mt-1 block text-xs font-semibold text-white/70">compatibilité</span>
+        </div>
+      </div>
+
+      {requiresConnection ? (
+        <p className="mt-5 rounded-xl bg-skysoft p-4 font-semibold text-forest-800">Connecte-toi et complète ton profil pour voir ton match personnalisé.</p>
+      ) : (
+        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+          <div>
+            <h3 className="font-semibold">Pourquoi ce Trip te correspond ?</h3>
+            <div className="mt-3 grid gap-2">
+              {match.reasons.slice(0, 4).map((reason) => (
+                <div className="flex items-start gap-2 rounded-xl bg-forest-50 px-3 py-2 text-sm font-semibold text-forest-800" key={reason}>
+                  <BadgeCheck className="mt-0.5 shrink-0 text-forest-700" size={16} />
+                  <span>{reason}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="font-semibold">Pour améliorer la précision</h3>
+            {match.missingCriteria.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {match.missingCriteria.slice(0, 5).map((criterion) => <span className="pill text-xs" key={criterion}>{criterion}</span>)}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-forest-700">Ton profil contient assez d'informations pour un match précis.</p>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -4135,7 +4285,7 @@ function Community({
   const [activeTribeMemberId, setActiveTribeMemberId] = useState<string | null>(null);
   const [inviteTarget, setInviteTarget] = useState<CompatibleTribeProfile | null>(null);
   const profileUsers = useMemo(() => {
-    const remoteProfiles = profiles.map(profileRecordToUserProfile);
+    const remoteProfiles = profiles.map((profile) => profileRecordToUserProfile(profile));
     return remoteProfiles.length ? remoteProfiles : [...members, ...tribeExtraMembers];
   }, [profiles]);
   const relationIds = useMemo(() => new Set([
@@ -5126,6 +5276,8 @@ function Profile({
   onAuthClick,
   onShowOwnProfile,
   onUpdateProfile,
+  travelPreferences,
+  onUpdateTravelPreferences,
   onUploadAvatar,
   onOpenTrip,
   trips: availableTrips,
@@ -5139,6 +5291,8 @@ function Profile({
   onAuthClick: () => void;
   onShowOwnProfile: () => void;
   onUpdateProfile: (updates: UserProfileUpdate) => Promise<UserProfileRecord>;
+  travelPreferences: TravelPreferences | null;
+  onUpdateTravelPreferences: (updates: TravelPreferencesUpdate) => Promise<TravelPreferences>;
   onUploadAvatar: (file: File) => Promise<UserProfileRecord>;
   onOpenTrip: (trip: Trip, shouldOpenConversation: boolean) => void | Promise<void>;
   trips: Trip[];
@@ -5198,6 +5352,8 @@ function Profile({
         isOwnProfile={isOwnProfile}
         createdTripsCount={createdTrips.length}
         onUpdateProfile={onUpdateProfile}
+        travelPreferences={travelPreferences}
+        onUpdateTravelPreferences={onUpdateTravelPreferences}
         onUploadAvatar={onUploadAvatar}
       />
 
@@ -5255,9 +5411,19 @@ type ProfileFormState = {
   safety_preferences: string;
   badges: string;
   past_trips: string;
+  preferred_destinations: string;
+  preferred_activities: string;
+  preferred_accommodation: string;
+  food_preferences: string;
+  group_preferences: string;
+  personal_values: string;
+  availability_periods: string;
+  max_distance_km: string;
+  preferred_group_size_min: string;
+  preferred_group_size_max: string;
 };
 
-function profileRecordToForm(profile: UserProfileRecord): ProfileFormState {
+function profileRecordToForm(profile: UserProfileRecord, preferences?: TravelPreferences | null): ProfileFormState {
   return {
     display_name: profile.display_name ?? "",
     avatar_url: resolveProfileAvatarUrl(profile.avatar_url, profile.avatar_path) ?? "",
@@ -5270,7 +5436,17 @@ function profileRecordToForm(profile: UserProfileRecord): ProfileFormState {
     preferred_ambiences: (profile.preferred_ambiences ?? []).join(", "),
     safety_preferences: (profile.safety_preferences ?? []).join(", "),
     badges: (profile.badges ?? []).join(", "),
-    past_trips: String(profile.past_trips ?? 0)
+    past_trips: String(profile.past_trips ?? 0),
+    preferred_destinations: (preferences?.preferred_destinations ?? []).join(", "),
+    preferred_activities: (preferences?.preferred_activities ?? []).join(", "),
+    preferred_accommodation: (preferences?.preferred_accommodation ?? []).join(", "),
+    food_preferences: (preferences?.food_preferences ?? []).join(", "),
+    group_preferences: (preferences?.group_preferences ?? []).join(", "),
+    personal_values: (preferences?.personal_values ?? []).join(", "),
+    availability_periods: (preferences?.availability_periods ?? []).join(", "),
+    max_distance_km: preferences?.max_distance_km?.toString() ?? "",
+    preferred_group_size_min: preferences?.preferred_group_size_min?.toString() ?? "",
+    preferred_group_size_max: preferences?.preferred_group_size_max?.toString() ?? ""
   };
 }
 
@@ -5302,12 +5478,38 @@ function profileFormToUpdate(form: ProfileFormState): UserProfileUpdate {
   };
 }
 
+function profileFormToTravelPreferences(form: ProfileFormState): TravelPreferencesUpdate {
+  const optionalNumber = (value: string) => {
+    const parsed = Number(value);
+    return value.trim() && Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : null;
+  };
+  const optionalPositiveNumber = (value: string) => {
+    const parsed = optionalNumber(value);
+    return parsed && parsed > 0 ? parsed : null;
+  };
+
+  return {
+    preferred_destinations: csvToList(form.preferred_destinations),
+    preferred_activities: csvToList(form.preferred_activities),
+    preferred_accommodation: csvToList(form.preferred_accommodation),
+    food_preferences: csvToList(form.food_preferences),
+    group_preferences: csvToList(form.group_preferences),
+    personal_values: csvToList(form.personal_values),
+    availability_periods: csvToList(form.availability_periods),
+    max_distance_km: optionalNumber(form.max_distance_km),
+    preferred_group_size_min: optionalPositiveNumber(form.preferred_group_size_min),
+    preferred_group_size_max: optionalPositiveNumber(form.preferred_group_size_max)
+  };
+}
+
 function ProfilePublicCard({
   profileRecord,
   profileUser,
   isOwnProfile,
   createdTripsCount,
   onUpdateProfile,
+  travelPreferences,
+  onUpdateTravelPreferences,
   onUploadAvatar
 }: {
   profileRecord: UserProfileRecord;
@@ -5315,10 +5517,12 @@ function ProfilePublicCard({
   isOwnProfile: boolean;
   createdTripsCount: number;
   onUpdateProfile: (updates: UserProfileUpdate) => Promise<UserProfileRecord>;
+  travelPreferences: TravelPreferences | null;
+  onUpdateTravelPreferences: (updates: TravelPreferencesUpdate) => Promise<TravelPreferences>;
   onUploadAvatar: (file: File) => Promise<UserProfileRecord>;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [form, setForm] = useState<ProfileFormState>(() => profileRecordToForm(profileRecord));
+  const [form, setForm] = useState<ProfileFormState>(() => profileRecordToForm(profileRecord, travelPreferences));
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -5326,8 +5530,8 @@ function ProfilePublicCard({
   const [avatarSaving, setAvatarSaving] = useState(false);
 
   useEffect(() => {
-    if (!isEditing) setForm(profileRecordToForm(profileRecord));
-  }, [isEditing, profileRecord.avatar_path, profileRecord.avatar_url, profileRecord.id, profileRecord.updated_at]);
+    if (!isEditing) setForm(profileRecordToForm(profileRecord, travelPreferences));
+  }, [isEditing, profileRecord.avatar_path, profileRecord.avatar_url, profileRecord.id, profileRecord.updated_at, travelPreferences]);
 
   useEffect(() => {
     setAvatarFile(null);
@@ -5379,7 +5583,7 @@ function ProfilePublicCard({
 
     try {
       const nextProfile = await onUploadAvatar(avatarFile);
-      setForm(profileRecordToForm(nextProfile));
+      setForm(profileRecordToForm(nextProfile, travelPreferences));
       setAvatarFile(null);
       setAvatarPreview("");
       setFeedback("Photo enregistrée.");
@@ -5400,8 +5604,11 @@ function ProfilePublicCard({
     setFeedback("");
 
     try {
-      const nextProfile = await onUpdateProfile(profileFormToUpdate(form));
-      setForm(profileRecordToForm(nextProfile));
+      const [nextProfile, nextPreferences] = await Promise.all([
+        onUpdateProfile(profileFormToUpdate(form)),
+        onUpdateTravelPreferences(profileFormToTravelPreferences(form))
+      ]);
+      setForm(profileRecordToForm(nextProfile, nextPreferences));
       setIsEditing(false);
       setFeedback("Profil enregistré.");
     } catch (error) {
@@ -5469,12 +5676,30 @@ function ProfilePublicCard({
             <ProfileTextarea label="Ambiances préférées" hint="Sépare les valeurs par des virgules." value={form.preferred_ambiences} onChange={(value) => updateField("preferred_ambiences", value)} />
             <ProfileTextarea label="Confiance & confort" hint="Sépare les valeurs par des virgules." value={form.safety_preferences} onChange={(value) => updateField("safety_preferences", value)} />
             <ProfileTextarea label="Badges" hint="Sépare les valeurs par des virgules." value={form.badges} onChange={(value) => updateField("badges", value)} />
+            <div className="mt-2 border-t border-forest-100 pt-5">
+              <h3 className="text-xl font-semibold">Préférences de matching</h3>
+              <p className="mt-1 text-sm text-forest-600">Facultatif. Ces informations privées servent uniquement à affiner tes Trips.</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <ProfileTextarea label="Destinations préférées" hint="Ex : Valais, Bretagne, Italie" value={form.preferred_destinations} onChange={(value) => updateField("preferred_destinations", value)} />
+              <ProfileTextarea label="Activités préférées" hint="Ex : randonnée, kayak, patrimoine" value={form.preferred_activities} onChange={(value) => updateField("preferred_activities", value)} />
+              <ProfileTextarea label="Hébergements préférés" hint="Ex : gîte, refuge, hôtel" value={form.preferred_accommodation} onChange={(value) => updateField("preferred_accommodation", value)} />
+              <ProfileTextarea label="Préférences alimentaires" hint="Ex : végétarien, halal, sans alcool" value={form.food_preferences} onChange={(value) => updateField("food_preferences", value)} />
+              <ProfileTextarea label="Préférences de groupe" hint="Ex : petit groupe, groupe calme" value={form.group_preferences} onChange={(value) => updateField("group_preferences", value)} />
+              <ProfileTextarea label="Valeurs et pratiques" hint="Uniquement ce que tu souhaites déclarer." value={form.personal_values} onChange={(value) => updateField("personal_values", value)} />
+              <ProfileTextarea label="Disponibilités" hint="Ex : week-end, août, 2026-08-15" value={form.availability_periods} onChange={(value) => updateField("availability_periods", value)} />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <ProfileInput label="Distance maximale (km)" type="number" value={form.max_distance_km} onChange={(value) => updateField("max_distance_km", value)} />
+              <ProfileInput label="Groupe minimum" type="number" value={form.preferred_group_size_min} onChange={(value) => updateField("preferred_group_size_min", value)} />
+              <ProfileInput label="Groupe maximum" type="number" value={form.preferred_group_size_max} onChange={(value) => updateField("preferred_group_size_max", value)} />
+            </div>
             <div className="flex flex-wrap gap-2">
               <button className="btn-primary disabled:cursor-wait disabled:opacity-60" disabled={saving} onClick={saveProfile}>
                 {saving ? "Enregistrement..." : "Enregistrer"}
               </button>
               <button className="btn-secondary" onClick={() => {
-                setForm(profileRecordToForm(profileRecord));
+                setForm(profileRecordToForm(profileRecord, travelPreferences));
                 setIsEditing(false);
                 setFeedback("");
               }}>

@@ -45,6 +45,14 @@ type SupabaseTripRow = {
   conversation_id?: string | null;
   source_catalog_trip_id?: string | null;
   created_from_catalog?: boolean | null;
+  region?: string | null;
+  country?: string | null;
+  accommodation_tags?: string[] | null;
+  food_tags?: string[] | null;
+  group_tags?: string[] | null;
+  safety_tags?: string[] | null;
+  value_tags?: string[] | null;
+  activity_tags?: string[] | null;
 };
 
 type SupabaseTripInsertRow = {
@@ -83,6 +91,14 @@ type SupabaseTripInsertRow = {
   conversation_id: string | null;
   source_catalog_trip_id: string | null;
   created_from_catalog: boolean;
+  region: string | null;
+  country: string | null;
+  accommodation_tags: string[];
+  food_tags: string[];
+  group_tags: string[];
+  safety_tags: string[];
+  value_tags: string[];
+  activity_tags: string[];
 };
 
 type SupabaseActivityRow = {
@@ -230,7 +246,15 @@ function mapTripRow(row: SupabaseTripRow): Trip {
     current_participants: Number(row.current_participants ?? 0),
     conversation_id: row.conversation_id ?? undefined,
     source_catalog_trip_id: row.source_catalog_trip_id ?? undefined,
-    created_from_catalog: Boolean(row.created_from_catalog)
+    created_from_catalog: Boolean(row.created_from_catalog),
+    region: row.region ?? undefined,
+    country: row.country ?? undefined,
+    accommodation_tags: row.accommodation_tags ?? [],
+    food_tags: row.food_tags ?? [],
+    group_tags: row.group_tags ?? [],
+    safety_tags: row.safety_tags ?? [],
+    value_tags: row.value_tags ?? [],
+    activity_tags: row.activity_tags ?? []
   };
 }
 
@@ -272,7 +296,15 @@ function normalizeTripForInsert(trip: Trip): Trip {
     current_participants: Number.isFinite(Number(trip.current_participants)) ? Number(trip.current_participants) : 1,
     conversation_id: trip.conversation_id?.trim() || undefined,
     source_catalog_trip_id: trip.source_catalog_trip_id?.trim() || undefined,
-    created_from_catalog: Boolean(trip.created_from_catalog)
+    created_from_catalog: Boolean(trip.created_from_catalog),
+    region: trip.region?.trim() || undefined,
+    country: trip.country?.trim() || undefined,
+    accommodation_tags: Array.isArray(trip.accommodation_tags) ? trip.accommodation_tags : [],
+    food_tags: Array.isArray(trip.food_tags) ? trip.food_tags : [],
+    group_tags: Array.isArray(trip.group_tags) ? trip.group_tags : [],
+    safety_tags: Array.isArray(trip.safety_tags) ? trip.safety_tags : [],
+    value_tags: Array.isArray(trip.value_tags) ? trip.value_tags : [],
+    activity_tags: Array.isArray(trip.activity_tags) ? trip.activity_tags : []
   };
 
   validateTripForInsert(normalizedTrip);
@@ -352,7 +384,15 @@ function toTripInsertRow(trip: Trip): SupabaseTripInsertRow {
     current_participants: Math.min(currentParticipants, maxParticipants),
     conversation_id: trip.conversation_id ?? null,
     source_catalog_trip_id: trip.source_catalog_trip_id ?? null,
-    created_from_catalog: Boolean(trip.created_from_catalog)
+    created_from_catalog: Boolean(trip.created_from_catalog),
+    region: trip.region ?? null,
+    country: trip.country ?? null,
+    accommodation_tags: trip.accommodation_tags ?? [],
+    food_tags: trip.food_tags ?? [],
+    group_tags: trip.group_tags ?? [],
+    safety_tags: trip.safety_tags ?? [],
+    value_tags: trip.value_tags ?? [],
+    activity_tags: trip.activity_tags ?? []
   };
 }
 

@@ -6,6 +6,21 @@ export type TripPlanningStatus = "idea" | "forming_group" | "planned" | "confirm
 export type TripVisibility = "public" | "private" | "unlisted";
 export type TripModerationStatus = "approved" | "pending" | "rejected";
 
+export type TravelPreferences = {
+  user_id: string;
+  preferred_destinations: string[];
+  preferred_activities: string[];
+  preferred_accommodation: string[];
+  food_preferences: string[];
+  group_preferences: string[];
+  personal_values: string[];
+  availability_periods: string[];
+  max_distance_km: number | null;
+  preferred_group_size_min: number | null;
+  preferred_group_size_max: number | null;
+  updated_at?: string;
+};
+
 export type UserProfile = {
   id: string;
   name: string;
@@ -21,6 +36,7 @@ export type UserProfile = {
   safety_preferences: string[];
   past_trips: number;
   badges: string[];
+  travel_preferences?: TravelPreferences | null;
 };
 
 export type AdventureProfile = {
@@ -71,6 +87,14 @@ export type Trip = {
   conversation_id?: string;
   source_catalog_trip_id?: string;
   created_from_catalog?: boolean;
+  region?: string;
+  country?: string;
+  accommodation_tags?: string[];
+  food_tags?: string[];
+  group_tags?: string[];
+  safety_tags?: string[];
+  value_tags?: string[];
+  activity_tags?: string[];
 };
 
 export type OnboardingProfile = {

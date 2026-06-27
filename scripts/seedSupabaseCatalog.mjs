@@ -89,7 +89,15 @@ function toTripRow(trip) {
     departure_city: trip.departure_city ?? null,
     max_participants: trip.max_participants ?? 6,
     current_participants: trip.current_participants ?? 0,
-    conversation_id: trip.conversation_id ?? null
+    conversation_id: trip.conversation_id ?? null,
+    region: trip.region ?? null,
+    country: trip.country ?? null,
+    accommodation_tags: trip.accommodation_tags ?? [],
+    food_tags: trip.food_tags ?? [],
+    group_tags: trip.group_tags ?? [],
+    safety_tags: trip.safety_tags ?? [],
+    value_tags: trip.value_tags ?? [],
+    activity_tags: trip.activity_tags ?? trip.activities ?? []
   };
 }
 
