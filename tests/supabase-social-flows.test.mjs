@@ -149,6 +149,19 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
       token: requester.access_token
     });
     assert.ok(requesterPrivateMessages.some((message) => message.id === privateMessage[0].id));
+
+    const readReceipt = await rest("tribe_message_reads?on_conflict=connection_id,user_id&select=*", {
+      method: "POST",
+      token: requester.access_token,
+      prefer: "resolution=merge-duplicates,return=representation",
+      body: {
+        connection_id: tribeConnection[0].id,
+        user_id: requester.user.id,
+        last_read_at: new Date().toISOString()
+      }
+    });
+    assert.equal(readReceipt[0].connection_id, tribeConnection[0].id);
+    assert.equal(readReceipt[0].user_id, requester.user.id);
   } finally {
     await cleanupTestData(cleanup);
   }

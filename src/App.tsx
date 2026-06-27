@@ -1,4 +1,4 @@
-import { type ChangeEvent, type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import {
   BadgeCheck,
@@ -79,6 +79,8 @@ import {
   getCompatibleProfiles,
   getMyTribeRequests,
   getTribeMessages,
+  getUnreadTribeMessageCounts,
+  markTribeConversationAsRead,
   rejectTribeRequest,
   sendTribeMessage,
   sendTribeRequest,
@@ -666,7 +668,7 @@ function App() {
   const [createTripSeed, setCreateTripSeed] = useState<Trip | null>(null);
   const [shareTrip, setShareTrip] = useState<Trip | null>(null);
   const [communityInitialTab, setCommunityInitialTab] = useState<CommunityTab>("compatibles");
-  const [tribeUnreadMessageCount, setTribeUnreadMessageCount] = useState(0);
+  const [tribeUnreadMessageCounts, setTribeUnreadMessageCounts] = useState<Record<string, number>>({});
   const [initialTripLinkHandled, setInitialTripLinkHandled] = useState(false);
   const [socialNotice, setSocialNotice] = useState("");
   const [catalogLoaded, setCatalogLoaded] = useState(!hasSupabaseCatalogConfig());
@@ -747,8 +749,8 @@ function App() {
       setTripInvitations(invitations);
 
       try {
-        const unreadTribeMessages = await getUnreadTribeMessageCount(session.user.id, requests.accepted, session.access_token);
-        setTribeUnreadMessageCount(unreadTribeMessages);
+        const unreadTribeMessages = await getUnreadTribeMessageCounts(session.user.id, requests.accepted, session.access_token);
+        setTribeUnreadMessageCounts(unreadTribeMessages);
       } catch (error) {
         console.warn("Compteur de messages Tribu indisponible.", error);
       }
@@ -765,7 +767,7 @@ function App() {
       setTribeProfiles([]);
       setTribeRequests({ received: [], sent: [], accepted: [] });
       setTripInvitations([]);
-      setTribeUnreadMessageCount(0);
+      setTribeUnreadMessageCounts({});
       return;
     }
 
@@ -787,7 +789,7 @@ function App() {
     const refresh = () => {
       refreshSocialData(authSession);
     };
-    const interval = window.setInterval(refresh, 15_000);
+    const interval = window.setInterval(refresh, 5_000);
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
 
@@ -846,6 +848,7 @@ function App() {
   );
   const pendingReceivedJoinRequestsWithoutNotification = pendingReceivedJoinRequests.filter((request) => !notifiedJoinRequestIds.has(request.id));
   const unreadNotificationCount = notifications.filter((notification) => !notification.read_at).length + pendingReceivedJoinRequestsWithoutNotification.length;
+  const tribeUnreadMessageCount = Object.values(tribeUnreadMessageCounts).reduce((total, count) => total + count, 0);
   const profilePageRecord = selectedProfileId ? viewedProfile ?? fallbackProfileRecord(selectedProfileId) : currentProfile;
   const profilePageUser = profilePageRecord ? profileRecordToUserProfile(profilePageRecord) : currentUser;
   const isOwnProfilePage = !selectedProfileId || selectedProfileId === currentProfile?.id;
@@ -913,12 +916,25 @@ function App() {
     go("profil", { keepSelectedProfile: true });
   };
   const openTribeInbox = () => {
-    if (currentProfile?.id) markTribeMessagesSeen(currentProfile.id);
     setCommunityInitialTab("tribe");
-    setTribeUnreadMessageCount(0);
     setNotificationsOpen(false);
     go("communaute");
   };
+  const markTribeConversationRead = useCallback(async (connectionId: string) => {
+    if (!authSession || !currentProfile) return;
+
+    try {
+      await markTribeConversationAsRead(connectionId, currentProfile.id, authSession.access_token);
+      setTribeUnreadMessageCounts((current) => {
+        if (!current[connectionId]) return current;
+        const next = { ...current };
+        delete next[connectionId];
+        return next;
+      });
+    } catch (error) {
+      console.warn("Lecture de la conversation non enregistrée.", error);
+    }
+  }, [authSession, currentProfile]);
   const loadTripMembers = async (trip: Trip, session = authSession) => {
     if (!session) return;
 
@@ -978,7 +994,7 @@ function App() {
     setTribeProfiles([]);
     setTribeRequests({ received: [], sent: [], accepted: [] });
     setTripInvitations([]);
-    setTribeUnreadMessageCount(0);
+    setTribeUnreadMessageCounts({});
     setSocialNotice("");
   };
   const requireAuth = (prompt: string) => {
@@ -1481,11 +1497,9 @@ function App() {
             accessToken={authSession?.access_token}
             isAuthenticated={isAuthenticated}
             initialTab={communityInitialTab}
+            unreadMessageCounts={tribeUnreadMessageCounts}
             onRequireAuth={() => openAuthModal("Connecte-toi pour contacter ou inviter des membres.")}
-            onTribeOpened={() => {
-              if (currentProfile?.id) markTribeMessagesSeen(currentProfile.id);
-              setTribeUnreadMessageCount(0);
-            }}
+            onTribeConversationRead={markTribeConversationRead}
             onSendTribeRequest={sendTribeConnectionRequest}
             onUpdateTribeConnection={updateTribeConnection}
             onAcceptJoinRequest={acceptJoinRequestFlow}
@@ -1584,7 +1598,7 @@ function Header({
               <button className="relative rounded-full bg-white p-2 text-forest-800 shadow-sm transition hover:bg-forest-50" onClick={onMessagesClick} aria-label="Messages">
                 <MessageCircle size={18} />
                 {unreadMessageCount > 0 && (
-                  <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-forest-800 px-1 text-[10px] font-bold text-white">
+                  <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-sun px-1 text-[10px] font-bold text-white">
                     {unreadMessageCount}
                   </span>
                 )}
@@ -1622,7 +1636,10 @@ function Header({
             ))}
             {currentProfile ? (
               <>
-                <button className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={onMessagesClick}>Messages ({unreadMessageCount})</button>
+                <button className="flex items-center justify-between rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={onMessagesClick}>
+                  <span>Messages</span>
+                  {unreadMessageCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-sun px-1 text-[10px] font-bold text-white">{unreadMessageCount}</span>}
+                </button>
                 <button className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={onNotificationsClick}>Notifications ({unreadNotificationCount})</button>
                 <button className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={() => go("profil")}>{currentProfile.display_name}</button>
                 <button className="rounded-lg bg-forest-800 px-4 py-3 text-left font-medium text-white" onClick={onSignOut}>Déconnexion</button>
@@ -4047,8 +4064,9 @@ function Community({
   accessToken,
   isAuthenticated,
   initialTab,
+  unreadMessageCounts,
   onRequireAuth,
-  onTribeOpened,
+  onTribeConversationRead,
   onSendTribeRequest,
   onUpdateTribeConnection,
   onAcceptJoinRequest,
@@ -4067,8 +4085,9 @@ function Community({
   accessToken?: string;
   isAuthenticated: boolean;
   initialTab: CommunityTab;
+  unreadMessageCounts: Record<string, number>;
   onRequireAuth: () => void;
-  onTribeOpened: () => void;
+  onTribeConversationRead: (connectionId: string) => void | Promise<void>;
   onSendTribeRequest: (member: UserProfile) => void | Promise<void>;
   onUpdateTribeConnection: (connectionId: string, action: "accept" | "reject" | "cancel") => void | Promise<void>;
   onAcceptJoinRequest: (requestId: string) => void | Promise<void>;
@@ -4132,6 +4151,7 @@ function Community({
   );
   const selectedTribeMember = myTribePeople.find((member) => member.id === activeTribeMemberId) ?? myTribePeople[0] ?? null;
   const selectedTribeConnection = selectedTribeMember ? findAcceptedConnection(selectedTribeMember.id) : undefined;
+  const unreadMessageTotal = Object.values(unreadMessageCounts).reduce((total, count) => total + count, 0);
   const guardSocialAction = (action: () => void) => {
     if (!isAuthenticated) {
       onRequireAuth();
@@ -4146,7 +4166,6 @@ function Community({
 
   useEffect(() => {
     if (activeTab !== "tribe") return;
-    onTribeOpened();
     if (myTribePeople.length === 0) {
       setActiveTribeMemberId(null);
       return;
@@ -4200,10 +4219,14 @@ function Community({
             onClick={() => {
               const nextTab = key as CommunityTab;
               setActiveTab(nextTab);
-              if (nextTab === "tribe") onTribeOpened();
             }}
           >
             {label}
+            {key === "tribe" && unreadMessageTotal > 0 && (
+              <span className="ml-2 inline-grid h-5 min-w-5 place-items-center rounded-full bg-sun px-1 text-[10px] font-bold text-white">
+                {unreadMessageTotal}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -4227,9 +4250,12 @@ function Community({
               people={myTribePeople}
               selectedMember={selectedTribeMember}
               selectedConnection={selectedTribeConnection}
+              connections={tribeRequests.accepted}
+              unreadMessageCounts={unreadMessageCounts}
               currentUser={currentUser}
               accessToken={accessToken}
               onSelectMember={(member) => setActiveTribeMemberId(member.id)}
+              onConversationRead={onTribeConversationRead}
               onViewProfile={onViewProfile}
               onInvite={(member) => guardSocialAction(() => setInviteTarget(member))}
               onRequireAuth={onRequireAuth}
@@ -4394,9 +4420,12 @@ function TribeInbox({
   people,
   selectedMember,
   selectedConnection,
+  connections,
+  unreadMessageCounts,
   currentUser,
   accessToken,
   onSelectMember,
+  onConversationRead,
   onViewProfile,
   onInvite,
   onRequireAuth
@@ -4404,9 +4433,12 @@ function TribeInbox({
   people: CompatibleTribeProfile[];
   selectedMember: CompatibleTribeProfile | null;
   selectedConnection?: TribeConnection;
+  connections: TribeConnection[];
+  unreadMessageCounts: Record<string, number>;
   currentUser: UserProfile;
   accessToken?: string;
   onSelectMember: (member: CompatibleTribeProfile) => void;
+  onConversationRead: (connectionId: string) => void | Promise<void>;
   onViewProfile: (profileId: string) => void;
   onInvite: (member: CompatibleTribeProfile) => void;
   onRequireAuth: () => void;
@@ -4421,21 +4453,31 @@ function TribeInbox({
         <div className="max-h-[680px] overflow-y-auto">
           {people.map((member) => {
             const active = selectedMember?.id === member.id;
+            const connection = connections.find((item) => (
+              (item.requester_id === currentUser.id && item.receiver_id === member.id)
+              || (item.receiver_id === currentUser.id && item.requester_id === member.id)
+            ));
+            const unreadCount = connection ? unreadMessageCounts[connection.id] ?? 0 : 0;
             return (
               <article
-                className={`flex cursor-pointer items-center gap-3 border-b border-forest-50 p-4 transition hover:bg-forest-50 ${active ? "bg-forest-50" : "bg-white"}`}
+                className={`flex cursor-pointer items-center gap-3 border-b border-forest-50 p-4 transition hover:bg-forest-50 ${active ? "bg-forest-50" : unreadCount > 0 ? "border-l-4 border-l-sun bg-sun/10" : "bg-white"}`}
                 key={member.id}
                 onClick={() => onSelectMember(member)}
               >
                 <img className="h-14 w-14 rounded-full object-cover" src={member.photo_url} alt={member.name} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="truncate font-semibold">{member.name}</p>
+                    <p className={`truncate ${unreadCount > 0 ? "font-bold text-forest-900" : "font-semibold"}`}>{member.name}</p>
                     {member.verified && <BadgeCheck className="shrink-0 text-forest-700" size={16} />}
                   </div>
                   <p className="truncate text-sm text-forest-700">{member.city} · {member.adventure_style}</p>
-                  <p className="mt-1 truncate text-xs font-semibold text-forest-500">{member.compatibilityTags.slice(0, 2).join(" · ")}</p>
+                  {unreadCount > 0 ? (
+                    <p className="mt-1 truncate text-xs font-bold text-forest-900">{unreadCount} nouveau{unreadCount > 1 ? "x" : ""} message{unreadCount > 1 ? "s" : ""}</p>
+                  ) : (
+                    <p className="mt-1 truncate text-xs font-semibold text-forest-500">{member.compatibilityTags.slice(0, 2).join(" · ")}</p>
+                  )}
                 </div>
+                {unreadCount > 0 && <span className="grid h-6 min-w-6 place-items-center rounded-full bg-sun px-1.5 text-xs font-bold text-white">{unreadCount}</span>}
                 <button
                   className="rounded-full bg-forest-900 px-4 py-2 text-sm font-semibold text-white"
                   onClick={(event) => {
@@ -4456,6 +4498,7 @@ function TribeInbox({
         connection={selectedConnection}
         currentUser={currentUser}
         accessToken={accessToken}
+        onConversationRead={onConversationRead}
         onViewProfile={onViewProfile}
         onInvite={onInvite}
         onRequireAuth={onRequireAuth}
@@ -4469,6 +4512,7 @@ function TribeDirectConversation({
   connection,
   currentUser,
   accessToken,
+  onConversationRead,
   onViewProfile,
   onInvite,
   onRequireAuth
@@ -4477,6 +4521,7 @@ function TribeDirectConversation({
   connection?: TribeConnection;
   currentUser: UserProfile;
   accessToken?: string;
+  onConversationRead: (connectionId: string) => void | Promise<void>;
   onViewProfile: (profileId: string) => void;
   onInvite: (member: CompatibleTribeProfile) => void;
   onRequireAuth: () => void;
@@ -4485,11 +4530,13 @@ function TribeDirectConversation({
   const [messages, setMessages] = useState<TribeMessage[]>([]);
   const [notice, setNotice] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const lastReadIncomingMessageId = useRef<string | null>(null);
 
   useEffect(() => {
     setDraft("");
     setMessages([]);
     setNotice("");
+    lastReadIncomingMessageId.current = null;
 
     if (!member || !connection || !accessToken) return;
 
@@ -4498,7 +4545,14 @@ function TribeDirectConversation({
     const loadMessages = async () => {
       try {
         const rows = await getTribeMessages(connection.id, accessToken);
-        if (mounted) setMessages(rows);
+        if (mounted) {
+          setMessages(rows);
+          const latestIncomingMessage = [...rows].reverse().find((message) => message.sender_id !== currentUser.id);
+          if (latestIncomingMessage && latestIncomingMessage.id !== lastReadIncomingMessageId.current) {
+            lastReadIncomingMessageId.current = latestIncomingMessage.id;
+            void onConversationRead(connection.id);
+          }
+        }
       } catch (error) {
         console.warn("Messages Tribu indisponibles.", error);
         if (mounted) setNotice("Impossible de synchroniser cette conversation pour le moment.");
@@ -4512,7 +4566,7 @@ function TribeDirectConversation({
       mounted = false;
       window.clearInterval(interval);
     };
-  }, [accessToken, connection, member]);
+  }, [accessToken, connection, currentUser.id, member, onConversationRead]);
 
   if (!member) {
     return (
@@ -4960,33 +5014,6 @@ async function copyTextToClipboard(value: string) {
   textarea.select();
   document.execCommand("copy");
   document.body.removeChild(textarea);
-}
-
-async function getUnreadTribeMessageCount(userId: string, connections: TribeConnection[], accessToken: string) {
-  const seenAt = getTribeMessagesSeenAt(userId);
-  const messages = await Promise.all(
-    connections.map((connection) => getTribeMessages(connection.id, accessToken).catch(() => [] as TribeMessage[]))
-  );
-
-  return messages.flat().filter((message) => {
-    if (message.sender_id === userId || !message.created_at) return false;
-    return new Date(message.created_at).getTime() > seenAt;
-  }).length;
-}
-
-function getTribeMessagesSeenAt(userId: string) {
-  if (typeof window === "undefined") return 0;
-  const raw = window.localStorage.getItem(getTribeMessagesSeenStorageKey(userId));
-  return raw ? new Date(raw).getTime() || 0 : 0;
-}
-
-function markTribeMessagesSeen(userId: string) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(getTribeMessagesSeenStorageKey(userId), new Date().toISOString());
-}
-
-function getTribeMessagesSeenStorageKey(userId: string) {
-  return `tribu_nature_tribe_messages_seen_at_${userId}`;
 }
 
 function getCompatiblePeople(userProfile: UserProfile, candidates: UserProfile[], availableTrips: Trip[]): CompatibleTribeProfile[] {

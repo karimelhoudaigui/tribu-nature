@@ -25,6 +25,12 @@ export type TribeMessage = {
   created_at?: string;
 };
 
+export type TribeMessageRead = {
+  connection_id: string;
+  user_id: string;
+  last_read_at: string;
+};
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -103,6 +109,53 @@ export async function sendTribeMessage(
       connection_id: connectionId,
       sender_id: senderId,
       body
+    }
+  });
+
+  return rows[0];
+}
+
+export async function getUnreadTribeMessageCounts(
+  userId: string,
+  connections: TribeConnection[],
+  accessToken: string
+): Promise<Record<string, number>> {
+  if (connections.length === 0) return {};
+
+  const connectionFilter = connections.map((connection) => encodeURIComponent(connection.id)).join(",");
+  const [messages, receipts] = await Promise.all([
+    requestRest<TribeMessage[]>(
+      `tribe_messages?connection_id=in.(${connectionFilter})&sender_id=neq.${encodeURIComponent(userId)}&select=id,connection_id,sender_id,body,created_at`,
+      { accessToken }
+    ),
+    requestRest<TribeMessageRead[]>(
+      `tribe_message_reads?user_id=eq.${encodeURIComponent(userId)}&connection_id=in.(${connectionFilter})&select=connection_id,user_id,last_read_at`,
+      { accessToken }
+    )
+  ]);
+  const readAtByConnection = new Map(receipts.map((receipt) => [receipt.connection_id, new Date(receipt.last_read_at).getTime()]));
+
+  return messages.reduce<Record<string, number>>((counts, message) => {
+    const createdAt = message.created_at ? new Date(message.created_at).getTime() : 0;
+    const lastReadAt = readAtByConnection.get(message.connection_id) ?? 0;
+    if (createdAt > lastReadAt) counts[message.connection_id] = (counts[message.connection_id] ?? 0) + 1;
+    return counts;
+  }, {});
+}
+
+export async function markTribeConversationAsRead(
+  connectionId: string,
+  userId: string,
+  accessToken: string
+): Promise<TribeMessageRead> {
+  const rows = await requestRest<TribeMessageRead[]>("tribe_message_reads?on_conflict=connection_id,user_id&select=*", {
+    method: "POST",
+    accessToken,
+    prefer: "resolution=merge-duplicates,return=representation",
+    body: {
+      connection_id: connectionId,
+      user_id: userId,
+      last_read_at: new Date().toISOString()
     }
   });
 
