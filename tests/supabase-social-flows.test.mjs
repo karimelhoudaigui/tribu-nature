@@ -111,9 +111,11 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
     const userTripId = `${runId}-user-trip`;
     cleanup.tripIds.push(userTripId);
     await createUserProjectTrip(userTripId, owner);
-    const userProjectConversation = await ensureTripConversation(userTripId, "user_project", owner.access_token);
-    await addTripParticipant(userTripId, owner.user.id, owner.access_token, "creator");
-    await addConversationMember(userProjectConversation.id, owner.user.id, owner.access_token);
+    const userProjectConversation = { id: `user_project-${userTripId}` };
+    const initialProjectMembers = await rest(`conversation_members?conversation_id=eq.${encodeURIComponent(userProjectConversation.id)}&select=*`, {
+      token: owner.access_token
+    });
+    assert.ok(initialProjectMembers.some((member) => member.user_id === owner.user.id), "Le créateur doit être ajouté automatiquement à la conversation.");
 
     const joinRequest = await requestToJoinTrip(userTripId, requester.user.id, owner.user.id, requester.access_token);
     await createNotification(owner.user.id, requester.user.id, userTripId, joinRequest.id, requester.access_token);
@@ -131,8 +133,14 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
     });
     assert.equal(acceptedRequest[0].status, "accepted");
 
-    await addTripParticipant(userTripId, requester.user.id, owner.access_token, "participant");
-    await addConversationMember(userProjectConversation.id, requester.user.id, owner.access_token);
+    const acceptedProjectMembers = await rest(`conversation_members?conversation_id=eq.${encodeURIComponent(userProjectConversation.id)}&select=*`, {
+      token: requester.access_token
+    });
+    assert.deepEqual(
+      new Set(acceptedProjectMembers.map((member) => member.user_id)),
+      new Set([owner.user.id, requester.user.id]),
+      "L'acceptation doit synchroniser automatiquement les participants et la conversation."
+    );
 
     const requesterProjectMessage = await sendConversationMessage(userProjectConversation.id, requester, "Je confirme ma participation au Trip utilisateur.");
     const ownerProjectMessages = await rest(`conversation_messages?conversation_id=eq.${encodeURIComponent(userProjectConversation.id)}&select=*`, {
