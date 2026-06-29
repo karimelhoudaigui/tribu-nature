@@ -36,7 +36,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export async function getCompatibleProfiles(userId: string, accessToken: string): Promise<UserProfileRecord[]> {
   return requestRest<UserProfileRecord[]>(
-    `profiles?id=neq.${encodeURIComponent(userId)}&select=*&order=display_name.asc`,
+    `profiles?id=neq.${encodeURIComponent(userId)}&is_seed_profile=eq.false&select=*&order=display_name.asc`,
     { accessToken }
   );
 }

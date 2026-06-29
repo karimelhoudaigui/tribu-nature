@@ -54,6 +54,9 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
       badges: ["test", "fiable"]
     });
 
+    const seedProfiles = await rest("profiles?is_seed_profile=eq.true&select=id", { token: owner.access_token });
+    assert.equal(seedProfiles.length, 0, "Les profils fictifs ne doivent plus être présents dans la base sociale.");
+
     const ownerPreferences = await rest("travel_preferences?on_conflict=user_id&select=*", {
       method: "POST",
       token: owner.access_token,
@@ -116,6 +119,15 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
       token: owner.access_token
     });
     assert.ok(initialProjectMembers.some((member) => member.user_id === owner.user.id), "Le créateur doit être ajouté automatiquement à la conversation.");
+
+    const cancellableRequest = await requestToJoinTrip(userTripId, requester.user.id, owner.user.id, requester.access_token);
+    const cancelledRequest = await rest(`trip_join_requests?id=eq.${encodeURIComponent(cancellableRequest.id)}&select=*`, {
+      method: "PATCH",
+      token: requester.access_token,
+      prefer: "return=representation",
+      body: { status: "cancelled" }
+    });
+    assert.equal(cancelledRequest[0].status, "cancelled");
 
     const joinRequest = await requestToJoinTrip(userTripId, requester.user.id, owner.user.id, requester.access_token);
     await createNotification(owner.user.id, requester.user.id, userTripId, joinRequest.id, requester.access_token);
