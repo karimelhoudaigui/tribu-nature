@@ -36,6 +36,7 @@ export type UserProfile = {
   safety_preferences: string[];
   past_trips: number;
   badges: string[];
+  last_seen_at?: string | null;
   travel_preferences?: TravelPreferences | null;
 };
 
@@ -56,7 +57,11 @@ export type Trip = {
   title: string;
   destination: string;
   image_url: string;
+  image_urls?: string[];
   dates: string;
+  start_date?: string;
+  end_date?: string;
+  date_precision?: "flexible" | "month" | "exact";
   duration: string;
   budget_min: number;
   budget_max: number;
@@ -82,6 +87,8 @@ export type Trip = {
   creator_name?: string;
   creator_id?: string;
   departure_city?: string;
+  departure_lat?: number;
+  departure_lng?: number;
   max_participants?: number;
   current_participants?: number;
   conversation_id?: string;

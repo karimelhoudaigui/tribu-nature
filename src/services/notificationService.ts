@@ -7,7 +7,8 @@ export type NotificationType =
   | "trip_invitation_rejected"
   | "friend_request_received"
   | "friend_request_accepted"
-  | "conversation_new_member";
+  | "conversation_new_member"
+  | "trip_message_received";
 
 export type NotificationRecord = {
   id: string;

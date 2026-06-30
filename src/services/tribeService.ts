@@ -22,7 +22,9 @@ export type TribeMessage = {
   connection_id: string;
   sender_id: string;
   body: string;
+  image_paths?: string[];
   created_at?: string;
+  updated_at?: string | null;
 };
 
 export type TribeMessageRead = {
@@ -36,7 +38,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export async function getCompatibleProfiles(userId: string, accessToken: string): Promise<UserProfileRecord[]> {
   return requestRest<UserProfileRecord[]>(
-    `profiles?id=neq.${encodeURIComponent(userId)}&is_seed_profile=eq.false&select=*&order=display_name.asc`,
+    `public_profiles?id=neq.${encodeURIComponent(userId)}&is_seed_profile=eq.false&select=*&order=display_name.asc`,
     { accessToken }
   );
 }
@@ -99,7 +101,8 @@ export async function sendTribeMessage(
   connectionId: string,
   senderId: string,
   body: string,
-  accessToken: string
+  accessToken: string,
+  imagePaths: string[] = []
 ): Promise<TribeMessage> {
   const rows = await requestRest<TribeMessage[]>("tribe_messages?select=*", {
     method: "POST",
@@ -108,11 +111,30 @@ export async function sendTribeMessage(
     body: {
       connection_id: connectionId,
       sender_id: senderId,
-      body
+      body,
+      image_paths: imagePaths
     }
   });
 
   return rows[0];
+}
+
+export async function updateTribeMessage(messageId: string, body: string, accessToken: string): Promise<TribeMessage> {
+  const rows = await requestRest<TribeMessage[]>(`tribe_messages?id=eq.${encodeURIComponent(messageId)}&select=*`, {
+    method: "PATCH",
+    accessToken,
+    prefer: "return=representation",
+    body: { body, updated_at: new Date().toISOString() }
+  });
+  return rows[0];
+}
+
+export async function deleteTribeMessage(messageId: string, accessToken: string): Promise<void> {
+  await requestRest<void>(`tribe_messages?id=eq.${encodeURIComponent(messageId)}`, {
+    method: "DELETE",
+    accessToken,
+    prefer: "return=minimal"
+  });
 }
 
 export async function getUnreadTribeMessageCounts(

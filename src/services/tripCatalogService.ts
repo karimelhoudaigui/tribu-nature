@@ -14,7 +14,11 @@ type SupabaseTripRow = {
   title: string;
   destination: string;
   image_url: string;
+  image_urls?: string[] | null;
   dates: string;
+  start_date?: string | null;
+  end_date?: string | null;
+  date_precision?: Trip["date_precision"] | null;
   duration: string;
   budget_min: number;
   budget_max: number;
@@ -40,6 +44,8 @@ type SupabaseTripRow = {
   creator_name?: string | null;
   creator_id?: string | null;
   departure_city?: string | null;
+  departure_lat?: number | null;
+  departure_lng?: number | null;
   max_participants?: number | null;
   current_participants?: number | null;
   conversation_id?: string | null;
@@ -60,7 +66,11 @@ type SupabaseTripInsertRow = {
   title: string;
   destination: string;
   image_url: string;
+  image_urls: string[];
   dates: string;
+  start_date: string | null;
+  end_date: string | null;
+  date_precision: NonNullable<Trip["date_precision"]>;
   duration: string;
   budget_min: number;
   budget_max: number;
@@ -86,6 +96,8 @@ type SupabaseTripInsertRow = {
   creator_name: string | null;
   creator_id: string | null;
   departure_city: string | null;
+  departure_lat: number | null;
+  departure_lng: number | null;
   max_participants: number;
   current_participants: number;
   conversation_id: string | null;
@@ -130,13 +142,14 @@ export function hasSupabaseCatalogConfig() {
   return Boolean(supabaseUrl && supabaseAnonKey);
 }
 
-export async function loadTripCatalog(): Promise<TripCatalog> {
+export async function loadTripCatalog(accessToken?: string): Promise<TripCatalog> {
   if (!hasSupabaseCatalogConfig()) return getLocalCatalog();
 
   try {
+    await cleanupExpiredTrips().catch((error) => console.warn("Nettoyage des Trips expirés indisponible.", error));
     const [remoteTrips, remoteActivities] = await Promise.all([
-      fetchSupabaseRows<SupabaseTripRow>("trips", "select=*&order=compatibility_score.desc"),
-      fetchSupabaseRows<SupabaseActivityRow>("local_activities", "select=*")
+      fetchSupabaseRows<SupabaseTripRow>("trips", "select=*&order=compatibility_score.desc", accessToken),
+      fetchSupabaseRows<SupabaseActivityRow>("local_activities", "select=*", accessToken)
     ]);
 
     if (remoteTrips.length === 0) return getLocalCatalog();
@@ -150,6 +163,31 @@ export async function loadTripCatalog(): Promise<TripCatalog> {
     console.warn("Impossible de charger le catalogue Supabase, fallback local.", error);
     return getLocalCatalog();
   }
+}
+
+export async function deleteTrip(tripId: string, accessToken: string): Promise<void> {
+  const response = await fetch(`${getSupabaseApiUrl()}/rest/v1/trips?id=eq.${encodeURIComponent(tripId)}`, {
+    method: "DELETE",
+    headers: {
+      ...getSupabaseHeaders(accessToken),
+      Prefer: "return=minimal"
+    }
+  });
+
+  if (!response.ok) throw new Error(`Suppression impossible: ${await getSupabaseErrorMessage(response)}`);
+}
+
+async function cleanupExpiredTrips(): Promise<void> {
+  const response = await fetch(`${getSupabaseApiUrl()}/rest/v1/rpc/cleanup_expired_user_trips`, {
+    method: "POST",
+    headers: {
+      ...getSupabaseHeaders(),
+      "Content-Type": "application/json"
+    },
+    body: "{}"
+  });
+
+  if (!response.ok) throw new Error(await getSupabaseErrorMessage(response));
 }
 
 export async function createTrip(trip: Trip, accessToken?: string): Promise<Trip> {
@@ -184,9 +222,9 @@ function getLocalCatalog(): TripCatalog {
   };
 }
 
-async function fetchSupabaseRows<T>(table: string, query: string): Promise<T[]> {
+async function fetchSupabaseRows<T>(table: string, query: string, accessToken?: string): Promise<T[]> {
   const response = await fetch(`${getSupabaseApiUrl()}/rest/v1/${table}?${query}`, {
-    headers: getSupabaseHeaders()
+    headers: getSupabaseHeaders(accessToken)
   });
 
   if (!response.ok) {
@@ -216,7 +254,11 @@ function mapTripRow(row: SupabaseTripRow): Trip {
     title: row.title,
     destination: row.destination,
     image_url: row.image_url,
+    image_urls: row.image_urls?.length ? row.image_urls : [row.image_url].filter(Boolean),
     dates: row.dates,
+    start_date: row.start_date ?? undefined,
+    end_date: row.end_date ?? undefined,
+    date_precision: row.date_precision ?? "flexible",
     duration: row.duration,
     budget_min: Number(row.budget_min),
     budget_max: Number(row.budget_max),
@@ -242,6 +284,8 @@ function mapTripRow(row: SupabaseTripRow): Trip {
     creator_name: row.creator_name ?? row.created_by ?? undefined,
     creator_id: row.creator_id ?? undefined,
     departure_city: row.departure_city ?? undefined,
+    departure_lat: row.departure_lat ?? undefined,
+    departure_lng: row.departure_lng ?? undefined,
     max_participants: Number(row.max_participants ?? 6),
     current_participants: Number(row.current_participants ?? 0),
     conversation_id: row.conversation_id ?? undefined,
@@ -267,7 +311,13 @@ function normalizeTripForInsert(trip: Trip): Trip {
     title: trip.title.trim(),
     destination: trip.destination.trim(),
     image_url: trip.image_url?.trim() || defaultTripImage,
+    image_urls: Array.isArray(trip.image_urls) && trip.image_urls.length
+      ? trip.image_urls.filter(Boolean)
+      : [trip.image_url?.trim() || defaultTripImage],
     dates: trip.dates?.trim() || trip.duration?.trim() || "Dates à définir",
+    start_date: trip.start_date || undefined,
+    end_date: trip.end_date || undefined,
+    date_precision: trip.date_precision ?? "flexible",
     duration: trip.duration?.trim() || trip.dates?.trim() || "Durée à définir",
     budget_min: Number.isFinite(budgetMin) ? Math.max(0, Math.round(budgetMin)) : Number.NaN,
     budget_max: Number.isFinite(budgetMax) ? Math.max(0, Math.round(budgetMax)) : Number.NaN,
@@ -292,6 +342,8 @@ function normalizeTripForInsert(trip: Trip): Trip {
     creator_name: trip.creator_name?.trim() || trip.created_by?.trim() || undefined,
     creator_id: trip.creator_id?.trim() || undefined,
     departure_city: trip.departure_city?.trim() || undefined,
+    departure_lat: Number.isFinite(Number(trip.departure_lat)) ? Number(trip.departure_lat) : undefined,
+    departure_lng: Number.isFinite(Number(trip.departure_lng)) ? Number(trip.departure_lng) : undefined,
     max_participants: Number.isFinite(Number(trip.max_participants)) ? Number(trip.max_participants) : 6,
     current_participants: Number.isFinite(Number(trip.current_participants)) ? Number(trip.current_participants) : 1,
     conversation_id: trip.conversation_id?.trim() || undefined,
@@ -323,6 +375,7 @@ function validateTripForInsert(trip: Trip) {
   }
   if (!trip.physical_level) errors.push("le niveau physique est obligatoire");
   if (!trip.duration) errors.push("la durée est obligatoire");
+  if (trip.start_date && trip.end_date && trip.end_date < trip.start_date) errors.push("la date de fin doit suivre la date de début");
   if (!trip.description && !trip.brief) errors.push("la description est obligatoire");
 
   if (errors.length > 0) {
@@ -354,7 +407,11 @@ function toTripInsertRow(trip: Trip): SupabaseTripInsertRow {
     title: trip.title,
     destination: trip.destination,
     image_url: trip.image_url,
+    image_urls: trip.image_urls ?? [trip.image_url],
     dates: trip.dates,
+    start_date: trip.start_date ?? null,
+    end_date: trip.end_date ?? null,
+    date_precision: trip.date_precision ?? "flexible",
     duration: trip.duration,
     budget_min: trip.budget_min,
     budget_max: trip.budget_max,
@@ -380,6 +437,8 @@ function toTripInsertRow(trip: Trip): SupabaseTripInsertRow {
     creator_name: trip.creator_name ?? trip.created_by ?? null,
     creator_id: trip.creator_id ?? null,
     departure_city: trip.departure_city ?? null,
+    departure_lat: trip.departure_lat ?? null,
+    departure_lng: trip.departure_lng ?? null,
     max_participants: maxParticipants,
     current_participants: Math.min(currentParticipants, maxParticipants),
     conversation_id: trip.conversation_id ?? null,

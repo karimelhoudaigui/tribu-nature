@@ -38,7 +38,11 @@ export async function inviteUserToFavoriteTrip(
 }
 
 export async function acceptTripInvitation(invitationId: string, accessToken: string): Promise<TripInvitation> {
-  return updateTripInvitationStatus(invitationId, "accepted", accessToken);
+  return requestRest<TripInvitation>("rpc/accept_trip_invitation", {
+    method: "POST",
+    accessToken,
+    body: { invitation_id: invitationId }
+  });
 }
 
 export async function rejectTripInvitation(invitationId: string, accessToken: string): Promise<TripInvitation> {

@@ -8,17 +8,26 @@ import {
   Camera,
   Compass,
   Copy,
+  CheckCircle2,
   ExternalLink,
+  FileText,
   Heart,
   HeartHandshake,
   Home,
   MapPin,
+  ImagePlus,
+  Info,
+  Languages,
+  LogOut,
+  Mail,
   Menu,
   MessageCircle,
+  MoreHorizontal,
   Mountain,
   Plus,
   Search,
   Send,
+  Settings,
   Share2,
   ShieldCheck,
   SlidersHorizontal,
@@ -38,12 +47,14 @@ import {
   signOut,
   signInWithEmail,
   signUpWithEmail,
+  touchPresence,
+  updatePassword,
   updateProfile,
   type AuthSession,
   type UserProfileUpdate,
   type UserProfileRecord
 } from "./services/authService";
-import { createTrip, hasSupabaseCatalogConfig, loadTripCatalog, type TripCatalog } from "./services/tripCatalogService";
+import { createTrip, deleteTrip, hasSupabaseCatalogConfig, loadTripCatalog, type TripCatalog } from "./services/tripCatalogService";
 import {
   createNotification,
   deleteNotification,
@@ -68,15 +79,25 @@ import {
   addTripParticipant,
   acceptJoinRequest,
   cancelJoinRequest,
+  confirmTrip,
+  deleteConversationMessage,
   expressInterestInCatalogTrip,
   ensureTripConversation,
   getConversationMembers,
   getConversationMessages,
+  getMyTripConversationSummaries,
+  getTripConfirmations,
   getTripParticipants,
   getUserTripActions,
+  leaveTrip,
+  markTripConversationAsRead,
   requestToJoinTrip,
   rejectJoinRequest,
   sendConversationMessage,
+  updateConversationMessage,
+  withdrawTripConfirmation,
+  type TripConfirmation,
+  type TripConversationSummary,
   type UserTripActions
 } from "./services/tripSocialService";
 import {
@@ -89,6 +110,8 @@ import {
   markTribeConversationAsRead,
   rejectTribeRequest,
   sendTribeMessage,
+  deleteTribeMessage,
+  updateTribeMessage,
   sendTribeRequest,
   type TribeConnection,
   type TribeMessage,
@@ -96,6 +119,15 @@ import {
 } from "./services/tribeService";
 import { resolveProfileAvatarUrl, uploadProfileAvatar, validateProfileAvatarFile } from "./services/profileService";
 import { searchLocationSuggestions, type LocationSuggestion } from "./services/locationService";
+import {
+  createConversationMediaUrls,
+  deleteConversationImages,
+  deleteTripImages,
+  uploadConversationImages,
+  uploadTripImages,
+  validateImageFiles
+} from "./services/mediaService";
+import { sendContactMessage } from "./services/contactService";
 import { calculateTripMatch, type TripMatchResult } from "./services/matchService";
 import {
   getTravelPreferences,
@@ -104,7 +136,7 @@ import {
 } from "./services/travelPreferenceService";
 import type { Activity, MockLocalActivity, OnboardingProfile, TravelPreferences, Trip, UserProfile } from "./types";
 
-type Page = "landing" | "dashboard" | "my-trips" | "create-trip" | "trip" | "conversation" | "messages" | "notifications" | "communaute" | "profil" | "prestataires" | "securite";
+type Page = "landing" | "dashboard" | "my-trips" | "create-trip" | "trip" | "conversation" | "messages" | "notifications" | "communaute" | "profil" | "prestataires" | "securite" | "settings" | "cgu" | "privacy" | "about" | "contact";
 type CommunityTab = "compatibles" | "tribe";
 
 type NavigationSnapshot = {
@@ -125,12 +157,16 @@ type Conversation = {
     author: string;
     content: string;
     time: string;
+    createdAt?: string;
+    updatedAt?: string | null;
+    imagePaths?: string[];
+    imageUrls?: string[];
     system?: boolean;
   }[];
 };
 
 const navItems: { page: Page; label: string }[] = [
-  { page: "dashboard", label: "Explorer" },
+  { page: "dashboard", label: "Destination" },
   { page: "my-trips", label: "Mes Trips" },
   { page: "communaute", label: "Tribu" },
   { page: "profil", label: "Profil" }
@@ -479,6 +515,7 @@ function profileRecordToUserProfile(profile: UserProfileRecord, travelPreference
     safety_preferences: profile.safety_preferences?.length ? profile.safety_preferences : ["Profil connecté"],
     past_trips: profile.past_trips ?? 0,
     badges: profile.badges?.length ? profile.badges : ["profil connecté"],
+    last_seen_at: profile.last_seen_at ?? null,
     travel_preferences: travelPreferences ?? null
   };
 }
@@ -504,10 +541,14 @@ function fallbackProfileRecord(profileId: string): UserProfileRecord {
 }
 
 function getProfileHandle(profile: UserProfileRecord) {
-  const emailHandle = profile.email?.split("@")[0]?.trim();
-  const source = emailHandle || profile.display_name || "membre";
+  const source = profile.display_name || "membre";
   const normalized = normalizeUiText(source).replace(/[^a-z0-9._]+/g, ".").replace(/^\.+|\.+$/g, "");
-  return `@${normalized || `membre.${profile.id.slice(0, 6)}`}`;
+  return `@${normalized || "membre"}.${profile.id.slice(0, 5)}`;
+}
+
+function isProfileOnline(lastSeenAt?: string | null) {
+  if (!lastSeenAt) return false;
+  return Date.now() - new Date(lastSeenAt).getTime() < 2 * 60_000;
 }
 
 function getTripCardType(trip: Trip) {
@@ -554,7 +595,7 @@ type MyTripStatus = {
   tone: string;
 };
 
-function getMyTripStatuses(trip: Trip, userId: string, userTripActions: UserTripActions | null): MyTripStatus[] {
+function getMyTripStatuses(trip: Trip, userId: string, userTripActions: UserTripActions | null, isFavorite = false): MyTripStatus[] {
   if (trip.creator_id === userId) {
     return [{ key: "created", label: "Trip créé par toi", tone: "bg-forest-900 text-white" }];
   }
@@ -574,7 +615,7 @@ function getMyTripStatuses(trip: Trip, userId: string, userTripActions: UserTrip
     statuses.push({ key: "cancelled", label: "Demande annulée", tone: "bg-forest-100 text-forest-700" });
   }
 
-  if (activeInterest && !statuses.some((status) => status.key === "joined")) {
+  if ((activeInterest || isFavorite) && !statuses.some((status) => status.key === "joined")) {
     statuses.push({ key: "interested", label: "Tu es intéressé", tone: "bg-skysoft text-forest-900" });
   }
 
@@ -661,6 +702,7 @@ function App() {
   const [communityInitialTab, setCommunityInitialTab] = useState<CommunityTab>("compatibles");
   const [selectedTribeMessageMemberId, setSelectedTribeMessageMemberId] = useState<string | null>(null);
   const [tribeUnreadMessageCounts, setTribeUnreadMessageCounts] = useState<Record<string, number>>({});
+  const [tripConversationSummaries, setTripConversationSummaries] = useState<TripConversationSummary[]>([]);
   const [initialTripLinkHandled, setInitialTripLinkHandled] = useState(false);
   const [socialNotice, setSocialNotice] = useState("");
   const [catalogLoaded, setCatalogLoaded] = useState(!hasSupabaseCatalogConfig());
@@ -715,14 +757,14 @@ function App() {
       return;
     }
 
-    const nextCatalog = await loadTripCatalog();
+    const nextCatalog = await loadTripCatalog(authSession?.access_token);
     setCatalog((previous) => (
       previous.source === "supabase" && nextCatalog.source === "local"
         ? previous
         : keepPreviousIfEqual(previous, nextCatalog)
     ));
     setCatalogLoaded(true);
-  }, []);
+  }, [authSession?.access_token]);
 
   useEffect(() => {
     let mounted = true;
@@ -748,13 +790,14 @@ function App() {
 
   const refreshSocialData = async (session: AuthSession) => {
     try {
-      const [actions, favorites, nextNotifications, profiles, requests, invitations] = await Promise.all([
+      const [actions, favorites, nextNotifications, profiles, requests, invitations, tripConversations] = await Promise.all([
         getUserTripActions(session.user.id, session.access_token),
         getMyFavoriteTrips(session.user.id, session.access_token),
         getMyNotifications(session.user.id, session.access_token),
         getCompatibleProfiles(session.user.id, session.access_token),
         getMyTribeRequests(session.user.id, session.access_token),
-        getMyTripInvitations(session.user.id, session.access_token)
+        getMyTripInvitations(session.user.id, session.access_token),
+        getMyTripConversationSummaries(session.user.id, session.access_token)
       ]);
 
       setUserTripActions((previous) => keepPreviousIfEqual(previous, actions));
@@ -763,6 +806,7 @@ function App() {
       setTribeProfiles((previous) => keepPreviousIfEqual(previous, profiles));
       setTribeRequests((previous) => keepPreviousIfEqual(previous, requests));
       setTripInvitations((previous) => keepPreviousIfEqual(previous, invitations));
+      setTripConversationSummaries((previous) => keepPreviousIfEqual(previous, tripConversations));
 
       try {
         const unreadTribeMessages = await getUnreadTribeMessageCounts(session.user.id, requests.accepted, session.access_token);
@@ -785,6 +829,7 @@ function App() {
       setTripInvitations([]);
       setCurrentTravelPreferences(null);
       setTribeUnreadMessageCounts({});
+      setTripConversationSummaries([]);
       return;
     }
 
@@ -798,6 +843,16 @@ function App() {
     return () => {
       mounted = false;
     };
+  }, [authSession]);
+
+  useEffect(() => {
+    if (!authSession) return;
+    const touch = () => void touchPresence(authSession.access_token)
+      .then((lastSeenAt) => setCurrentProfile((profile) => profile ? { ...profile, last_seen_at: lastSeenAt } : profile))
+      .catch((error) => console.warn("Présence indisponible.", error));
+    touch();
+    const interval = window.setInterval(touch, 60_000);
+    return () => window.clearInterval(interval);
   }, [authSession]);
 
   useEffect(() => {
@@ -876,7 +931,17 @@ function App() {
     };
   }, [authSession, currentProfile, selectedProfileId, tribeProfiles]);
 
-  const visibleCatalogTrips = catalog.trips.filter(isTripPubliclyVisible);
+  const relatedTripIds = new Set([
+    ...(userTripActions?.participants.map((item) => item.trip_id) ?? []),
+    ...(userTripActions?.interests.map((item) => item.trip_id) ?? []),
+    ...(userTripActions?.joinRequests.map((item) => item.trip_id) ?? []),
+    ...favoriteTripIds
+  ]);
+  const today = new Date().toISOString().slice(0, 10);
+  const visibleCatalogTrips = catalog.trips.filter((trip) => (
+    (!trip.end_date || trip.end_date >= today)
+    && (isTripPubliclyVisible(trip) || trip.creator_id === currentProfile?.id || relatedTripIds.has(trip.id))
+  ));
   const availableTrips = [...new Map(
     [...visibleCatalogTrips, ...communityTrips].map((trip) => [trip.id, trip])
   ).values()];
@@ -893,6 +958,7 @@ function App() {
   const pendingReceivedJoinRequestsWithoutNotification = pendingReceivedJoinRequests.filter((request) => !notifiedJoinRequestIds.has(request.id));
   const unreadNotificationCount = notifications.filter((notification) => !notification.read_at).length + pendingReceivedJoinRequestsWithoutNotification.length;
   const tribeUnreadMessageCount = Object.values(tribeUnreadMessageCounts).reduce((total, count) => total + count, 0);
+  const tripUnreadMessageCount = tripConversationSummaries.reduce((total, summary) => total + summary.unreadCount, 0);
   const selectedTripMatch = calculateTripMatch(isAuthenticated ? currentUser : null, selectedTrip);
   const profilePageRecord = selectedProfileId ? viewedProfile ?? fallbackProfileRecord(selectedProfileId) : currentProfile;
   const profilePageUser = profilePageRecord ? profileRecordToUserProfile(profilePageRecord) : currentUser;
@@ -1060,6 +1126,7 @@ function App() {
     setTripInvitations([]);
     setCurrentTravelPreferences(null);
     setTribeUnreadMessageCounts({});
+    setTripConversationSummaries([]);
     setSocialNotice("");
   };
   const requireAuth = (prompt: string) => {
@@ -1165,20 +1232,7 @@ function App() {
       if (action === "accept") {
         if (getTripCardType(trip) === "catalog") {
           await expressInterestInCatalogTrip(trip.id, session.user.id, session.access_token);
-          await addTripParticipant(trip.id, session.user.id, session.access_token, "participant").catch((error) => {
-            console.warn("Participant catalogue non ajouté depuis l'invitation.", error);
-          });
-        } else {
-          await addTripParticipant(trip.id, session.user.id, session.access_token, "participant").catch((error) => {
-            console.warn("Participant non ajouté depuis l'invitation.", error);
-          });
         }
-
-        const conversation = await ensureTripConversation(trip.id, getTripCardType(trip) === "catalog" ? "catalog_interest" : "user_project", session.access_token);
-        await addConversationMember(conversation.id, session.user.id, session.access_token);
-        await addConversationMember(conversation.id, invitation.inviter_id, session.access_token).catch((error) => {
-          console.warn("Invitant non ajouté à la conversation.", error);
-        });
       }
 
       await createNotification({
@@ -1264,10 +1318,6 @@ function App() {
 
     try {
       await acceptJoinRequest(request.id, session.access_token);
-      await addTripParticipant(request.trip_id, request.requester_id, session.access_token, "participant");
-      const conversation = await ensureTripConversation(request.trip_id, "user_project", session.access_token);
-      await addConversationMember(conversation.id, request.creator_id, session.access_token);
-      await addConversationMember(conversation.id, request.requester_id, session.access_token);
       await createNotification({
         user_id: request.requester_id,
         type: "join_request_accepted",
@@ -1370,13 +1420,13 @@ function App() {
     setSelectedTripId(trip.id);
     go("create-trip");
   };
-  const publishCommunityTrip = async (trip: Trip) => {
+  const publishCommunityTrip = async (trip: Trip, imageFiles: File[] = []) => {
     const session = requireAuth("Connecte-toi pour publier un Trip avec ton vrai profil.");
     if (!session || !currentProfile) {
       throw new Error("Connecte-toi pour publier un Trip.");
     }
 
-    const authenticatedTrip: Trip = {
+    let authenticatedTrip: Trip = {
       ...trip,
       community: true,
       created_by: currentProfile.display_name,
@@ -1390,8 +1440,18 @@ function App() {
       current_participants: Math.max(1, trip.current_participants ?? 1),
       generation_reasons: [`Proposée par ${currentProfile.display_name}`, ...(trip.generation_reasons ?? []).filter((reason) => !reason.startsWith("Proposée par "))]
     };
+    let uploadedImageUrls: string[] = [];
 
     try {
+      if (imageFiles.length > 0) {
+        const uploadedImages = await uploadTripImages(session.user.id, authenticatedTrip.id, imageFiles, session.access_token);
+        uploadedImageUrls = uploadedImages.map((image) => image.url);
+        authenticatedTrip = {
+          ...authenticatedTrip,
+          image_url: uploadedImageUrls[0],
+          image_urls: uploadedImageUrls
+        };
+      }
       const publishedTrip = hasSupabaseCatalogConfig() ? await createTrip(authenticatedTrip, session.access_token) : authenticatedTrip;
       if (hasSupabaseCatalogConfig()) {
         await addTripParticipant(publishedTrip.id, session.user.id, session.access_token, "creator").catch((error) => {
@@ -1410,8 +1470,37 @@ function App() {
       await refreshCatalog();
     } catch (error) {
       console.error("Impossible de publier le Trip.", error);
+      if (uploadedImageUrls.length > 0) {
+        await deleteTripImages(uploadedImageUrls, session.access_token).catch(() => undefined);
+      }
       throw error;
     }
+    go("dashboard");
+  };
+  const leaveTripFlow = async (trip: Trip) => {
+    const session = requireAuth("Connecte-toi pour quitter ce Trip.");
+    if (!session) return;
+    await leaveTrip(trip.id, session.access_token);
+    if (favoriteTripIds.includes(trip.id)) {
+      await removeTripFromFavorites(trip.id, session.user.id, session.access_token);
+      setFavoriteTripIds((previous) => previous.filter((id) => id !== trip.id));
+    }
+    setConversation(null);
+    setSocialNotice(`Tu as quitté « ${trip.title} » et sa conversation.`);
+    await Promise.all([refreshSocialData(session), refreshCatalog()]);
+    go("my-trips");
+  };
+  const deleteTripFlow = async (trip: Trip) => {
+    const session = requireAuth("Connecte-toi pour supprimer ce Trip.");
+    if (!session || trip.creator_id !== session.user.id) throw new Error("Seul le créateur peut supprimer ce Trip.");
+    await deleteTripImages(trip.image_urls ?? [trip.image_url], session.access_token).catch((error) => {
+      console.warn("Photos du Trip non supprimées.", error);
+    });
+    await deleteTrip(trip.id, session.access_token);
+    setCommunityTrips((previous) => previous.filter((item) => item.id !== trip.id));
+    setConversation(null);
+    setSocialNotice(`« ${trip.title} » a été supprimé.`);
+    await Promise.all([refreshSocialData(session), refreshCatalog()]);
     go("dashboard");
   };
   const openTripConversation = async (trip: Trip, conversationId?: string) => {
@@ -1561,7 +1650,7 @@ function App() {
         authLoading={authLoading}
         currentProfile={currentProfile}
         unreadNotificationCount={unreadNotificationCount}
-        unreadMessageCount={tribeUnreadMessageCount}
+        unreadMessageCount={tribeUnreadMessageCount + tripUnreadMessageCount}
         onAuthClick={() => openAuthModal("Connecte-toi pour accéder à ton profil et aux Trips.")}
         onNotificationsClick={() => go("notifications")}
         onMessagesClick={() => openTribeInbox()}
@@ -1592,6 +1681,7 @@ function App() {
             onUpdateTripInvitation={updateTripInvitation}
             onUpdateTribeConnection={updateTribeConnection}
             onViewProfile={openProfile}
+            onOpenTripConversation={(trip) => openTripConversation(trip, getTripConversationId(trip))}
             onMarkRead={markNotificationRead}
             onDeleteNotification={deleteNotificationFlow}
           />
@@ -1621,12 +1711,15 @@ function App() {
             onAuthClick={() => openAuthModal("Connecte-toi pour retrouver tous tes Trips.")}
             onOpenTrip={openTripFromProfile}
             onCancelJoinRequest={cancelJoinRequestFlow}
+            favoriteTripIds={favoriteTripIds}
+            onLeaveTrip={leaveTripFlow}
+            onDeleteTrip={deleteTripFlow}
             onCreateTrip={() => go("create-trip")}
           />
         )}
         {page === "create-trip" && <CreateTripPage proposerName={currentUser.name} initialTrip={createTripSeed} onPublish={publishCommunityTrip} />}
-        {page === "trip" && <TripDetail trip={selectedTrip} match={selectedTripMatch} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} onShareTrip={setShareTrip} creatorProfile={getKnownProfileRecord(selectedTrip.creator_id)} onViewProfile={openProfile} />}
-        {page === "conversation" && <ConversationPage conversation={conversation} go={go} currentUser={currentUser} accessToken={authSession?.access_token} isAuthenticated={isAuthenticated} onRequireAuth={() => openAuthModal("Connecte-toi pour écrire dans la conversation.")} onFormalizeTrip={formalizeCatalogTrip} />}
+        {page === "trip" && <TripDetail trip={selectedTrip} match={selectedTripMatch} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} onShareTrip={setShareTrip} creatorProfile={getKnownProfileRecord(selectedTrip.creator_id)} onViewProfile={openProfile} currentUserId={currentProfile?.id} acceptedTribeMemberIds={acceptedTribeMemberIds} onAddFriend={sendTribeConnectionRequest} onLeaveTrip={leaveTripFlow} onDeleteTrip={deleteTripFlow} />}
+        {page === "conversation" && <ConversationPage conversation={conversation} go={go} currentUser={currentUser} accessToken={authSession?.access_token} isAuthenticated={isAuthenticated} onRequireAuth={() => openAuthModal("Connecte-toi pour écrire dans la conversation.")} onFormalizeTrip={formalizeCatalogTrip} onViewProfile={openProfile} acceptedTribeMemberIds={acceptedTribeMemberIds} onAddFriend={sendTribeConnectionRequest} onLeaveTrip={leaveTripFlow} onDeleteTrip={deleteTripFlow} onRefresh={async () => { if (authSession) await refreshSocialData(authSession); await refreshCatalog(); }} />}
         {page === "messages" && (
           <MessagesPage
             currentUser={currentUser}
@@ -1637,8 +1730,10 @@ function App() {
             isAuthenticated={isAuthenticated}
             initialMemberId={selectedTribeMessageMemberId}
             unreadMessageCounts={tribeUnreadMessageCounts}
+            tripConversationSummaries={tripConversationSummaries}
             onRequireAuth={() => openAuthModal("Connecte-toi pour accéder à tes messages.")}
             onConversationRead={markTribeConversationRead}
+            onOpenTripConversation={(trip, conversationId) => openTripConversation(trip, conversationId)}
             onViewProfile={openProfile}
             onInviteToTrip={sendFavoriteTripInvitation}
             favoriteTrips={favoriteTrips}
@@ -1681,6 +1776,11 @@ function App() {
         )}
         {page === "prestataires" && <Providers />}
         {page === "securite" && <Safety />}
+        {page === "settings" && <SettingsPage profile={currentProfile} accessToken={authSession?.access_token} onRequireAuth={() => openAuthModal("Connecte-toi pour gérer ton compte.")} onProfileUpdated={(profile) => setCurrentProfile(profile)} />}
+        {page === "cgu" && <LegalPage kind="cgu" />}
+        {page === "privacy" && <LegalPage kind="privacy" />}
+        {page === "about" && <AboutPage />}
+        {page === "contact" && <ContactPage profile={currentProfile} accessToken={authSession?.access_token} />}
       </main>
       <Footer go={go} />
       <MobileBottomNav page={page} go={go} onCreateTrip={() => go("create-trip")} />
@@ -1823,7 +1923,7 @@ function Header({
       {menuOpen && (
         <div className="container-page border-t border-forest-100 py-3 lg:hidden">
           <div className="grid gap-2">
-            {[...visibleNavItems, { page: "create-trip" as Page, label: "Créer un Trip" }].map((item) => (
+            {[...visibleNavItems, { page: "create-trip" as Page, label: "Créer un Trip" }, { page: "about" as Page, label: "À propos" }, { page: "contact" as Page, label: "Nous contacter" }, { page: "cgu" as Page, label: "CGU" }, { page: "privacy" as Page, label: "Confidentialité" }].map((item) => (
               <button key={item.page} className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={() => go(item.page)}>
                 {item.label}
               </button>
@@ -1836,6 +1936,7 @@ function Header({
                 </button>
                 <button className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={onNotificationsClick}>Notifications ({unreadNotificationCount})</button>
                 <button className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={() => go("profil")}>{currentProfile.display_name} · {getProfileHandle(currentProfile)}</button>
+                <button className="rounded-lg bg-white px-4 py-3 text-left font-medium" onClick={() => go("settings")}>Paramètres</button>
                 <button className="rounded-lg bg-forest-800 px-4 py-3 text-left font-medium text-white" onClick={onSignOut}>Déconnexion</button>
               </>
             ) : (
@@ -1859,6 +1960,13 @@ function AuthModal({
 }) {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [displayName, setDisplayName] = useState("");
+  const [signupStep, setSignupStep] = useState<1 | 2>(1);
+  const [cityText, setCityText] = useState("");
+  const [selectedCity, setSelectedCity] = useState<LocationSuggestion | null>(null);
+  const [ageRange, setAgeRange] = useState("");
+  const [physicalLevel, setPhysicalLevel] = useState("");
+  const [budgetRange, setBudgetRange] = useState("");
+  const [adventureStyle, setAdventureStyle] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -1867,6 +1975,18 @@ function AuthModal({
   const submit = async () => {
     if (isSubmitting) return;
     setFeedback("");
+    if (mode === "signup" && signupStep === 1) {
+      if (!displayName.trim() || !email.includes("@") || password.length < 6) {
+        setFeedback("Renseigne ton pseudo, un email valide et un mot de passe d'au moins 6 caractères.");
+        return;
+      }
+      setSignupStep(2);
+      return;
+    }
+    if (mode === "signup" && (!selectedCity || !ageRange || !physicalLevel || !budgetRange || !adventureStyle)) {
+      setFeedback("Complète ces quelques informations pour personnaliser ton profil.");
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -1878,6 +1998,17 @@ function AuthModal({
         setFeedback("Compte créé. Vérifie ton email si Supabase demande une confirmation, puis connecte-toi.");
         setMode("signin");
         return;
+      }
+
+      if (mode === "signup") {
+        await updateProfile(session.user.id, {
+          city: selectedCity?.label ?? null,
+          age_range: ageRange,
+          physical_level: physicalLevel,
+          budget_range: budgetRange,
+          adventure_style: adventureStyle,
+          preferred_ambiences: adventureStyle ? [adventureStyle] : []
+        }, session.access_token);
       }
 
       await onAuthenticated(session);
@@ -1903,36 +2034,47 @@ function AuthModal({
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-2 rounded-full bg-forest-50 p-1">
-          <button className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "signin" ? "bg-white shadow-sm" : "text-forest-700"}`} onClick={() => setMode("signin")}>
+          <button className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "signin" ? "bg-white shadow-sm" : "text-forest-700"}`} onClick={() => { setMode("signin"); setSignupStep(1); }}>
             Se connecter
           </button>
-          <button className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "signup" ? "bg-white shadow-sm" : "text-forest-700"}`} onClick={() => setMode("signup")}>
+          <button className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "signup" ? "bg-white shadow-sm" : "text-forest-700"}`} onClick={() => { setMode("signup"); setSignupStep(1); }}>
             Créer un compte
           </button>
         </div>
 
+        {mode === "signup" && <div className="mt-5 flex items-center gap-2"><span className={`h-1.5 flex-1 rounded-full ${signupStep >= 1 ? "bg-forest-800" : "bg-forest-100"}`} /><span className={`h-1.5 flex-1 rounded-full ${signupStep === 2 ? "bg-forest-800" : "bg-forest-100"}`} /></div>}
         <div className="mt-5 grid gap-3">
-          {mode === "signup" && (
+          {mode === "signup" && signupStep === 1 && (
             <label className="grid gap-2 text-sm font-semibold text-forest-700">
               Nom ou pseudo public
               <input className="rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-forest-600" value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Ex : Karim Explorer" />
             </label>
           )}
-          <label className="grid gap-2 text-sm font-semibold text-forest-700">
+          {(mode === "signin" || signupStep === 1) && <label className="grid gap-2 text-sm font-semibold text-forest-700">
             Email
             <input className="rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-forest-600" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="toi@email.com" />
-          </label>
-          <label className="grid gap-2 text-sm font-semibold text-forest-700">
+          </label>}
+          {(mode === "signin" || signupStep === 1) && <label className="grid gap-2 text-sm font-semibold text-forest-700">
             Mot de passe
             <input className="rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-forest-600" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Minimum 6 caractères" />
-          </label>
+          </label>}
+          {mode === "signup" && signupStep === 2 && (
+            <>
+              <label className="grid gap-2 text-sm font-semibold text-forest-700">Ta ville<LocationAutocomplete value={cityText} selectedLocation={selectedCity} onChange={(value) => { setCityText(value); setSelectedCity(null); }} onSelect={(location) => { setCityText(location.label); setSelectedCity(location); }} /></label>
+              <ChipSelect label="Ta tranche d'âge" value={ageRange} options={["18-25", "25-35", "35-45", "45+"]} onChange={setAgeRange} />
+              <ChipSelect label="Ton niveau" value={physicalLevel} options={["Débutant", "Facile", "Intermédiaire", "Sportif"]} onChange={setPhysicalLevel} />
+              <ChipSelect label="Ton budget" value={budgetRange} options={["Moins de 100 €", "100 à 200 €", "200 à 350 €", "350 à 500 €", "Flexible"]} onChange={setBudgetRange} />
+              <ChipSelect label="Ton style" value={adventureStyle} options={["Calme & déconnexion", "Sport & dépassement", "Découverte locale", "Fun & aventure douce"]} onChange={setAdventureStyle} />
+            </>
+          )}
         </div>
 
         {feedback && <p className="mt-4 rounded-lg bg-skysoft px-4 py-3 text-sm font-semibold text-forest-900">{feedback}</p>}
 
         <button className="btn-primary mt-5 w-full disabled:cursor-wait disabled:opacity-70" disabled={isSubmitting} onClick={submit}>
-          {isSubmitting ? mode === "signup" ? "Création..." : "Connexion..." : mode === "signup" ? "Créer mon compte" : "Me connecter"}
+          {isSubmitting ? mode === "signup" ? "Création..." : "Connexion..." : mode === "signup" ? signupStep === 1 ? "Continuer" : "Créer mon profil" : "Me connecter"}
         </button>
+        {mode === "signup" && signupStep === 2 && <button className="mt-3 w-full text-sm font-bold text-forest-600" onClick={() => setSignupStep(1)}>Retour aux identifiants</button>}
       </div>
     </div>
   );
@@ -1974,6 +2116,7 @@ function NotificationsPage({
   onUpdateTripInvitation,
   onUpdateTribeConnection,
   onViewProfile,
+  onOpenTripConversation,
   onMarkRead,
   onDeleteNotification
 }: {
@@ -1989,6 +2132,7 @@ function NotificationsPage({
   onUpdateTripInvitation: (invitationId: string, action: "accept" | "reject") => void | Promise<void>;
   onUpdateTribeConnection: (connectionId: string, action: "accept" | "reject" | "cancel") => void | Promise<void>;
   onViewProfile: (profileId: string) => void;
+  onOpenTripConversation: (trip: Trip) => void | Promise<void>;
   onMarkRead: (notificationId: string) => void | Promise<void>;
   onDeleteNotification: (notificationId: string) => void | Promise<void>;
 }) {
@@ -2095,6 +2239,9 @@ function NotificationsPage({
                     <button className="btn-primary py-2" onClick={() => onUpdateTribeConnection(tribeRequest.id, "accept")}>Accepter</button>
                     <button className="btn-secondary py-2" onClick={() => onUpdateTribeConnection(tribeRequest.id, "reject")}>Refuser</button>
                   </div>
+                )}
+                {notification.type === "trip_message_received" && trip && (
+                  <button className="btn-primary mt-3 w-full py-2" onClick={() => { onMarkRead(notification.id); onOpenTripConversation(trip); }}>Ouvrir la conversation</button>
                 )}
               </SwipeToDeleteNotification>
             );
@@ -2938,18 +3085,25 @@ function CreateTripPage({
 }: {
   proposerName: string;
   initialTrip: Trip | null;
-  onPublish: (trip: Trip) => Promise<void> | void;
+  onPublish: (trip: Trip, imageFiles: File[]) => Promise<void> | void;
 }) {
   const [title, setTitle] = useState("");
   const [destinationText, setDestinationText] = useState("");
   const [selectedLocation, setSelectedLocation] = useState<LocationSuggestion | null>(null);
+  const [departureText, setDepartureText] = useState("");
+  const [selectedDeparture, setSelectedDeparture] = useState<LocationSuggestion | null>(null);
   const [duration, setDuration] = useState("Week-end");
+  const [dateMode, setDateMode] = useState<"month" | "exact">("month");
+  const [tripMonth, setTripMonth] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [budget, setBudget] = useState("200 à 350 €");
   const [level, setLevel] = useState("Facile");
   const [groupSize, setGroupSize] = useState("Petit groupe : 3 à 5 personnes");
   const [groupType, setGroupType] = useState("Groupe mixte");
   const [brief, setBrief] = useState("");
-  const [coverUrl, setCoverUrl] = useState("");
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [selectedZones, setSelectedZones] = useState<string[]>([]);
   const [ambiences, setAmbiences] = useState<string[]>([]);
   const [activitiesWanted, setActivitiesWanted] = useState<string[]>([]);
@@ -2958,6 +3112,7 @@ function CreateTripPage({
   const [showPreview, setShowPreview] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishError, setPublishError] = useState("");
+  const [invalidFields, setInvalidFields] = useState<string[]>([]);
 
   useEffect(() => {
     if (!initialTrip) return;
@@ -2965,34 +3120,46 @@ function CreateTripPage({
     setTitle(initialTrip.title);
     setDestinationText(initialTrip.destination);
     setSelectedLocation({ id: `catalog-${initialTrip.id}`, label: initialTrip.destination, name: initialTrip.destination, country: initialTrip.country ?? "", latitude: 0, longitude: 0, source: "curated" });
-    setDuration("Dates à compléter");
+    setDepartureText(initialTrip.departure_city ?? "");
+    setSelectedDeparture(initialTrip.departure_city ? { id: `departure-${initialTrip.id}`, label: initialTrip.departure_city, name: initialTrip.departure_city, country: "", latitude: initialTrip.departure_lat ?? 0, longitude: initialTrip.departure_lng ?? 0, source: "curated" } : null);
+    setDuration(initialTrip.duration || "Week-end");
     setBudget(numbersToBudgetRange(initialTrip.budget_min, initialTrip.budget_max));
     setLevel(initialTrip.physical_level);
     setBrief(initialTrip.description || initialTrip.brief || "Je veux transformer cette idée de voyage en vraie Trip avec un groupe motivé.");
-    setCoverUrl(initialTrip.image_url);
     setSelectedZones([inferZoneFromDestination(initialTrip.destination)]);
     setAmbiences(initialTrip.ambience_tags.length ? initialTrip.ambience_tags.slice(0, 4) : ["Découverte locale"]);
     setActivitiesWanted(initialTrip.activities.length ? initialTrip.activities : ["Activité locale", "Découverte nature"]);
     setShowPreview(true);
   }, [initialTrip, proposerName]);
 
+  useEffect(() => () => imagePreviews.forEach((preview) => URL.revokeObjectURL(preview)), [imagePreviews]);
+
+  const selectedDates = buildTripDates(dateMode, tripMonth, startDate, endDate);
+
   const previewTrip = {
     ...buildCommunityTrip({
-    proposerName,
-    title,
-    destinationText,
-    selectedZones,
-    duration,
-    budget,
-    level,
-    ambiences,
-    activitiesWanted,
-    groupPreferences,
-    groupSize,
-    groupType,
-    creatorName: proposerName,
-    brief,
-    coverUrl
+      proposerName,
+      title,
+      destinationText,
+      selectedZones,
+      duration,
+      budget,
+      level,
+      ambiences,
+      activitiesWanted,
+      groupPreferences,
+      groupSize,
+      groupType,
+      creatorName: proposerName,
+      brief,
+      coverUrl: imagePreviews[0] ?? initialTrip?.image_url ?? "",
+      dateLabel: selectedDates.label,
+      startDate: selectedDates.startDate,
+      endDate: selectedDates.endDate,
+      datePrecision: dateMode,
+      departureCity: departureText,
+      departureLat: selectedDeparture?.latitude,
+      departureLng: selectedDeparture?.longitude
     }),
     source_catalog_trip_id: initialTrip?.id,
     created_from_catalog: Boolean(initialTrip),
@@ -3018,22 +3185,23 @@ function CreateTripPage({
   const publishTrip = async () => {
     if (isPublishing) return;
     setPublishError("");
-    if (!title.trim()) {
-      setPublishError("Donne un titre à ton Trip.");
-      return;
-    }
-    if (!destinationText.trim() || !selectedLocation) {
-      setPublishError("Choisis une destination dans la liste de suggestions.");
-      return;
-    }
-    if (!brief.trim()) {
-      setPublishError("Ajoute une courte description pour présenter ton Trip.");
+    const missing = [
+      ...(!title.trim() ? ["title"] : []),
+      ...(!destinationText.trim() || !selectedLocation ? ["destination"] : []),
+      ...(!departureText.trim() || !selectedDeparture ? ["departure"] : []),
+      ...(!brief.trim() ? ["brief"] : []),
+      ...(!selectedDates.startDate || !selectedDates.endDate ? ["dates"] : []),
+      ...(dateMode === "exact" && endDate < startDate ? ["dates"] : [])
+    ];
+    setInvalidFields(missing);
+    if (missing.length > 0) {
+      setPublishError("Complète les champs obligatoires indiqués en rouge.");
       return;
     }
     setIsPublishing(true);
 
     try {
-      await onPublish(previewTrip);
+      await onPublish(previewTrip, imageFiles);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Le Trip n'a pas pu être publié. Réessaie dans un instant.";
       setPublishError(message);
@@ -3062,12 +3230,27 @@ function CreateTripPage({
             <h2 className="text-2xl font-semibold">L'essentiel</h2>
             <div className="mt-5 grid gap-4">
               <label className="grid gap-2">
-                <span className="text-sm font-semibold text-forest-700">Titre du Trip</span>
-                <input className="rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Donne un nom à ton aventure" />
+                <RequiredLabel label="Titre du Trip" invalid={invalidFields.includes("title")} />
+                <input className={`rounded-lg border bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600 ${invalidFields.includes("title") ? "border-red-500" : "border-forest-100"}`} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Donne un nom à ton aventure" />
               </label>
               <label className="grid gap-2">
-                <span className="text-sm font-semibold text-forest-700">Destination précise</span>
-                <LocationAutocomplete
+                <RequiredLabel label="Ville de départ souhaitée" invalid={invalidFields.includes("departure")} />
+                <div className={invalidFields.includes("departure") ? "rounded-xl ring-2 ring-red-400" : ""}><LocationAutocomplete
+                  value={departureText}
+                  selectedLocation={selectedDeparture}
+                  onChange={(value) => {
+                    setDepartureText(value);
+                    setSelectedDeparture(null);
+                  }}
+                  onSelect={(location) => {
+                    setDepartureText(location.label);
+                    setSelectedDeparture(location);
+                  }}
+                /></div>
+              </label>
+              <label className="grid gap-2">
+                <RequiredLabel label="Destination précise" invalid={invalidFields.includes("destination")} />
+                <div className={invalidFields.includes("destination") ? "rounded-xl ring-2 ring-red-400" : ""}><LocationAutocomplete
                   value={destinationText}
                   selectedLocation={selectedLocation}
                   onChange={(value) => {
@@ -3078,15 +3261,40 @@ function CreateTripPage({
                     setDestinationText(location.label);
                     setSelectedLocation(location);
                   }}
-                />
+                /></div>
               </label>
               <label className="grid gap-2">
-                <span className="text-sm font-semibold text-forest-700">Décris l'esprit du Trip</span>
-                <textarea className="min-h-32 rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600" value={brief} onChange={(event) => setBrief(event.target.value)} placeholder="Décris l'esprit du Trip" />
+                <RequiredLabel label="Décris l'esprit du Trip" invalid={invalidFields.includes("brief")} />
+                <textarea className={`min-h-32 rounded-lg border bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600 ${invalidFields.includes("brief") ? "border-red-500" : "border-forest-100"}`} value={brief} onChange={(event) => setBrief(event.target.value)} placeholder="Décris l'esprit du Trip" />
               </label>
               <label className="grid gap-2">
-                <span className="text-sm font-semibold text-forest-700">Image de couverture</span>
-                <input className="rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600" value={coverUrl} onChange={(event) => setCoverUrl(event.target.value)} placeholder="URL d'image, optionnel" />
+                <span className="text-sm font-semibold text-forest-700">Photos du Trip</span>
+                <label className="flex cursor-pointer items-center justify-center gap-3 rounded-xl border border-dashed border-forest-300 bg-forest-50 px-4 py-6 font-bold text-forest-800 transition hover:bg-forest-100">
+                  <ImagePlus size={22} /> Importer plusieurs photos
+                  <input
+                    className="sr-only"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    onChange={(event) => {
+                      const files = Array.from(event.target.files ?? []);
+                      event.target.value = "";
+                      const error = validateImageFiles(files);
+                      if (error) {
+                        setPublishError(error);
+                        return;
+                      }
+                      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+                      setImageFiles(files);
+                      setImagePreviews(files.map((file) => URL.createObjectURL(file)));
+                    }}
+                  />
+                </label>
+                {imagePreviews.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                    {imagePreviews.map((preview, index) => <img className="aspect-square w-full rounded-lg object-cover" src={preview} alt={`Photo ${index + 1}`} key={preview} />)}
+                  </div>
+                )}
               </label>
             </div>
           </section>
@@ -3122,7 +3330,22 @@ function CreateTripPage({
           <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
             <h2 className="text-2xl font-semibold">Cadre du voyage</h2>
             <div className="mt-5 grid gap-4">
-              <ChipSelect label="Dates ou durée" value={duration} options={["Week-end", "2-3 jours", "Une semaine", "10 jours", "Dates flexibles en août"]} onChange={setDuration} />
+              <div className={`rounded-xl p-3 ${invalidFields.includes("dates") ? "bg-red-50 ring-2 ring-red-400" : "bg-forest-50"}`}>
+                <RequiredLabel label="Dates du Trip" invalid={invalidFields.includes("dates")} />
+                <div className="mt-3 grid grid-cols-2 gap-2 rounded-full bg-white p-1">
+                  <button className={`rounded-full px-3 py-2 text-sm font-bold ${dateMode === "month" ? "bg-forest-900 text-white" : "text-forest-700"}`} onClick={() => setDateMode("month")}>Mois</button>
+                  <button className={`rounded-full px-3 py-2 text-sm font-bold ${dateMode === "exact" ? "bg-forest-900 text-white" : "text-forest-700"}`} onClick={() => setDateMode("exact")}>Dates précises</button>
+                </div>
+                {dateMode === "month" ? (
+                  <input className="mt-3 w-full rounded-lg border border-forest-100 bg-white px-4 py-3" type="month" min={new Date().toISOString().slice(0, 7)} value={tripMonth} onChange={(event) => setTripMonth(event.target.value)} />
+                ) : (
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <label className="grid gap-1 text-xs font-bold text-forest-600">Début<input className="rounded-lg border border-forest-100 bg-white px-3 py-3 text-sm" type="date" min={new Date().toISOString().slice(0, 10)} value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label>
+                    <label className="grid gap-1 text-xs font-bold text-forest-600">Fin<input className="rounded-lg border border-forest-100 bg-white px-3 py-3 text-sm" type="date" min={startDate || new Date().toISOString().slice(0, 10)} value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label>
+                  </div>
+                )}
+              </div>
+              <ChipSelect label="Durée indicative" value={duration} options={["Week-end", "2-3 jours", "Une semaine", "10 jours"]} onChange={setDuration} />
               <ChipSelect label="Budget estimé" value={budget} options={["Moins de 100 €", "100 à 200 €", "200 à 350 €", "350 à 500 €", "500 € et plus", "Budget à définir ensemble"]} onChange={setBudget} />
               <ChipSelect label="Niveau physique" value={level} options={["Facile", "Intermédiaire", "Sportif", "Très sportif"]} onChange={setLevel} />
               <ChipSelect label="Taille du groupe" value={groupSize} options={["Petit groupe : 3 à 5 personnes", "Groupe moyen : 6 à 8 personnes", "Grand groupe : 9 personnes et plus"]} onChange={setGroupSize} />
@@ -3252,6 +3475,32 @@ function LocationAutocomplete({
   );
 }
 
+function RequiredLabel({ label, invalid }: { label: string; invalid: boolean }) {
+  return (
+    <span className={`text-sm font-semibold ${invalid ? "text-red-700" : "text-forest-700"}`}>
+      {label} <span className="text-red-600">· champ obligatoire</span>
+    </span>
+  );
+}
+
+function buildTripDates(mode: "month" | "exact", month: string, startDate: string, endDate: string) {
+  if (mode === "month") {
+    if (!/^\d{4}-\d{2}$/.test(month)) return { label: "Mois à préciser", startDate: "", endDate: "" };
+    const [year, monthNumber] = month.split("-").map(Number);
+    const lastDay = new Date(year, monthNumber, 0).getDate();
+    const label = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(new Date(year, monthNumber - 1, 1));
+    return {
+      label: label.charAt(0).toUpperCase() + label.slice(1),
+      startDate: `${month}-01`,
+      endDate: `${month}-${String(lastDay).padStart(2, "0")}`
+    };
+  }
+
+  if (!startDate || !endDate) return { label: "Dates à préciser", startDate, endDate };
+  const format = (date: string) => new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${date}T12:00:00`));
+  return { label: `Du ${format(startDate)} au ${format(endDate)}`, startDate, endDate };
+}
+
 function ChipSelect({
   label,
   value,
@@ -3312,7 +3561,14 @@ function buildCommunityTrip({
   groupType,
   creatorName,
   brief,
-  coverUrl
+  coverUrl,
+  dateLabel,
+  startDate,
+  endDate,
+  datePrecision,
+  departureCity,
+  departureLat,
+  departureLng
 }: {
   proposerName: string;
   title: string;
@@ -3329,6 +3585,13 @@ function buildCommunityTrip({
   creatorName: string;
   brief: string;
   coverUrl: string;
+  dateLabel: string;
+  startDate: string;
+  endDate: string;
+  datePrecision: NonNullable<Trip["date_precision"]>;
+  departureCity: string;
+  departureLat?: number;
+  departureLng?: number;
 }): Trip {
   const [budgetMin, budgetMax] = budgetRangeToNumbers(budget);
   const destinationLabel = [selectedZones.join(" > "), destinationText.trim()].filter(Boolean).join(" > ") || "Destination à préciser";
@@ -3340,7 +3603,10 @@ function buildCommunityTrip({
     title: title.trim() || "Nouveau Trip communautaire",
     destination: destinationLabel,
     image_url: coverUrl.trim() || inferCommunityTripImage(destinationLabel, activitiesWanted, ambiences),
-    dates: duration,
+    dates: dateLabel,
+    start_date: startDate || undefined,
+    end_date: endDate || undefined,
+    date_precision: datePrecision,
     duration,
     budget_min: budgetMin,
     budget_max: budgetMax,
@@ -3362,6 +3628,9 @@ function buildCommunityTrip({
     visibility: "public",
     moderation_status: "approved",
     creator_name: displayName,
+    departure_city: departureCity,
+    departure_lat: departureLat,
+    departure_lng: departureLng,
     max_participants: maxParticipants,
     current_participants: 1,
     region: selectedZones.find((zone) => zone !== "Peu m'importe"),
@@ -3446,6 +3715,7 @@ function Dashboard({
   const [activeSection, setActiveSection] = useState<"trips" | "explore">("trips");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [openFilter, setOpenFilter] = useState<ResultFilterKey | null>(null);
+  const [destinationSearch, setDestinationSearch] = useState("");
   const [filterAnswers, setFilterAnswers] = useState<Record<string, string | string[]>>({
     availability: [],
     destinationZones: []
@@ -3454,7 +3724,12 @@ function Dashboard({
   const catalogTrips = useMemo(() => dashboardTrips.filter((trip) => getTripCardType(trip) === "catalog"), [dashboardTrips]);
   const sectionTrips = activeSection === "trips" ? userProjectTrips : catalogTrips;
   const activeFilterTags = useMemo(() => buildActiveResultFilterTags(activeFilters, filterAnswers), [activeFilters, filterAnswers]);
-  const filteredTrips = useMemo(() => filterTripsByResultFilters(sectionTrips, activeFilterTags), [activeFilterTags, sectionTrips]);
+  const filteredTrips = useMemo(() => {
+    const byFilters = filterTripsByResultFilters(sectionTrips, activeFilterTags);
+    const query = normalizeUiText(destinationSearch.trim());
+    if (!query) return byFilters;
+    return byFilters.filter((trip) => normalizeUiText(`${trip.destination} ${trip.region ?? ""} ${trip.country ?? ""} ${trip.title}`).includes(query));
+  }, [activeFilterTags, destinationSearch, sectionTrips]);
   const toggleResultFilter = (filter: string) => {
     setActiveFilters((prev) => (prev.includes(filter) ? prev.filter((item) => item !== filter) : [...prev, filter]));
   };
@@ -3463,12 +3738,13 @@ function Dashboard({
     setFilterAnswers((prev) => ({
       ...prev,
       availability: Array.isArray(prev.availability) ? prev.availability.filter((item) => item !== filter) : prev.availability,
-      destinationZones: Array.isArray(prev.destinationZones) ? prev.destinationZones.filter((item) => item !== filter) : prev.destinationZones
+      destinationZones: Array.isArray(prev.destinationZones) ? prev.destinationZones.filter((item) => item !== filter) : prev.destinationZones,
+      departureCity: filter.startsWith("Départ ") ? "" : prev.departureCity
     }));
   };
   const clearResultFilters = () => {
     setActiveFilters([]);
-    setFilterAnswers((prev) => ({ ...prev, availability: [], destinationZones: [] }));
+    setFilterAnswers((prev) => ({ ...prev, availability: [], destinationZones: [], departureCity: "" }));
   };
   const switchSection = (section: "trips" | "explore") => {
     setActiveSection(section);
@@ -3490,8 +3766,8 @@ function Dashboard({
           className={`rounded-[1.15rem] p-4 text-left transition ${activeSection === "explore" ? "bg-forest-900 text-white" : "bg-forest-50 text-forest-900 hover:bg-forest-100"}`}
           onClick={() => switchSection("explore")}
         >
-          <span className="text-sm font-bold opacity-80">Section Explore</span>
-          <span className="mt-1 block text-2xl font-semibold">Explore</span>
+          <span className="text-sm font-bold opacity-80">Section Explorer</span>
+          <span className="mt-1 block text-2xl font-semibold">Explorer</span>
           <span className="mt-2 block text-sm leading-6 opacity-80">{catalogTrips.length} idée{catalogTrips.length > 1 ? "s" : ""} de voyage à co-construire</span>
         </button>
       </div>
@@ -3499,6 +3775,11 @@ function Dashboard({
         <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-forest-700 shadow-sm">{filteredTrips.length} proposition{filteredTrips.length > 1 ? "s" : ""}</span>
         <button className="btn-primary py-2" onClick={onCreateTrip}>Créer un Trip</button>
       </div>
+      <label className="mt-4 flex items-center gap-3 rounded-[1.1rem] bg-white px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-forest-700">
+        <Search className="shrink-0 text-forest-600" size={20} />
+        <input className="min-w-0 flex-1 bg-transparent outline-none" value={destinationSearch} onChange={(event) => setDestinationSearch(event.target.value)} placeholder="Rechercher une destination, une région ou un Trip" />
+        {destinationSearch && <button className="rounded-full p-1 text-forest-500 hover:bg-forest-50" onClick={() => setDestinationSearch("")} aria-label="Effacer la recherche"><X size={17} /></button>}
+      </label>
       <ResultFilters
         activeFilters={activeFilterTags}
         filterAnswers={filterAnswers}
@@ -3520,10 +3801,10 @@ function Dashboard({
         filteredTrips.length === 0 && activeSection === "trips" ? (
           <div className="mt-8 rounded-[1.5rem] bg-white p-8 text-center shadow-soft">
             <h2 className="text-2xl font-semibold">Aucun Trip membre pour ces filtres.</h2>
-            <p className="mx-auto mt-3 max-w-xl text-forest-700">Tu peux créer le premier Trip ou passer dans Explore pour partir d'une idée de voyage.</p>
+            <p className="mx-auto mt-3 max-w-xl text-forest-700">Tu peux créer le premier Trip ou passer dans Explorer pour partir d'une idée de voyage.</p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <button className="btn-primary" onClick={onCreateTrip}>Créer un Trip</button>
-              <button className="btn-secondary" onClick={() => switchSection("explore")}>Voir Explore</button>
+              <button className="btn-secondary" onClick={() => switchSection("explore")}>Voir Explorer</button>
             </div>
           </div>
         ) : (
@@ -3615,6 +3896,14 @@ function ResultFilterPanel({
   setFilterAnswers: Dispatch<SetStateAction<Record<string, string | string[]>>>;
   onToggle: (filter: string) => void;
 }) {
+  const departureCity = typeof filterAnswers.departureCity === "string" ? filterAnswers.departureCity : "";
+  const [departureText, setDepartureText] = useState(departureCity);
+  const [selectedDeparture, setSelectedDeparture] = useState<LocationSuggestion | null>(null);
+
+  useEffect(() => {
+    if (!selectedDeparture && departureCity !== departureText) setDepartureText(departureCity);
+  }, [departureCity, departureText, selectedDeparture]);
+
   if (openFilter === "dates") {
     return (
       <div className="mt-4 border-t border-forest-100 pt-4">
@@ -3643,6 +3932,34 @@ function ResultFilterPanel({
     return (
       <div className="mt-4 border-t border-forest-100 pt-4">
         <DestinationMapPicker selectedZones={selectedZones} onToggleZone={toggleZone} onRemoveZone={removeZone} />
+      </div>
+    );
+  }
+
+  if (openFilter === "localisation") {
+    return (
+      <div className="mt-4 border-t border-forest-100 pt-4">
+        <p className="mb-3 text-sm font-bold text-forest-700">Ville de départ souhaitée</p>
+        <LocationAutocomplete
+          value={departureText}
+          selectedLocation={selectedDeparture}
+          onChange={(value) => {
+            setDepartureText(value);
+            setSelectedDeparture(null);
+            setFilterAnswers((previous) => ({ ...previous, departureCity: "" }));
+          }}
+          onSelect={(location) => {
+            setDepartureText(location.label);
+            setSelectedDeparture(location);
+            setFilterAnswers((previous) => ({
+              ...previous,
+              departureCity: location.label,
+              departureLat: String(location.latitude),
+              departureLng: String(location.longitude)
+            }));
+          }}
+        />
+        <p className="mt-3 text-xs font-semibold text-forest-500">Les résultats affichent les Trips prévus au départ de cette ville.</p>
       </div>
     );
   }
@@ -3697,10 +4014,12 @@ function ResultFilterPanel({
 function buildActiveResultFilterTags(filters: string[], answers: Record<string, string | string[]>) {
   const availability = Array.isArray(answers.availability) ? answers.availability : [];
   const destinationZones = Array.isArray(answers.destinationZones) ? answers.destinationZones : [];
+  const departureCity = typeof answers.departureCity === "string" ? answers.departureCity : "";
   const tags = [
     ...filters,
     ...availability.filter((item) => item !== "Peu m'importe"),
-    ...destinationZones.filter((item) => item !== "Peu m'importe")
+    ...destinationZones.filter((item) => item !== "Peu m'importe"),
+    ...(departureCity ? [`Départ ${departureCity}`] : [])
   ];
   return Array.from(new Set(tags));
 }
@@ -3720,6 +4039,7 @@ function filterTripsByResultFilters(tripsToFilter: Trip[], filters: string[]) {
 
 function getResultFilterGroup(filter: string) {
   if (isIsoDate(filter) || ["Journée", "Week-end", "2-3 jours", "Semaine"].includes(filter)) return "dates";
+  if (normalizeUiText(filter).startsWith("depart ")) return "localisation";
 
   const destinationOptions = new Set([
     ...Object.values(selectableCountries),
@@ -3767,8 +4087,9 @@ function tripMatchesResultFilter(trip: Trip, filter: string) {
     ...(trip.value_tags ?? [])
   ].join(" "));
   if (isIsoDate(filter)) return getTripCardType(trip) === "catalog" || trip.dates.includes(filter);
-  if (["depart bordeaux", "depart paris", "depart lyon", "depart toulouse"].includes(normalizedFilter)) {
-    return normalizeUiText(trip.departure_city ?? "") === normalizedFilter.replace("depart ", "");
+  if (normalizedFilter.startsWith("depart ")) {
+    const departureQuery = normalizedFilter.replace("depart ", "").split(",")[0].trim();
+    return normalizeUiText(trip.departure_city ?? "").includes(departureQuery);
   }
   if (normalizedFilter === "tous") return true;
   if (normalizedFilter === "idees de voyage") return getTripCardType(trip) === "catalog";
@@ -3993,7 +4314,12 @@ function TripDetail({
   onToggleFavorite,
   onShareTrip,
   creatorProfile,
-  onViewProfile
+  onViewProfile,
+  currentUserId,
+  acceptedTribeMemberIds,
+  onAddFriend,
+  onLeaveTrip,
+  onDeleteTrip
 }: {
   trip: Trip;
   match: TripMatchResult;
@@ -4006,9 +4332,17 @@ function TripDetail({
   onShareTrip: (trip: Trip) => void;
   creatorProfile: UserProfileRecord | null;
   onViewProfile: (profileId: string) => void;
+  currentUserId?: string;
+  acceptedTribeMemberIds: Set<string>;
+  onAddFriend: (member: UserProfile) => void | Promise<void>;
+  onLeaveTrip: (trip: Trip) => void | Promise<void>;
+  onDeleteTrip: (trip: Trip) => void | Promise<void>;
 }) {
   const tripActivities = getTripActivities(trip, catalogActivities);
   const actionState = getTripActionState(trip, userTripActions);
+  const [destructiveAction, setDestructiveAction] = useState<"leave" | "delete" | null>(null);
+  const canManageMembership = actionState === "participant" || actionState === "accepted" || actionState === "interested";
+  const isCreator = Boolean(currentUserId && trip.creator_id === currentUserId);
 
   return (
     <>
@@ -4036,6 +4370,12 @@ function TripDetail({
         </div>
       </section>
 
+      {(trip.image_urls?.length ?? 0) > 1 && (
+        <section className="container-page grid grid-cols-2 gap-3 pt-8 sm:grid-cols-4">
+          {trip.image_urls?.slice(1, 5).map((image, index) => <img className="aspect-[4/3] w-full rounded-xl object-cover" src={image} alt={`${trip.title}, photo ${index + 2}`} key={image} />)}
+        </section>
+      )}
+
       <section className="container-page space-y-10 py-10">
         <TripTypeSection trip={trip} creatorProfile={creatorProfile} onViewProfile={onViewProfile} />
         <TripMatchSection match={match} />
@@ -4057,10 +4397,34 @@ function TripDetail({
         )}
         <ActivitiesSection activities={tripActivities} />
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-          <TripMembersSection members={validatedMembers} onViewProfile={onViewProfile} />
+          <TripMembersSection members={validatedMembers} currentUserId={currentUserId} acceptedTribeMemberIds={acceptedTribeMemberIds} onViewProfile={onViewProfile} onAddFriend={onAddFriend} />
           <BudgetSection trip={trip} />
         </div>
+        {(isCreator || canManageMembership) && (
+          <section className="rounded-[1.25rem] border border-forest-100 bg-white p-5">
+            <h2 className="text-xl font-semibold">Gérer ce Trip</h2>
+            <p className="mt-2 text-sm text-forest-600">{isCreator ? "La suppression retire définitivement le Trip et sa conversation." : "Quitter te retire des participants et de la conversation."}</p>
+            <button className="mt-4 inline-flex items-center gap-2 rounded-full border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50" onClick={() => setDestructiveAction(isCreator ? "delete" : "leave")}>
+              {isCreator ? <Trash2 size={17} /> : <LogOut size={17} />}
+              {isCreator ? "Supprimer le Trip" : "Quitter le Trip"}
+            </button>
+          </section>
+        )}
       </section>
+      {destructiveAction && (
+        <ConfirmDialog
+          title={destructiveAction === "delete" ? "Supprimer définitivement ce Trip ?" : "Quitter ce Trip ?"}
+          description={destructiveAction === "delete" ? "Le Trip, les demandes et la conversation seront supprimés. Cette action est irréversible." : "Tu ne feras plus partie des participants et tu perdras l'accès à la conversation."}
+          confirmLabel={destructiveAction === "delete" ? "Supprimer" : "Quitter"}
+          danger
+          onCancel={() => setDestructiveAction(null)}
+          onConfirm={async () => {
+            if (destructiveAction === "delete") await onDeleteTrip(trip);
+            else await onLeaveTrip(trip);
+            setDestructiveAction(null);
+          }}
+        />
+      )}
     </>
   );
 }
@@ -4190,7 +4554,7 @@ function ActivitiesSection({ activities: tripActivities }: { activities: Array<A
   );
 }
 
-function TripMembersSection({ members: tripMembers, onViewProfile }: { members: UserProfile[]; onViewProfile: (profileId: string) => void }) {
+function TripMembersSection({ members: tripMembers, currentUserId, acceptedTribeMemberIds, onViewProfile, onAddFriend }: { members: UserProfile[]; currentUserId?: string; acceptedTribeMemberIds: Set<string>; onViewProfile: (profileId: string) => void; onAddFriend: (member: UserProfile) => void | Promise<void> }) {
   return (
     <section>
       <div className="mb-5">
@@ -4199,9 +4563,10 @@ function TripMembersSection({ members: tripMembers, onViewProfile }: { members: 
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {tripMembers.map((member) => (
-          <button className="flex items-center gap-4 rounded-[1.25rem] bg-white p-4 text-left shadow-soft transition hover:-translate-y-0.5 hover:bg-forest-50" key={member.id} onClick={() => onViewProfile(member.id)}>
-            <img className="h-16 w-16 rounded-2xl object-cover" src={member.photo_url} alt={member.name} />
-            <div className="min-w-0 flex-1">
+          <article className="flex items-center gap-3 rounded-[1.25rem] bg-white p-4 shadow-soft" key={member.id}>
+            <button className="flex min-w-0 flex-1 items-center gap-4 text-left" onClick={() => onViewProfile(member.id)}>
+              <img className="h-16 w-16 rounded-2xl object-cover" src={member.photo_url} alt={member.name} />
+              <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <h3 className="truncate font-semibold">{member.name}, {member.age_range}</h3>
                 {member.verified && <BadgeCheck className="shrink-0 text-forest-700" size={17} />}
@@ -4210,8 +4575,14 @@ function TripMembersSection({ members: tripMembers, onViewProfile }: { members: 
               <div className="mt-2 flex flex-wrap gap-2">
                 {member.badges.slice(0, 2).map((badge) => <span className="pill text-xs" key={badge}>{badge}</span>)}
               </div>
-            </div>
-          </button>
+              </div>
+            </button>
+            {member.id !== currentUserId && (
+              acceptedTribeMemberIds.has(member.id)
+                ? <span className="shrink-0 rounded-full bg-forest-50 px-3 py-2 text-xs font-bold text-forest-700">Dans ta tribu</span>
+                : <button className="shrink-0 rounded-full bg-forest-900 px-3 py-2 text-xs font-bold text-white" onClick={() => onAddFriend(member)}>Ajouter</button>
+            )}
+          </article>
         ))}
       </div>
     </section>
@@ -4267,7 +4638,13 @@ function ConversationPage({
   accessToken,
   isAuthenticated,
   onRequireAuth,
-  onFormalizeTrip
+  onFormalizeTrip,
+  onViewProfile,
+  acceptedTribeMemberIds,
+  onAddFriend,
+  onLeaveTrip,
+  onDeleteTrip,
+  onRefresh
 }: {
   conversation: Conversation | null;
   go: (page: Page) => void;
@@ -4276,19 +4653,48 @@ function ConversationPage({
   isAuthenticated: boolean;
   onRequireAuth: () => void;
   onFormalizeTrip: (trip: Trip) => void;
+  onViewProfile: (profileId: string) => void;
+  acceptedTribeMemberIds: Set<string>;
+  onAddFriend: (member: UserProfile) => void | Promise<void>;
+  onLeaveTrip: (trip: Trip) => void | Promise<void>;
+  onDeleteTrip: (trip: Trip) => void | Promise<void>;
+  onRefresh: () => void | Promise<void>;
 }) {
   const [draft, setDraft] = useState("");
   const [participants, setParticipants] = useState<UserProfile[]>(conversation?.participants ?? []);
   const [remoteMessages, setRemoteMessages] = useState<Conversation["messages"]>([]);
+  const [confirmations, setConfirmations] = useState<TripConfirmation[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState("");
+  const [tripAction, setTripAction] = useState<"leave" | "delete" | null>(null);
   const [chatNotice, setChatNotice] = useState("");
   const [isSending, setIsSending] = useState(false);
   const conversationId = conversation?.id;
+  const messageScrollRef = useRef<HTMLDivElement | null>(null);
+  const displayMessages = useMemo(() => {
+    const systemMessages = conversation?.messages?.filter((message) => message.system) ?? [];
+    return [...systemMessages, ...[...remoteMessages].sort((a, b) => new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime())];
+  }, [conversation?.messages, remoteMessages]);
 
   useEffect(() => {
     setParticipants(conversation?.participants ?? []);
     setRemoteMessages([]);
+    setConfirmations([]);
+    setImageFiles([]);
+    setImagePreviews([]);
+    setSelectedMessageId(null);
     setChatNotice("");
   }, [conversationId]);
+
+  useEffect(() => {
+    const container = messageScrollRef.current;
+    if (container) container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+  }, [displayMessages.length]);
+
+  useEffect(() => () => imagePreviews.forEach((preview) => URL.revokeObjectURL(preview)), [imagePreviews]);
 
   useEffect(() => {
     if (!conversationId || !accessToken) return;
@@ -4297,9 +4703,10 @@ function ConversationPage({
 
     const loadConversationData = async () => {
       try {
-        const [memberRows, messageRows] = await Promise.all([
+        const [memberRows, messageRows, confirmationRows] = await Promise.all([
           getConversationMembers(conversationId, accessToken),
-          getConversationMessages(conversationId, accessToken)
+          getConversationMessages(conversationId, accessToken),
+          conversation ? getTripConfirmations(conversation.trip.id, accessToken).catch(() => []) : Promise.resolve([])
         ]);
         const profileIds = [
           ...memberRows.map((member) => member.user_id),
@@ -4312,6 +4719,8 @@ function ConversationPage({
           profileRecordToUserProfile(profileById.get(member.user_id) ?? fallbackProfileRecord(member.user_id))
         ));
 
+        const allImagePaths = messageRows.flatMap((message) => message.image_paths ?? []);
+        const mediaUrls = allImagePaths.length > 0 ? await createConversationMediaUrls(allImagePaths, accessToken) : {};
         const nextMessages = messageRows.map((message) => {
           const profile = profileById.get(message.user_id);
           return {
@@ -4319,7 +4728,11 @@ function ConversationPage({
             authorId: message.user_id,
             author: profile?.display_name ?? (message.user_id === currentUser.id ? currentUser.name : "Membre Tribu"),
             content: message.body,
-            time: formatConversationTime(message.created_at)
+            time: formatConversationTime(message.created_at),
+            createdAt: message.created_at,
+            updatedAt: message.updated_at,
+            imagePaths: message.image_paths ?? [],
+            imageUrls: (message.image_paths ?? []).map((path) => mediaUrls[path]).filter(Boolean)
           };
         });
 
@@ -4328,7 +4741,9 @@ function ConversationPage({
           setParticipants((previous) => keepPreviousIfEqual(previous, nextParticipants));
         }
         setRemoteMessages((previous) => keepPreviousIfEqual(previous, nextMessages));
+        setConfirmations((previous) => keepPreviousIfEqual(previous, confirmationRows));
         setChatNotice((previous) => previous ? "" : previous);
+        await markTripConversationAsRead(conversationId, currentUser.id, accessToken).catch(() => undefined);
       } catch (error) {
         console.warn("Conversation indisponible.", error);
         if (mounted) setChatNotice("Impossible de synchroniser la conversation pour le moment.");
@@ -4342,7 +4757,7 @@ function ConversationPage({
       mounted = false;
       window.clearInterval(interval);
     };
-  }, [accessToken, conversationId, currentUser.id, currentUser.name]);
+  }, [accessToken, conversation, conversationId, currentUser.id, currentUser.name]);
 
   if (!conversation) {
     return (
@@ -4357,10 +4772,8 @@ function ConversationPage({
     );
   }
 
-  const displayMessages = [...(conversation.messages ?? []), ...remoteMessages];
-
   const sendMessage = async () => {
-    if (!draft.trim()) return;
+    if (!draft.trim() && imageFiles.length === 0) return;
     if (!isAuthenticated) {
       onRequireAuth();
       return;
@@ -4377,7 +4790,9 @@ function ConversationPage({
     setChatNotice("");
 
     try {
-      const message = await sendConversationMessage(conversation.id, currentUser.id, body, accessToken);
+      const uploadedPaths = imageFiles.length > 0 ? await uploadConversationImages(currentUser.id, conversation.id, imageFiles, accessToken) : [];
+      const mediaUrls = uploadedPaths.length > 0 ? await createConversationMediaUrls(uploadedPaths, accessToken) : {};
+      const message = await sendConversationMessage(conversation.id, currentUser.id, body, accessToken, uploadedPaths);
       setRemoteMessages((prev) => [
         ...prev.filter((item) => item.id !== message.id),
         {
@@ -4385,9 +4800,16 @@ function ConversationPage({
           authorId: message.user_id,
           author: currentUser.name,
           content: message.body,
-          time: formatConversationTime(message.created_at)
+          time: formatConversationTime(message.created_at),
+          createdAt: message.created_at,
+          imagePaths: uploadedPaths,
+          imageUrls: uploadedPaths.map((path) => mediaUrls[path]).filter(Boolean)
         }
       ]);
+      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+      setImageFiles([]);
+      setImagePreviews([]);
+      await markTripConversationAsRead(conversation.id, currentUser.id, accessToken).catch(() => undefined);
     } catch (error) {
       console.error("Message non envoyé.", error);
       setDraft(body);
@@ -4395,6 +4817,32 @@ function ConversationPage({
     } finally {
       setIsSending(false);
     }
+  };
+
+  const saveEditedMessage = async () => {
+    if (!editingMessageId || !editDraft.trim() || !accessToken) return;
+    const updated = await updateConversationMessage(editingMessageId, editDraft.trim(), accessToken);
+    setRemoteMessages((messages) => messages.map((message) => message.id === updated.id ? { ...message, content: updated.body, updatedAt: updated.updated_at } : message));
+    setEditingMessageId(null);
+    setSelectedMessageId(null);
+  };
+
+  const removeMessage = async (messageId: string) => {
+    if (!accessToken) return;
+    const message = remoteMessages.find((item) => item.id === messageId);
+    if (message?.imagePaths?.length) await deleteConversationImages(message.imagePaths, accessToken).catch(() => undefined);
+    await deleteConversationMessage(messageId, accessToken);
+    setRemoteMessages((messages) => messages.filter((item) => item.id !== messageId));
+    setSelectedMessageId(null);
+  };
+
+  const toggleConfirmation = async () => {
+    if (!accessToken) return;
+    const existing = confirmations.some((confirmation) => confirmation.user_id === currentUser.id);
+    if (existing) await withdrawTripConfirmation(conversation.trip.id, currentUser.id, accessToken);
+    else await confirmTrip(conversation.trip.id, currentUser.id, accessToken);
+    setConfirmations(await getTripConfirmations(conversation.trip.id, accessToken));
+    await onRefresh();
   };
 
   return (
@@ -4415,21 +4863,31 @@ function ConversationPage({
                   Créer un Trip à partir de cette idée
                 </button>
               )}
+              <button className={`mt-3 w-full rounded-full px-5 py-3 font-bold ${confirmations.some((item) => item.user_id === currentUser.id) ? "bg-emerald-100 text-emerald-900" : "bg-forest-900 text-white"}`} onClick={toggleConfirmation}>
+                <CheckCircle2 className="mr-2 inline" size={18} />
+                {confirmations.some((item) => item.user_id === currentUser.id) ? "Départ confirmé" : "Confirmer ce Trip"}
+              </button>
+              <p className="mt-2 text-center text-xs font-semibold text-forest-600">{confirmations.length}/{participants.length} confirmations</p>
               <button className="btn-secondary mt-5 w-full" onClick={() => go("trip")}>Retour au Trip</button>
+              <button className="mt-3 w-full rounded-full border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700" onClick={() => setTripAction(conversation.trip.creator_id === currentUser.id ? "delete" : "leave")}>
+                {conversation.trip.creator_id === currentUser.id ? "Supprimer le Trip" : "Quitter le Trip"}
+              </button>
             </div>
           </div>
           <Panel title="Participants">
             <div className="grid gap-3">
               {participants.map((member) => (
-                <div className="flex items-center justify-between rounded-lg bg-forest-50 p-3" key={member.id}>
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between gap-2 rounded-lg bg-forest-50 p-3" key={member.id}>
+                  <button className="flex min-w-0 items-center gap-3 text-left" onClick={() => onViewProfile(member.id)}>
                     <img className="h-10 w-10 rounded-full object-cover" src={member.photo_url} alt={member.name} />
                     <div>
                       <p className="font-semibold">{member.name}</p>
                       <p className="text-sm text-forest-700">{member.adventure_style}</p>
                     </div>
-                  </div>
-                  {member.verified && <BadgeCheck className="text-forest-700" size={18} />}
+                  </button>
+                  {member.id !== currentUser.id && !acceptedTribeMemberIds.has(member.id) ? (
+                    <button className="rounded-full bg-white px-3 py-2 text-xs font-bold text-forest-800" onClick={() => onAddFriend(member)}>Ajouter</button>
+                  ) : member.verified ? <BadgeCheck className="shrink-0 text-forest-700" size={18} /> : null}
                 </div>
               ))}
             </div>
@@ -4447,22 +4905,53 @@ function ConversationPage({
             </div>
             {chatNotice && <p className="mt-3 rounded-lg bg-sun/15 px-3 py-2 text-sm font-semibold text-forest-800">{chatNotice}</p>}
           </div>
-          <div className="flex-1 space-y-4 bg-forest-50 p-4 sm:p-6">
+          <div ref={messageScrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-forest-50 p-4 sm:p-6">
             {displayMessages.map((message) => (
               <div
-                className={`rounded-lg p-4 ${message.system ? "bg-skysoft text-forest-900" : message.authorId === currentUser.id ? "ml-auto max-w-[88%] bg-forest-800 text-white" : "max-w-[88%] bg-white"}`}
+                className={`rounded-lg p-4 ${message.system ? "bg-skysoft text-forest-900" : message.authorId === currentUser.id ? "ml-auto max-w-[88%] cursor-pointer bg-forest-800 text-white" : "max-w-[88%] bg-white"}`}
                 key={message.id}
+                onClick={() => message.authorId === currentUser.id && setSelectedMessageId((current) => current === message.id ? null : message.id)}
               >
                 <div className="mb-1 flex items-center justify-between gap-4 text-xs font-semibold opacity-80">
                   <span>{message.author}</span>
                   <span>{message.time}</span>
                 </div>
-                <p>{message.content}</p>
+                {editingMessageId === message.id ? (
+                  <div className="mt-2 grid gap-2" onClick={(event) => event.stopPropagation()}>
+                    <textarea className="rounded-lg bg-white p-3 text-forest-900" value={editDraft} onChange={(event) => setEditDraft(event.target.value)} />
+                    <div className="flex gap-2">
+                      <button className="rounded-full bg-white px-3 py-1 text-xs font-bold text-forest-900" onClick={saveEditedMessage}>Enregistrer</button>
+                      <button className="rounded-full border border-white/40 px-3 py-1 text-xs font-bold" onClick={() => setEditingMessageId(null)}>Annuler</button>
+                    </div>
+                  </div>
+                ) : message.content ? <p>{message.content}</p> : null}
+                {message.imageUrls && message.imageUrls.length > 0 && (
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {message.imageUrls.map((url) => <a href={url} target="_blank" rel="noreferrer" key={url}><img className="max-h-72 w-full rounded-lg object-cover" src={url} alt="Photo envoyée" /></a>)}
+                  </div>
+                )}
+                {message.updatedAt && <span className="mt-1 block text-[10px] opacity-60">modifié</span>}
+                {selectedMessageId === message.id && !message.system && (
+                  <div className="mt-3 flex justify-end gap-2 border-t border-white/20 pt-2" onClick={(event) => event.stopPropagation()}>
+                    <button className="rounded-full bg-white/15 p-2" onClick={() => { setEditingMessageId(message.id); setEditDraft(message.content); }} aria-label="Modifier"><FileText size={15} /></button>
+                    <button className="rounded-full bg-white/15 p-2" onClick={() => removeMessage(message.id)} aria-label="Supprimer"><Trash2 size={15} /></button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
           <div className="border-t border-forest-100 bg-white p-4">
+            {imagePreviews.length > 0 && (
+              <div className="mb-3 flex gap-2 overflow-x-auto">
+                {imagePreviews.map((preview) => <img className="h-16 w-16 rounded-lg object-cover" src={preview} alt="Photo à envoyer" key={preview} />)}
+                <button className="rounded-full p-2 text-red-700" onClick={() => { imagePreviews.forEach((preview) => URL.revokeObjectURL(preview)); setImageFiles([]); setImagePreviews([]); }} aria-label="Retirer les photos"><X size={18} /></button>
+              </div>
+            )}
             <div className="flex gap-3">
+              <label className="grid cursor-pointer place-items-center rounded-full bg-forest-50 p-3 text-forest-800" aria-label="Ajouter des photos">
+                <ImagePlus size={19} />
+                <input className="sr-only" type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={(event) => { const files = Array.from(event.target.files ?? []); event.target.value = ""; const error = validateImageFiles(files, 6); if (error) { setChatNotice(error); return; } imagePreviews.forEach((preview) => URL.revokeObjectURL(preview)); setImageFiles(files); setImagePreviews(files.map((file) => URL.createObjectURL(file))); }} />
+              </label>
               <input
                 className="min-w-0 flex-1 rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600"
                 placeholder="Écrire au groupe..."
@@ -4481,6 +4970,20 @@ function ConversationPage({
           </div>
         </div>
       </div>
+      {tripAction && (
+        <ConfirmDialog
+          title={tripAction === "delete" ? "Supprimer définitivement ce Trip ?" : "Quitter ce Trip ?"}
+          description={tripAction === "delete" ? "Le Trip et sa conversation seront supprimés pour tout le groupe." : "Tu seras retiré des participants et de la conversation."}
+          confirmLabel={tripAction === "delete" ? "Supprimer" : "Quitter"}
+          danger
+          onCancel={() => setTripAction(null)}
+          onConfirm={async () => {
+            if (tripAction === "delete") await onDeleteTrip(conversation.trip);
+            else await onLeaveTrip(conversation.trip);
+            setTripAction(null);
+          }}
+        />
+      )}
     </section>
   );
 }
@@ -4501,8 +5004,10 @@ function MessagesPage({
   isAuthenticated,
   initialMemberId,
   unreadMessageCounts,
+  tripConversationSummaries,
   onRequireAuth,
   onConversationRead,
+  onOpenTripConversation,
   onViewProfile,
   onInviteToTrip
 }: {
@@ -4515,8 +5020,10 @@ function MessagesPage({
   isAuthenticated: boolean;
   initialMemberId: string | null;
   unreadMessageCounts: Record<string, number>;
+  tripConversationSummaries: TripConversationSummary[];
   onRequireAuth: () => void;
   onConversationRead: (connectionId: string) => void | Promise<void>;
+  onOpenTripConversation: (trip: Trip, conversationId: string) => void | Promise<void>;
   onViewProfile: (profileId: string) => void;
   onInviteToTrip: (trip: Trip, member: UserProfile) => void | Promise<void>;
 }) {
@@ -4564,8 +5071,10 @@ function MessagesPage({
       <div>
         <p className="pill">Messages</p>
         <h1 className="mt-3 text-4xl font-semibold">Tes conversations</h1>
-        <p className="mt-2 text-forest-700">Discute uniquement avec les personnes qui font réellement partie de ta tribu.</p>
+        <p className="mt-2 text-forest-700">Retrouve ici tes discussions privées et toutes les conversations de Trips.</p>
       </div>
+      <TripConversationInbox summaries={tripConversationSummaries} trips={trips} onOpen={onOpenTripConversation} />
+      <div className="mt-8"><h2 className="text-2xl font-semibold">Messages privés</h2></div>
       {tribePeople.length > 0 ? (
         <TribeInbox
           people={tribePeople}
@@ -4595,6 +5104,28 @@ function MessagesPage({
           }}
         />
       )}
+    </section>
+  );
+}
+
+function TripConversationInbox({ summaries, trips, onOpen }: { summaries: TripConversationSummary[]; trips: Trip[]; onOpen: (trip: Trip, conversationId: string) => void | Promise<void> }) {
+  const rows = summaries.map((summary) => ({ summary, trip: trips.find((trip) => trip.id === summary.conversation.trip_id) })).filter((row): row is { summary: TripConversationSummary; trip: Trip } => Boolean(row.trip));
+  return (
+    <section className="mt-6 overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
+      <div className="border-b border-forest-100 p-4">
+        <p className="text-sm font-semibold text-forest-600">Conversations de Trips</p>
+        <h2 className="text-2xl font-semibold">Tes groupes</h2>
+      </div>
+      {rows.length > 0 ? rows.map(({ summary, trip }) => (
+        <button className={`flex w-full items-center gap-3 border-b border-forest-50 p-4 text-left transition last:border-0 hover:bg-forest-50 ${summary.unreadCount > 0 ? "bg-sun/10" : "bg-white"}`} key={summary.conversation.id} onClick={() => onOpen(trip, summary.conversation.id)}>
+          <img className="h-14 w-14 rounded-xl object-cover" src={trip.image_url} alt="" />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate font-bold">{trip.title}</span>
+            <span className="mt-1 block truncate text-sm text-forest-600">{summary.latestMessage?.body || (summary.latestMessage?.image_paths?.length ? "Photo" : "Conversation du groupe")}</span>
+          </span>
+          {summary.unreadCount > 0 && <span className="grid h-7 min-w-7 place-items-center rounded-full bg-sun px-2 text-xs font-bold text-white">{summary.unreadCount}</span>}
+        </button>
+      )) : <p className="p-5 text-sm font-semibold text-forest-600">Tes conversations de Trips apparaîtront ici après avoir rejoint un groupe.</p>}
     </section>
   );
 }
@@ -4862,7 +5393,7 @@ function TribeInbox({
                 key={member.id}
                 onClick={() => onSelectMember(member)}
               >
-                <img className="h-14 w-14 rounded-full object-cover" src={member.photo_url} alt={member.name} />
+                <span className="relative shrink-0"><img className="h-14 w-14 rounded-full object-cover" src={member.photo_url} alt={member.name} /><span className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${isProfileOnline(member.last_seen_at) ? "bg-emerald-500" : "bg-forest-300"}`} /></span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className={`truncate ${unreadCount > 0 ? "font-bold text-forest-900" : "font-semibold"}`}>{member.name}</p>
@@ -4926,6 +5457,12 @@ function TribeDirectConversation({
 }) {
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState<TribeMessage[]>([]);
+  const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState("");
   const [notice, setNotice] = useState("");
   const [isSending, setIsSending] = useState(false);
   const lastReadIncomingMessageId = useRef<string | null>(null);
@@ -4935,9 +5472,15 @@ function TribeDirectConversation({
   useEffect(() => {
     setDraft("");
     setMessages([]);
+    setMediaUrls({});
+    setImageFiles([]);
+    setImagePreviews([]);
+    setSelectedMessageId(null);
     setNotice("");
     lastReadIncomingMessageId.current = null;
   }, [connectionId, memberId]);
+
+  useEffect(() => () => imagePreviews.forEach((preview) => URL.revokeObjectURL(preview)), [imagePreviews]);
 
   useEffect(() => {
     if (!memberId || !connectionId || !accessToken) return;
@@ -4947,8 +5490,11 @@ function TribeDirectConversation({
     const loadMessages = async () => {
       try {
         const rows = await getTribeMessages(connectionId, accessToken);
+        const paths = rows.flatMap((message) => message.image_paths ?? []);
+        const nextMediaUrls = paths.length > 0 ? await createConversationMediaUrls(paths, accessToken) : {};
         if (mounted) {
-          setMessages((previous) => keepPreviousIfEqual(previous, rows));
+          setMessages((previous) => keepPreviousIfEqual(previous, [...rows].sort((a, b) => new Date(a.created_at ?? 0).getTime() - new Date(b.created_at ?? 0).getTime())));
+          setMediaUrls((previous) => keepPreviousIfEqual(previous, nextMediaUrls));
           setNotice((previous) => previous ? "" : previous);
           const latestIncomingMessage = [...rows].reverse().find((message) => message.sender_id !== currentUser.id);
           if (latestIncomingMessage && latestIncomingMessage.id !== lastReadIncomingMessageId.current) {
@@ -4984,7 +5530,7 @@ function TribeDirectConversation({
   }
 
   const send = async () => {
-    if (!draft.trim()) return;
+    if (!draft.trim() && imageFiles.length === 0) return;
     if (!accessToken) {
       onRequireAuth();
       return;
@@ -5000,8 +5546,14 @@ function TribeDirectConversation({
     setNotice("");
 
     try {
-      const nextMessage = await sendTribeMessage(connection.id, currentUser.id, body, accessToken);
+      const uploadedPaths = imageFiles.length > 0 ? await uploadConversationImages(currentUser.id, connection.id, imageFiles, accessToken) : [];
+      const nextUrls = uploadedPaths.length > 0 ? await createConversationMediaUrls(uploadedPaths, accessToken) : {};
+      const nextMessage = await sendTribeMessage(connection.id, currentUser.id, body, accessToken, uploadedPaths);
       setMessages((prev) => [...prev.filter((message) => message.id !== nextMessage.id), nextMessage]);
+      setMediaUrls((previous) => ({ ...previous, ...nextUrls }));
+      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+      setImageFiles([]);
+      setImagePreviews([]);
     } catch (error) {
       console.error("Message Tribu non envoyé.", error);
       setDraft(body);
@@ -5009,6 +5561,22 @@ function TribeDirectConversation({
     } finally {
       setIsSending(false);
     }
+  };
+
+  const saveEdit = async () => {
+    if (!editingMessageId || !editDraft.trim() || !accessToken) return;
+    const updated = await updateTribeMessage(editingMessageId, editDraft.trim(), accessToken);
+    setMessages((previous) => previous.map((message) => message.id === updated.id ? updated : message));
+    setEditingMessageId(null);
+    setSelectedMessageId(null);
+  };
+
+  const removeMessage = async (message: TribeMessage) => {
+    if (!accessToken) return;
+    if (message.image_paths?.length) await deleteConversationImages(message.image_paths, accessToken).catch(() => undefined);
+    await deleteTribeMessage(message.id, accessToken);
+    setMessages((previous) => previous.filter((item) => item.id !== message.id));
+    setSelectedMessageId(null);
   };
 
   return (
@@ -5019,7 +5587,7 @@ function TribeDirectConversation({
             <img className="h-14 w-14 rounded-full object-cover" src={member.photo_url} alt={member.name} />
             <div>
               <p className="text-lg font-semibold">{member.name}</p>
-              <p className="text-sm text-forest-700">{member.city} · {member.compatibilityScore}% compatible</p>
+              <p className="text-sm text-forest-700">{isProfileOnline(member.last_seen_at) ? "En ligne" : "Déconnecté"} · {member.city} · {member.compatibilityScore}% compatible</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -5043,18 +5611,32 @@ function TribeDirectConversation({
         {messages.map((message) => {
           const mine = message.sender_id === currentUser.id;
           return (
-            <div className={`max-w-[86%] rounded-2xl p-3 ${mine ? "ml-auto bg-forest-800 text-white" : "bg-white"}`} key={message.id}>
+            <div className={`max-w-[86%] rounded-2xl p-3 ${mine ? "ml-auto cursor-pointer bg-forest-800 text-white" : "bg-white"}`} key={message.id} onClick={() => mine && setSelectedMessageId((current) => current === message.id ? null : message.id)}>
               <div className="mb-1 flex justify-between gap-3 text-xs font-semibold opacity-75">
                 <span>{mine ? "Toi" : member.name}</span>
                 <span>{formatConversationTime(message.created_at)}</span>
               </div>
-              <p>{message.body}</p>
+              {editingMessageId === message.id ? (
+                <div className="grid gap-2" onClick={(event) => event.stopPropagation()}>
+                  <textarea className="rounded-lg bg-white p-2 text-forest-900" value={editDraft} onChange={(event) => setEditDraft(event.target.value)} />
+                  <div className="flex gap-2"><button className="rounded-full bg-white px-3 py-1 text-xs font-bold text-forest-900" onClick={saveEdit}>Enregistrer</button><button className="text-xs font-bold" onClick={() => setEditingMessageId(null)}>Annuler</button></div>
+                </div>
+              ) : message.body ? <p>{message.body}</p> : null}
+              {(message.image_paths ?? []).length > 0 && <div className="mt-2 grid grid-cols-2 gap-2">{message.image_paths?.map((path) => mediaUrls[path] ? <a href={mediaUrls[path]} target="_blank" rel="noreferrer" key={path}><img className="max-h-72 w-full rounded-lg object-cover" src={mediaUrls[path]} alt="Photo envoyée" /></a> : null)}</div>}
+              {message.updated_at && <span className="mt-1 block text-[10px] opacity-60">modifié</span>}
+              {mine && selectedMessageId === message.id && <div className="mt-2 flex justify-end gap-2 border-t border-white/20 pt-2" onClick={(event) => event.stopPropagation()}><button className="rounded-full bg-white/15 p-2" onClick={() => { setEditingMessageId(message.id); setEditDraft(message.body); }} aria-label="Modifier"><FileText size={15} /></button><button className="rounded-full bg-white/15 p-2" onClick={() => removeMessage(message)} aria-label="Supprimer"><Trash2 size={15} /></button></div>}
             </div>
           );
         })}
       </div>
 
-      <div className="flex gap-2 border-t border-forest-100 p-4">
+      <div className="border-t border-forest-100 p-4">
+        {imagePreviews.length > 0 && <div className="mb-3 flex gap-2 overflow-x-auto">{imagePreviews.map((preview) => <img className="h-16 w-16 rounded-lg object-cover" src={preview} alt="Photo à envoyer" key={preview} />)}<button className="text-red-700" onClick={() => { imagePreviews.forEach((preview) => URL.revokeObjectURL(preview)); setImageFiles([]); setImagePreviews([]); }}><X size={18} /></button></div>}
+        <div className="flex gap-2">
+        <label className="grid cursor-pointer place-items-center rounded-full bg-forest-50 p-3 text-forest-800">
+          <ImagePlus size={19} />
+          <input className="sr-only" type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={(event) => { const files = Array.from(event.target.files ?? []); event.target.value = ""; const error = validateImageFiles(files, 6); if (error) { setNotice(error); return; } imagePreviews.forEach((preview) => URL.revokeObjectURL(preview)); setImageFiles(files); setImagePreviews(files.map((file) => URL.createObjectURL(file))); }} />
+        </label>
         <input
           className="min-w-0 flex-1 rounded-lg border border-forest-100 bg-forest-50 px-4 py-3 outline-none focus:ring-2 focus:ring-forest-600"
           value={draft}
@@ -5068,6 +5650,7 @@ function TribeDirectConversation({
         <button className="btn-primary px-4 disabled:cursor-wait disabled:opacity-60" disabled={isSending} onClick={send} aria-label="Envoyer">
           <Send size={18} />
         </button>
+        </div>
       </div>
     </div>
   );
@@ -5493,6 +6076,9 @@ function MyTripsPage({
   onAuthClick,
   onOpenTrip,
   onCancelJoinRequest,
+  favoriteTripIds,
+  onLeaveTrip,
+  onDeleteTrip,
   onCreateTrip
 }: {
   trips: Trip[];
@@ -5502,10 +6088,14 @@ function MyTripsPage({
   onAuthClick: () => void;
   onOpenTrip: (trip: Trip, shouldOpenConversation: boolean) => void | Promise<void>;
   onCancelJoinRequest: (requestId: string) => void | Promise<void>;
+  favoriteTripIds: string[];
+  onLeaveTrip: (trip: Trip) => void | Promise<void>;
+  onDeleteTrip: (trip: Trip) => void | Promise<void>;
   onCreateTrip: () => void;
 }) {
   const [statusFilter, setStatusFilter] = useState<"all" | "validated" | "pending" | "interested" | "history">("all");
   const [requestToCancel, setRequestToCancel] = useState<{ id: string; tripTitle: string } | null>(null);
+  const [tripAction, setTripAction] = useState<{ trip: Trip; action: "leave" | "delete" } | null>(null);
 
   if (!isAuthenticated || !userId) {
     return (
@@ -5521,7 +6111,7 @@ function MyTripsPage({
   }
 
   const myTrips = availableTrips
-    .map((trip) => ({ trip, statuses: getMyTripStatuses(trip, userId, userTripActions) }))
+    .map((trip) => ({ trip, statuses: getMyTripStatuses(trip, userId, userTripActions, favoriteTripIds.includes(trip.id)) }))
     .filter((entry) => entry.statuses.length > 0);
   const matchesStatusFilter = (statuses: MyTripStatus[]) => {
     if (statusFilter === "all") return true;
@@ -5608,6 +6198,12 @@ function MyTripsPage({
                         Annuler la demande
                       </button>
                     )}
+                    {!pendingRequest && statuses.some((status) => status.key === "created") && (
+                      <button className="btn-secondary w-full border-red-200 text-red-700 hover:bg-red-50" onClick={() => setTripAction({ trip, action: "delete" })}>Supprimer le Trip</button>
+                    )}
+                    {!pendingRequest && !statuses.some((status) => status.key === "created") && (
+                      <button className="btn-secondary w-full border-red-200 text-red-700 hover:bg-red-50" onClick={() => setTripAction({ trip, action: "leave" })}>Retirer de Mes Trips</button>
+                    )}
                   </div>
                 </div>
               </article>
@@ -5617,7 +6213,7 @@ function MyTripsPage({
       ) : (
         <div className="mt-8 rounded-[1.5rem] bg-white p-8 text-center shadow-soft">
           <h2 className="text-2xl font-semibold">Aucun Trip dans cette catégorie.</h2>
-          <p className="mt-2 text-forest-700">Change de statut ou découvre de nouvelles propositions dans Explorer.</p>
+          <p className="mt-2 text-forest-700">Change de statut ou découvre de nouvelles propositions dans Destination.</p>
         </div>
       )}
       {requestToCancel && (
@@ -5630,6 +6226,20 @@ function MyTripsPage({
           onConfirm={async () => {
             await onCancelJoinRequest(requestToCancel.id);
             setRequestToCancel(null);
+          }}
+        />
+      )}
+      {tripAction && (
+        <ConfirmDialog
+          title={tripAction.action === "delete" ? "Supprimer définitivement ce Trip ?" : "Retirer ce Trip ?"}
+          description={tripAction.action === "delete" ? "Le Trip et sa conversation seront définitivement supprimés." : "Tu quitteras le Trip et sa conversation. Un simple favori sera retiré de Mes Trips."}
+          confirmLabel={tripAction.action === "delete" ? "Supprimer" : "Quitter / retirer"}
+          danger
+          onCancel={() => setTripAction(null)}
+          onConfirm={async () => {
+            if (tripAction.action === "delete") await onDeleteTrip(tripAction.trip);
+            else await onLeaveTrip(tripAction.trip);
+            setTripAction(null);
           }}
         />
       )}
@@ -6026,6 +6636,7 @@ function ProfilePublicCard({
             {profileUser.verified && <BadgeCheck className="text-forest-700" size={24} />}
           </div>
           <p className="mt-1 font-semibold text-forest-500">{getProfileHandle(profileRecord)}</p>
+          <p className={`mt-2 inline-flex items-center gap-2 text-xs font-bold ${isProfileOnline(profileRecord.last_seen_at) ? "text-emerald-700" : "text-forest-500"}`}><span className={`h-2.5 w-2.5 rounded-full ${isProfileOnline(profileRecord.last_seen_at) ? "bg-emerald-500" : "bg-forest-300"}`} />{isProfileOnline(profileRecord.last_seen_at) ? "En ligne" : "Déconnecté"}</p>
           <p className="mt-2 text-sm font-semibold text-forest-700">{profileUser.age_range} · {profileUser.city}</p>
           <p className="mt-4 leading-7 text-forest-700">{profileUser.bio}</p>
           <TagList tags={[profileUser.verified ? "profil vérifié" : "profil à vérifier", profileUser.physical_level, profileUser.budget_range]} />
@@ -6274,6 +6885,99 @@ function Safety() {
   );
 }
 
+function SettingsPage({ profile, accessToken, onRequireAuth, onProfileUpdated }: { profile: UserProfileRecord | null; accessToken?: string; onRequireAuth: () => void; onProfileUpdated: (profile: UserProfileRecord) => void }) {
+  const [language, setLanguage] = useState(profile?.preferred_language ?? "fr");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  if (!profile || !accessToken) {
+    return <section className="container-page py-10"><EmptyState title="Connecte-toi pour ouvrir les paramètres" text="La langue et la sécurité du compte sont liées à ton profil." /><div className="mt-5 text-center"><button className="btn-primary" onClick={onRequireAuth}>Se connecter</button></div></section>;
+  }
+
+  const saveLanguage = async () => {
+    setSaving(true);
+    try {
+      const nextProfile = await updateProfile(profile.id, { preferred_language: language }, accessToken);
+      onProfileUpdated(nextProfile);
+      document.documentElement.lang = language;
+      setFeedback("Préférence de langue enregistrée. Les traductions complètes seront activées progressivement.");
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Langue impossible à enregistrer.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const changePassword = async () => {
+    if (password.length < 8 || password !== passwordConfirmation) {
+      setFeedback("Utilise au moins 8 caractères et saisis deux fois le même mot de passe.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updatePassword(password, accessToken);
+      setPassword("");
+      setPasswordConfirmation("");
+      setFeedback("Mot de passe modifié.");
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Mot de passe impossible à modifier.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <section className="container-page py-10">
+      <p className="pill">Paramètres</p><h1 className="mt-3 text-4xl font-semibold">Mon compte</h1>
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <Panel title="Langue"><label className="grid gap-2 text-sm font-bold">Langue préférée<select className="rounded-lg border border-forest-100 bg-forest-50 p-3" value={language} onChange={(event) => setLanguage(event.target.value)}><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="ar">العربية</option></select></label><button className="btn-primary mt-4" disabled={saving} onClick={saveLanguage}><Languages className="mr-2 inline" size={17} />Enregistrer</button></Panel>
+        <Panel title="Changer de mot de passe"><div className="grid gap-3"><input className="rounded-lg border border-forest-100 bg-forest-50 p-3" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Nouveau mot de passe" /><input className="rounded-lg border border-forest-100 bg-forest-50 p-3" type="password" value={passwordConfirmation} onChange={(event) => setPasswordConfirmation(event.target.value)} placeholder="Confirmer le mot de passe" /><button className="btn-primary" disabled={saving} onClick={changePassword}>Modifier le mot de passe</button></div></Panel>
+      </div>
+      {feedback && <p className="mt-5 rounded-xl bg-white p-4 font-semibold text-forest-700">{feedback}</p>}
+    </section>
+  );
+}
+
+function LegalPage({ kind }: { kind: "cgu" | "privacy" }) {
+  const isPrivacy = kind === "privacy";
+  const sections = isPrivacy ? [
+    ["Données traitées", "Compte, profil public, préférences de voyage, Trips, relations sociales, messages, médias, données de connexion et demandes de contact."],
+    ["Finalités", "Créer le compte, personnaliser les propositions, permettre les échanges, sécuriser la communauté, traiter les demandes et améliorer la beta."],
+    ["Visibilité", "L'e-mail et les réglages de compte restent privés. Le pseudo, la photo, la ville, la bio et les préférences choisies composent le profil visible par les membres connectés."],
+    ["Conservation", "Les données restent liées au compte tant qu'il est actif. Les Trips datés expirent après leur date de fin. Les durées détaillées seront précisées avant la sortie commerciale."],
+    ["Prestataires", "L'hébergement technique et l'authentification reposent actuellement sur Supabase. Des services cartographiques et de contenu peuvent également être sollicités."],
+    ["Tes droits", "Tu peux demander l'accès, la rectification, l'effacement, la limitation ou la portabilité via la page Nous contacter. Tu peux aussi saisir la CNIL." ]
+  ] : [
+    ["Objet", "Tribu Nature est une beta sociale qui permet de proposer, découvrir et organiser des idées de voyage entre membres."],
+    ["Compte", "Tu dois fournir des informations exactes, protéger ton mot de passe et utiliser un pseudo ou un nom public respectueux."],
+    ["Trips et réservations", "Les membres organisent les dates, transports, hébergements et activités. Tribu Nature n'est pas une agence de voyages et aucune réservation n'est conclue automatiquement dans l'app."],
+    ["Comportement", "Harcèlement, discrimination, fraude, contenu illicite ou dangereux et usurpation d'identité sont interdits. Un compte ou un contenu peut être modéré."],
+    ["Contenus", "Tu restes responsable des textes et photos publiés et confirmes disposer des droits nécessaires pour les partager avec le groupe."],
+    ["Sécurité", "Chaque membre doit vérifier les conditions météo, son niveau, les assurances et l'encadrement professionnel requis avant une activité."],
+    ["Beta", "Le service évolue et peut connaître des interruptions. Ces conditions provisoires devront être validées juridiquement avant un lancement commercial." ]
+  ];
+  return (
+    <section className="container-page py-10"><p className="pill">{isPrivacy ? "Vie privée" : "Conditions"}</p><h1 className="mt-3 text-4xl font-semibold">{isPrivacy ? "Politique de confidentialité" : "Conditions générales d'utilisation"}</h1><p className="mt-3 max-w-3xl text-forest-700">Version beta du 30 juin 2026. Document d'information à faire valider avant une exploitation commerciale.</p><div className="mt-8 grid gap-4">{sections.map(([title, text]) => <section className="rounded-[1.25rem] bg-white p-5 shadow-sm" key={title}><h2 className="text-xl font-semibold">{title}</h2><p className="mt-2 leading-7 text-forest-700">{text}</p></section>)}</div></section>
+  );
+}
+
+function AboutPage() {
+  return <section className="container-page py-10"><div className="mx-auto max-w-4xl"><p className="pill">À propos</p><h1 className="mt-4 text-4xl font-semibold">Faire passer une envie de voyage du « peut-être » au « on y va ».</h1><p className="mt-5 text-lg leading-8 text-forest-700">Tribu Nature est née d'une idée simple : beaucoup de personnes veulent partir, mais pas forcément seules, et ne trouvent ni le bon groupe ni le bon cadre pour commencer.</p><div className="mt-8 grid gap-5 md:grid-cols-3"><InfoBlock eyebrow="Mission" title="Créer le bon groupe" text="Faire rencontrer des profils compatibles autour d'un projet concret, avec un cadre clair et humain." /><InfoBlock eyebrow="Produit" title="Des Trips réelles" text="Les idées de destination, les projets membres et les conversations servent à construire une aventure ensemble." /><InfoBlock eyebrow="Cap" title="Voyager mieux" text="Mettre en avant la nature, les acteurs locaux, la confiance et des groupes à taille humaine." /></div></div></section>;
+}
+
+function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | null; accessToken?: string }) {
+  const [email, setEmail] = useState(profile?.email ?? "");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [sending, setSending] = useState(false);
+  return (
+    <section className="container-page py-10"><div className="mx-auto max-w-2xl"><p className="pill">Nous contacter</p><h1 className="mt-3 text-4xl font-semibold">Parlons de ton expérience.</h1><form className="mt-8 grid gap-4 rounded-[1.5rem] bg-white p-5 shadow-soft" onSubmit={async (event) => { event.preventDefault(); if (!email.includes("@") || !subject.trim() || !body.trim()) { setFeedback("Complète tous les champs."); return; } setSending(true); try { await sendContactMessage({ userId: profile?.id, email, subject, body }, accessToken); setSubject(""); setBody(""); setFeedback("Message envoyé. Merci pour ton retour."); } catch (error) { setFeedback(error instanceof Error ? error.message : "Message impossible à envoyer."); } finally { setSending(false); } }}><label className="grid gap-2 text-sm font-bold">Email<input className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label><label className="grid gap-2 text-sm font-bold">Sujet<input className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal" value={subject} onChange={(event) => setSubject(event.target.value)} /></label><label className="grid gap-2 text-sm font-bold">Message<textarea className="min-h-40 rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal" value={body} onChange={(event) => setBody(event.target.value)} /></label><button className="btn-primary" disabled={sending} type="submit"><Mail className="mr-2 inline" size={18} />{sending ? "Envoi..." : "Envoyer"}</button>{feedback && <p className="rounded-lg bg-forest-50 p-3 text-sm font-semibold">{feedback}</p>}</form></div></section>
+  );
+}
+
 function InfoBlock({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
   return (
     <div className="card p-6 sm:p-8">
@@ -6470,7 +7174,7 @@ function ConfirmDialog({
 
 function MobileBottomNav({ page, go, onCreateTrip }: { page: Page; go: (page: Page) => void; onCreateTrip: () => void }) {
   const items: Array<{ page: Page; label: string; icon: typeof Home }> = [
-    { page: "dashboard", label: "Explorer", icon: Compass },
+    { page: "dashboard", label: "Destination", icon: Compass },
     { page: "my-trips", label: "Mes Trips", icon: CalendarDays },
     { page: "communaute", label: "Tribu", icon: Users },
     { page: "profil", label: "Profil", icon: UserRound }
@@ -6514,9 +7218,12 @@ function Footer({ go }: { go: (page: Page) => void }) {
         </div>
         <div className="flex flex-wrap gap-2">
           {[
-            ["Trips", "dashboard", Compass],
-            ["Profil", "profil", Users],
-            ["Sécurité", "securite", HeartHandshake]
+            ["Destination", "dashboard", Compass],
+            ["À propos", "about", Info],
+            ["Contact", "contact", Mail],
+            ["CGU", "cgu", FileText],
+            ["Confidentialité", "privacy", ShieldCheck],
+            ["Paramètres", "settings", Settings]
           ].map(([label, target, Icon]) => {
             const IconComponent = Icon as typeof Home;
             return (

@@ -21,7 +21,8 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
   const cleanup = {
     userIds: [],
     tripIds: [],
-    connectionIds: []
+    connectionIds: [],
+    storageObjects: []
   };
 
   try {
@@ -53,6 +54,16 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
       safety_preferences: ["Profil connecté"],
       badges: ["test", "fiable"]
     });
+
+    const requesterPrivateViewOfOwner = await rest(`profiles?id=eq.${encodeURIComponent(owner.user.id)}&select=*`, {
+      token: requester.access_token
+    });
+    assert.equal(requesterPrivateViewOfOwner.length, 0, "Un membre ne doit pas pouvoir lire la ligne de profil privée d'un autre membre.");
+    const requesterPublicViewOfOwner = await rest(`public_profiles?id=eq.${encodeURIComponent(owner.user.id)}&select=*`, {
+      token: requester.access_token
+    });
+    assert.equal(requesterPublicViewOfOwner.length, 1);
+    assert.equal(Object.hasOwn(requesterPublicViewOfOwner[0], "email"), false, "La vue publique ne doit jamais exposer l'email.");
 
     const seedProfiles = await rest("profiles?is_seed_profile=eq.true&select=id", { token: owner.access_token });
     assert.equal(seedProfiles.length, 0, "Les profils fictifs ne doivent plus être présents dans la base sociale.");
@@ -96,7 +107,7 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
     cleanup.tripIds.push(catalogTripId);
     await createCatalogTrip(catalogTripId);
 
-    const catalogConversation = await ensureTripConversation(catalogTripId, "catalog_interest", owner.access_token);
+    const catalogConversation = { id: `catalog_interest-${catalogTripId}` };
     await joinCatalogIdea(catalogTripId, catalogConversation.id, owner);
     await joinCatalogIdea(catalogTripId, catalogConversation.id, requester);
 
@@ -115,6 +126,9 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
     cleanup.tripIds.push(userTripId);
     await createUserProjectTrip(userTripId, owner);
     const userProjectConversation = { id: `user_project-${userTripId}` };
+    const tripImagePath = `${owner.user.id}/${userTripId}/test.png`;
+    await uploadStorageObject("trip-media", tripImagePath, owner.access_token);
+    cleanup.storageObjects.push({ bucket: "trip-media", path: tripImagePath });
     const initialProjectMembers = await rest(`conversation_members?conversation_id=eq.${encodeURIComponent(userProjectConversation.id)}&select=*`, {
       token: owner.access_token
     });
@@ -137,13 +151,12 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
     });
     assert.equal(ownerNotifications.length, 1);
 
-    const acceptedRequest = await rest(`trip_join_requests?id=eq.${encodeURIComponent(joinRequest.id)}&select=*`, {
-      method: "PATCH",
+    const acceptedRequest = await rest("rpc/accept_trip_join_request", {
+      method: "POST",
       token: owner.access_token,
-      prefer: "return=representation",
-      body: { status: "accepted" }
+      body: { request_id: joinRequest.id }
     });
-    assert.equal(acceptedRequest[0].status, "accepted");
+    assert.equal(acceptedRequest.status, "accepted");
 
     const acceptedProjectMembers = await rest(`conversation_members?conversation_id=eq.${encodeURIComponent(userProjectConversation.id)}&select=*`, {
       token: requester.access_token
@@ -154,11 +167,66 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
       "L'acceptation doit synchroniser automatiquement les participants et la conversation."
     );
 
+    const conversationImagePath = `${requester.user.id}/${userProjectConversation.id}/test.png`;
+    await uploadStorageObject("conversation-media", conversationImagePath, requester.access_token);
+    cleanup.storageObjects.push({ bucket: "conversation-media", path: conversationImagePath });
+    const signedConversationImage = await signStorageObject("conversation-media", conversationImagePath, owner.access_token);
+    assert.ok(signedConversationImage.signedURL || signedConversationImage.signedUrl, "Un membre du groupe doit pouvoir ouvrir une photo de conversation.");
+
     const requesterProjectMessage = await sendConversationMessage(userProjectConversation.id, requester, "Je confirme ma participation au Trip utilisateur.");
     const ownerProjectMessages = await rest(`conversation_messages?conversation_id=eq.${encodeURIComponent(userProjectConversation.id)}&select=*`, {
       token: owner.access_token
     });
     assert.ok(ownerProjectMessages.some((message) => message.id === requesterProjectMessage.id));
+
+    const ownerMessageNotifications = await rest(`notifications?user_id=eq.${encodeURIComponent(owner.user.id)}&type=eq.trip_message_received&related_trip_id=eq.${encodeURIComponent(userTripId)}&select=*`, {
+      token: owner.access_token
+    });
+    assert.ok(ownerMessageNotifications.length > 0, "Un message de Trip doit notifier les autres membres.");
+
+    const groupReadReceipt = await rest("conversation_message_reads?on_conflict=conversation_id,user_id&select=*", {
+      method: "POST",
+      token: owner.access_token,
+      prefer: "resolution=merge-duplicates,return=representation",
+      body: { conversation_id: userProjectConversation.id, user_id: owner.user.id, last_read_at: new Date().toISOString() }
+    });
+    assert.equal(groupReadReceipt[0].conversation_id, userProjectConversation.id);
+
+    const editedProjectMessage = await rest(`conversation_messages?id=eq.${encodeURIComponent(requesterProjectMessage.id)}&select=*`, {
+      method: "PATCH",
+      token: requester.access_token,
+      prefer: "return=representation",
+      body: { body: "Message de participation modifié.", updated_at: new Date().toISOString() }
+    });
+    assert.equal(editedProjectMessage[0].body, "Message de participation modifié.");
+
+    await rest("trip_confirmations?on_conflict=trip_id,user_id&select=*", {
+      method: "POST",
+      token: owner.access_token,
+      prefer: "resolution=ignore-duplicates,return=representation",
+      body: { trip_id: userTripId, user_id: owner.user.id }
+    });
+    await rest("trip_confirmations?on_conflict=trip_id,user_id&select=*", {
+      method: "POST",
+      token: requester.access_token,
+      prefer: "resolution=ignore-duplicates,return=representation",
+      body: { trip_id: userTripId, user_id: requester.user.id }
+    });
+    const confirmedTrip = await rest(`trips?id=eq.${encodeURIComponent(userTripId)}&select=planning_status,visibility`, { token: requester.access_token });
+    assert.equal(confirmedTrip[0].planning_status, "confirmed");
+    assert.equal(confirmedTrip[0].visibility, "private", "Un Trip confirmé doit quitter Destination sans perdre sa conversation.");
+
+    await rest("rpc/leave_trip", {
+      method: "POST",
+      token: requester.access_token,
+      body: { trip_key: userTripId }
+    });
+    const requesterParticipationAfterLeave = await rest(`trip_participants?trip_id=eq.${encodeURIComponent(userTripId)}&user_id=eq.${encodeURIComponent(requester.user.id)}&status=eq.active&select=*`, { token: requester.access_token });
+    const requesterRequestsAfterLeave = await rest(`trip_join_requests?trip_id=eq.${encodeURIComponent(userTripId)}&requester_id=eq.${encodeURIComponent(requester.user.id)}&select=*`, { token: requester.access_token });
+    assert.equal(requesterParticipationAfterLeave.length, 0);
+    assert.equal(requesterRequestsAfterLeave.length, 0, "Quitter doit aussi retirer le Trip de Mes Trips.");
+    const ownerConversationAfterLeave = await rest(`conversations?id=eq.${encodeURIComponent(userProjectConversation.id)}&select=*`, { token: owner.access_token });
+    assert.equal(ownerConversationAfterLeave.length, 1, "La conversation doit rester disponible aux autres membres.");
 
     const tribeConnection = await rest("tribe_connections?on_conflict=requester_id,receiver_id&select=*", {
       method: "POST",
@@ -495,6 +563,38 @@ async function rest(path, { method = "GET", token, prefer, body } = {}) {
   return JSON.parse(text);
 }
 
+async function uploadStorageObject(bucket, path, token) {
+  const tinyPng = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=", "base64");
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${encodeStoragePath(path)}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "image/png"
+    },
+    body: tinyPng
+  });
+  if (!response.ok) throw new Error(`Storage upload failed: ${response.status} ${await response.text()}`);
+}
+
+async function signStorageObject(bucket, path, token) {
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/${bucket}/${encodeStoragePath(path)}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ expiresIn: 60 })
+  });
+  if (!response.ok) throw new Error(`Storage sign failed: ${response.status} ${await response.text()}`);
+  return response.json();
+}
+
+function encodeStoragePath(path) {
+  return path.split("/").map(encodeURIComponent).join("/");
+}
+
 function authHeaders() {
   return {
     apikey: SUPABASE_ANON_KEY,
@@ -533,6 +633,14 @@ async function cleanupTestData(cleanup) {
   const connectionIds = cleanup.connectionIds.map(sql);
 
   const statements = [];
+
+  for (const object of cleanup.storageObjects ?? []) {
+    await fetch(`${SUPABASE_URL}/storage/v1/object/${object.bucket}`, {
+      method: "DELETE",
+      headers: serviceRoleHeaders(),
+      body: JSON.stringify({ prefixes: [object.path] })
+    }).catch(() => undefined);
+  }
 
   if (connectionIds.length) {
     statements.push(`delete from public.tribe_messages where connection_id in (${connectionIds.map((id) => `'${id}'`).join(",")});`);

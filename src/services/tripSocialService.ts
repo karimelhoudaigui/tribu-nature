@@ -50,7 +50,27 @@ export type ConversationMessage = {
   conversation_id: string;
   user_id: string;
   body: string;
+  image_paths?: string[];
   created_at?: string;
+  updated_at?: string | null;
+};
+
+export type ConversationMessageRead = {
+  conversation_id: string;
+  user_id: string;
+  last_read_at: string;
+};
+
+export type TripConfirmation = {
+  trip_id: string;
+  user_id: string;
+  confirmed_at: string;
+};
+
+export type TripConversationSummary = {
+  conversation: TripConversation;
+  latestMessage: ConversationMessage | null;
+  unreadCount: number;
 };
 
 export type UserTripActions = {
@@ -132,7 +152,11 @@ export async function cancelJoinRequest(requestId: string, accessToken: string):
 }
 
 export async function acceptJoinRequest(requestId: string, accessToken: string): Promise<TripJoinRequest> {
-  return updateJoinRequestStatus(requestId, "accepted", accessToken);
+  return requestRest<TripJoinRequest>("rpc/accept_trip_join_request", {
+    method: "POST",
+    accessToken,
+    body: { request_id: requestId }
+  });
 }
 
 export async function rejectJoinRequest(requestId: string, accessToken: string): Promise<TripJoinRequest> {
@@ -235,7 +259,8 @@ export async function sendConversationMessage(
   conversationId: string,
   userId: string,
   body: string,
-  accessToken: string
+  accessToken: string,
+  imagePaths: string[] = []
 ): Promise<ConversationMessage> {
   const rows = await requestRest<ConversationMessage[]>("conversation_messages?select=*", {
     method: "POST",
@@ -244,11 +269,109 @@ export async function sendConversationMessage(
     body: {
       conversation_id: conversationId,
       user_id: userId,
-      body
+      body,
+      image_paths: imagePaths
     }
   });
 
   return rows[0];
+}
+
+export async function updateConversationMessage(messageId: string, body: string, accessToken: string): Promise<ConversationMessage> {
+  const rows = await requestRest<ConversationMessage[]>(`conversation_messages?id=eq.${encodeURIComponent(messageId)}&select=*`, {
+    method: "PATCH",
+    accessToken,
+    prefer: "return=representation",
+    body: { body, updated_at: new Date().toISOString() }
+  });
+  return rows[0];
+}
+
+export async function deleteConversationMessage(messageId: string, accessToken: string): Promise<void> {
+  await requestRest<void>(`conversation_messages?id=eq.${encodeURIComponent(messageId)}`, {
+    method: "DELETE",
+    accessToken,
+    prefer: "return=minimal"
+  });
+}
+
+export async function leaveTrip(tripId: string, accessToken: string): Promise<void> {
+  await requestRest<void>("rpc/leave_trip", {
+    method: "POST",
+    accessToken,
+    body: { trip_key: tripId }
+  });
+}
+
+export async function getTripConfirmations(tripId: string, accessToken: string): Promise<TripConfirmation[]> {
+  return requestRest<TripConfirmation[]>(
+    `trip_confirmations?trip_id=eq.${encodeURIComponent(tripId)}&select=*&order=confirmed_at.asc`,
+    { accessToken }
+  );
+}
+
+export async function confirmTrip(tripId: string, userId: string, accessToken: string): Promise<TripConfirmation> {
+  const rows = await requestRest<TripConfirmation[]>("trip_confirmations?on_conflict=trip_id,user_id&select=*", {
+    method: "POST",
+    accessToken,
+    prefer: "resolution=ignore-duplicates,return=representation",
+    body: { trip_id: tripId, user_id: userId }
+  });
+  return rows[0] ?? { trip_id: tripId, user_id: userId, confirmed_at: new Date().toISOString() };
+}
+
+export async function withdrawTripConfirmation(tripId: string, userId: string, accessToken: string): Promise<void> {
+  await requestRest<void>(`trip_confirmations?trip_id=eq.${encodeURIComponent(tripId)}&user_id=eq.${encodeURIComponent(userId)}`, {
+    method: "DELETE",
+    accessToken,
+    prefer: "return=minimal"
+  });
+}
+
+export async function markTripConversationAsRead(conversationId: string, userId: string, accessToken: string): Promise<ConversationMessageRead> {
+  const rows = await requestRest<ConversationMessageRead[]>("conversation_message_reads?on_conflict=conversation_id,user_id&select=*", {
+    method: "POST",
+    accessToken,
+    prefer: "resolution=merge-duplicates,return=representation",
+    body: {
+      conversation_id: conversationId,
+      user_id: userId,
+      last_read_at: new Date().toISOString()
+    }
+  });
+  return rows[0];
+}
+
+export async function getMyTripConversationSummaries(userId: string, accessToken: string): Promise<TripConversationSummary[]> {
+  const memberships = await requestRest<TripConversationMember[]>(
+    `conversation_members?user_id=eq.${encodeURIComponent(userId)}&select=*&order=joined_at.desc`,
+    { accessToken }
+  );
+  const conversationIds = [...new Set(memberships.map((member) => member.conversation_id))];
+  if (conversationIds.length === 0) return [];
+
+  const inFilter = conversationIds.map((id) => encodeURIComponent(id)).join(",");
+  const [conversations, messages, receipts] = await Promise.all([
+    requestRest<TripConversation[]>(`conversations?id=in.(${inFilter})&select=*`, { accessToken }),
+    requestRest<ConversationMessage[]>(`conversation_messages?conversation_id=in.(${inFilter})&select=*&order=created_at.asc`, { accessToken }),
+    requestRest<ConversationMessageRead[]>(`conversation_message_reads?user_id=eq.${encodeURIComponent(userId)}&conversation_id=in.(${inFilter})&select=*`, { accessToken })
+  ]);
+  const readAt = new Map(receipts.map((receipt) => [receipt.conversation_id, new Date(receipt.last_read_at).getTime()]));
+
+  return conversations.map((conversation) => {
+    const conversationMessages = messages.filter((message) => message.conversation_id === conversation.id);
+    const lastReadAt = readAt.get(conversation.id) ?? 0;
+    return {
+      conversation,
+      latestMessage: conversationMessages[conversationMessages.length - 1] ?? null,
+      unreadCount: conversationMessages.filter((message) => (
+        message.user_id !== userId && new Date(message.created_at ?? 0).getTime() > lastReadAt
+      )).length
+    };
+  }).sort((a, b) => (
+    new Date(b.latestMessage?.created_at ?? b.conversation.created_at ?? 0).getTime()
+    - new Date(a.latestMessage?.created_at ?? a.conversation.created_at ?? 0).getTime()
+  ));
 }
 
 async function updateJoinRequestStatus(requestId: string, status: TripJoinRequestStatus, accessToken: string): Promise<TripJoinRequest> {

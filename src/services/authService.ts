@@ -33,6 +33,8 @@ export type UserProfileRecord = {
   past_trips?: number | null;
   badges?: string[] | null;
   is_seed_profile?: boolean | null;
+  last_seen_at?: string | null;
+  preferred_language?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -52,6 +54,7 @@ export type UserProfileUpdate = Partial<Pick<
   | "safety_preferences"
   | "past_trips"
   | "badges"
+  | "preferred_language"
 >>;
 
 type AuthApiResponse = {
@@ -162,7 +165,7 @@ export async function getCurrentProfile(session: AuthSession): Promise<UserProfi
 export async function getProfileById(profileId: string, accessToken: string): Promise<UserProfileRecord | null> {
   ensureAuthConfig();
 
-  const response = await fetch(`${getSupabaseUrl()}/rest/v1/profiles?id=eq.${encodeURIComponent(profileId)}&select=*&limit=1`, {
+  const response = await fetch(`${getSupabaseUrl()}/rest/v1/public_profiles?id=eq.${encodeURIComponent(profileId)}&select=*&limit=1`, {
     headers: getRestHeaders(accessToken)
   });
 
@@ -180,7 +183,7 @@ export async function getProfilesByIds(profileIds: string[], accessToken: string
   const uniqueIds = [...new Set(profileIds)].filter(Boolean);
   if (uniqueIds.length === 0) return [];
 
-  const response = await fetch(`${getSupabaseUrl()}/rest/v1/profiles?id=in.(${uniqueIds.map(encodeURIComponent).join(",")})&select=*`, {
+  const response = await fetch(`${getSupabaseUrl()}/rest/v1/public_profiles?id=in.(${uniqueIds.map(encodeURIComponent).join(",")})&select=*`, {
     headers: getRestHeaders(accessToken)
   });
 
@@ -211,6 +214,37 @@ export async function updateProfile(profileId: string, updates: UserProfileUpdat
   const rows = (await response.json()) as UserProfileRecord[];
   if (!rows[0]) throw new Error("Profil modifié, mais aucune donnée n'a été renvoyée.");
   return rows[0];
+}
+
+export async function updatePassword(password: string, accessToken: string): Promise<void> {
+  ensureAuthConfig();
+  const response = await fetch(`${getSupabaseUrl()}/auth/v1/user`, {
+    method: "PUT",
+    headers: {
+      ...getAuthHeaders(accessToken),
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ password })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Mot de passe impossible à modifier: ${await getErrorMessage(response)}`);
+  }
+}
+
+export async function touchPresence(accessToken: string): Promise<string> {
+  ensureAuthConfig();
+  const response = await fetch(`${getSupabaseUrl()}/rest/v1/rpc/touch_my_presence`, {
+    method: "POST",
+    headers: {
+      ...getRestHeaders(accessToken),
+      "Content-Type": "application/json"
+    },
+    body: "{}"
+  });
+
+  if (!response.ok) throw new Error(await getErrorMessage(response));
+  return response.json() as Promise<string>;
 }
 
 export async function upsertCurrentProfile(session: AuthSession, displayName?: string): Promise<UserProfileRecord> {
