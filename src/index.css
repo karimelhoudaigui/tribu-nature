@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+.activity-carousel {
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+  scroll-padding-inline: 1rem;
+}
+
+.activity-carousel::-webkit-scrollbar {
+  display: none;
+}
+
 @layer base {
   :root {
     color: #0c2b22;

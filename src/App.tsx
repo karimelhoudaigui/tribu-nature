@@ -6,9 +6,14 @@ import {
   Bell,
   CalendarDays,
   Camera,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  CloudSun,
   Compass,
   Copy,
   CheckCircle2,
+  Euro,
   ExternalLink,
   FileText,
   Heart,
@@ -4378,7 +4383,6 @@ function TripDetail({
 
       <section className="container-page space-y-10 py-10">
         <TripTypeSection trip={trip} creatorProfile={creatorProfile} onViewProfile={onViewProfile} />
-        <TripMatchSection match={match} />
         {trip.community && (
           <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -4396,6 +4400,7 @@ function TripDetail({
           </section>
         )}
         <ActivitiesSection activities={tripActivities} />
+        <TripMatchSection match={match} />
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
           <TripMembersSection members={validatedMembers} currentUserId={currentUserId} acceptedTribeMemberIds={acceptedTribeMemberIds} onViewProfile={onViewProfile} onAddFriend={onAddFriend} />
           <BudgetSection trip={trip} />
@@ -4538,18 +4543,83 @@ function TripTypeSection({
 }
 
 function ActivitiesSection({ activities: tripActivities }: { activities: Array<Activity | MockLocalActivity> }) {
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const scrollToActivity = (index: number) => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+    const cards = Array.from(carousel.children) as HTMLElement[];
+    const nextIndex = Math.max(0, Math.min(index, cards.length - 1));
+    const target = cards[nextIndex];
+    if (!target) return;
+    carousel.scrollTo({ left: target.offsetLeft - carousel.offsetLeft, behavior: "smooth" });
+    setActiveIndex(nextIndex);
+  };
+
+  const updateActiveActivity = () => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+    const cards = Array.from(carousel.children) as HTMLElement[];
+    if (!cards.length) return;
+    const closestIndex = cards.reduce((closest, card, index) => {
+      const currentDistance = Math.abs(card.offsetLeft - carousel.offsetLeft - carousel.scrollLeft);
+      const closestDistance = Math.abs(cards[closest].offsetLeft - carousel.offsetLeft - carousel.scrollLeft);
+      return currentDistance < closestDistance ? index : closest;
+    }, 0);
+    setActiveIndex(closestIndex);
+  };
+
   return (
-    <section>
-      <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <section className="overflow-hidden">
+      <div className="mb-5 flex items-end justify-between gap-4">
         <div>
           <p className="pill">Expériences</p>
           <h2 className="mt-3 text-3xl font-semibold">Activités proposées pour ce Trip</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-forest-600">Des moments à vivre ensemble, sélectionnés pour cette destination.</p>
         </div>
-        <span className="text-sm font-semibold text-forest-700">{tripActivities.length} idées sur place</span>
+        {tripActivities.length > 1 && (
+          <div className="hidden shrink-0 items-center gap-2 sm:flex">
+            <button
+              aria-label="Voir l'activité précédente"
+              className="grid h-11 w-11 place-items-center rounded-full border border-forest-200 bg-white text-forest-900 transition hover:bg-forest-50 disabled:cursor-default disabled:opacity-35"
+              disabled={activeIndex === 0}
+              onClick={() => scrollToActivity(activeIndex - 1)}
+              type="button"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              aria-label="Voir l'activité suivante"
+              className="grid h-11 w-11 place-items-center rounded-full bg-forest-900 text-white transition hover:bg-forest-800 disabled:cursor-default disabled:opacity-35"
+              disabled={activeIndex === tripActivities.length - 1}
+              onClick={() => scrollToActivity(activeIndex + 1)}
+              type="button"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
       </div>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div
+        aria-label="Carousel des activités proposées"
+        className="activity-carousel -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-5 sm:mx-0 sm:px-0"
+        onScroll={updateActiveActivity}
+        ref={carouselRef}
+        role="region"
+      >
         {tripActivities.map((activity) => <ActivityCard activity={activity} key={activity.id} />)}
       </div>
+      {tripActivities.length > 1 && (
+        <div className="mt-1 flex items-center justify-between sm:justify-end">
+          <span className="text-xs font-bold text-forest-600 sm:hidden">{activeIndex + 1} / {tripActivities.length}</span>
+          <div className="flex gap-1.5" aria-hidden="true">
+            {tripActivities.map((activity, index) => (
+              <span className={`h-1.5 rounded-full transition-all ${index === activeIndex ? "w-7 bg-forest-800" : "w-1.5 bg-forest-200"}`} key={activity.id} />
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -7004,15 +7074,14 @@ function ActivityCard({ activity }: { activity: Activity | MockLocalActivity }) 
         category: activity.category,
         duration: activity.duration,
         price: activity.estimated_price === 0 ? "gratuit" : `${activity.estimated_price} €`,
-        score: activity.group_friendly ? "Adapté au groupe" : "À vérifier",
         physicalLevel: activity.physical_level,
         risk: activity.risk,
-        weather: activity.weather_compatible.includes("pluie") ? "oui" : "selon météo",
-        group: activity.group_friendly ? "oui" : "non",
-        booking: activity.booking_required ? "oui" : "non",
-        supervision: activity.risk === "moyen" ? "recommandé" : "non requis",
-        tags: activity.ambience,
+        weatherDependent: !activity.weather_compatible.includes("pluie"),
+        groupFriendly: activity.group_friendly,
+        bookingRequired: activity.booking_required,
+        supervisionRequired: activity.risk === "moyen" || activity.risk === "élevé",
         description: activity.description,
+        image: activity.image,
         mapUrl: activity.lat && activity.lng ? `https://www.google.com/maps/search/?api=1&query=${activity.lat},${activity.lng}` : "",
         referenceUrl: activity.external_url ?? "",
         referenceLabel: activity.external_url ? referenceLabel(activity.source) : ""
@@ -7022,49 +7091,163 @@ function ActivityCard({ activity }: { activity: Activity | MockLocalActivity }) 
         category: activity.category,
         duration: activity.duration_estimate,
         price: activity.price_min === 0 ? "gratuit" : `${activity.price_min} à ${activity.price_max} €`,
-        score: `${activity.confidence_score}% adapté au groupe`,
         physicalLevel: activity.physical_level,
         risk: activity.risk_level,
-        weather: activity.weather_dependency ? "oui" : "non",
-        group: `${activity.group_size_min}-${activity.group_size_max} personnes`,
-        booking: activity.booking_required ? "oui" : "non",
-        supervision: activity.professional_supervision_required ? "obligatoire" : "non requis",
-        tags: activity.ambience_tags,
+        weatherDependent: activity.weather_dependency,
+        groupFriendly: activity.group_size_max > 1,
+        bookingRequired: activity.booking_required,
+        supervisionRequired: activity.professional_supervision_required,
         description: "",
+        image: "",
         mapUrl: `https://www.google.com/maps/search/?api=1&query=${activity.lat},${activity.lng}`,
         referenceUrl: "",
         referenceLabel: ""
       };
+  const photos = getActivityPhotos(display.name, display.category, display.image);
+  const highlights = getActivityHighlights(display);
+  const hook = getActivityHook(display.name, display.category, display.description);
 
   return (
-    <div className="group rounded-[1.25rem] bg-white p-4 shadow-soft transition hover:-translate-y-1">
-      <div className="flex items-start justify-between gap-3">
-        <p className="rounded-full bg-forest-50 px-3 py-1.5 text-xs font-semibold text-forest-700">{display.category}</p>
-        <span className="text-xs font-bold text-forest-700">{display.score}</span>
+    <article className="group w-[86vw] max-w-[460px] shrink-0 snap-start overflow-hidden rounded-lg bg-white shadow-soft transition duration-300 hover:-translate-y-1">
+      <div className="relative grid h-64 grid-cols-4 grid-rows-2 gap-1 overflow-hidden bg-forest-100 sm:h-72">
+        {photos.map((photo, index) => (
+          <img
+            className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${index === 0 ? "col-span-2 row-span-2" : index === 3 ? "col-span-2" : "col-span-1"}`}
+            loading="lazy"
+            src={photo}
+            alt={`${display.name}, vue ${index + 1}`}
+            key={`${photo}-${index}`}
+          />
+        ))}
+        <span className="absolute left-3 top-3 rounded-full bg-white/92 px-3 py-1.5 text-xs font-bold text-forest-900 shadow-sm backdrop-blur">
+          {display.category}
+        </span>
+        <span className="absolute bottom-3 right-3 rounded-full bg-forest-900/80 px-2.5 py-1 text-xs font-bold text-white backdrop-blur">
+          4 photos
+        </span>
       </div>
-      <h3 className="mt-4 text-xl font-semibold leading-tight">{display.name}</h3>
-      <p className="mt-2 text-sm font-semibold text-forest-700">{display.duration} · {display.price}</p>
-      {display.description && <p className="mt-3 text-sm leading-6 text-forest-700">{display.description}</p>}
-      <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-forest-700">
-        <span className="rounded-full bg-forest-50 px-3 py-1.5">{display.physicalLevel}</span>
-        <span className="rounded-full bg-forest-50 px-3 py-1.5">Risque {display.risk}</span>
-        <span className="rounded-full bg-forest-50 px-3 py-1.5">{display.booking === "oui" ? "Réservation" : "Sans réservation"}</span>
-      </div>
-      <TagList tags={display.tags.slice(0, 2)} />
-      <div className="mt-4 flex flex-wrap gap-2">
-        {display.mapUrl && (
-          <a className="btn-secondary py-2 text-sm" href={display.mapUrl} target="_blank" rel="noreferrer">
-            Voir sur la carte
-          </a>
+      <div className="p-5">
+        <h3 className="text-2xl font-semibold leading-tight text-forest-900">{display.name}</h3>
+        <p className="mt-2 min-h-12 text-sm leading-6 text-forest-700">{hook}</p>
+
+        <div className="mt-5 grid grid-cols-3 divide-x divide-forest-100 rounded-lg bg-forest-50 py-3">
+          <ActivityQuickFact icon={<Clock3 size={16} />} label="Durée" value={display.duration} />
+          <ActivityQuickFact icon={<Euro size={16} />} label="Prix" value={display.price} />
+          <ActivityQuickFact icon={<Mountain size={16} />} label="Niveau" value={display.physicalLevel} />
+        </div>
+
+        <div className="mt-4 flex min-h-8 flex-wrap gap-x-4 gap-y-2 text-xs font-bold text-forest-700">
+          {highlights.map((highlight) => (
+            <span className="inline-flex items-center gap-1.5" key={highlight.label}>
+              {highlight.weather ? <CloudSun size={16} /> : <CheckCircle2 size={16} />}
+              {highlight.label}
+            </span>
+          ))}
+        </div>
+
+        {(display.mapUrl || display.referenceUrl) && (
+          <div className="mt-5 flex gap-2 border-t border-forest-100 pt-4">
+            {display.mapUrl && (
+              <a className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-forest-200 px-4 py-2.5 text-sm font-bold text-forest-900 transition hover:bg-forest-50" href={display.mapUrl} target="_blank" rel="noreferrer">
+                <MapPin size={17} />
+                Carte
+              </a>
+            )}
+            {display.referenceUrl && (
+              <a
+                aria-label={display.referenceLabel}
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-forest-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-forest-800"
+                href={display.referenceUrl}
+                target="_blank"
+                rel="noreferrer"
+                title={display.referenceLabel}
+              >
+                <ExternalLink size={17} />
+                Référence
+              </a>
+            )}
+          </div>
         )}
-        {display.referenceUrl && (
-          <a className="btn-secondary py-2 text-sm" href={display.referenceUrl} target="_blank" rel="noreferrer">
-            {display.referenceLabel}
-          </a>
-        )}
       </div>
+    </article>
+  );
+}
+
+function ActivityQuickFact({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="min-w-0 px-2 text-center">
+      <span className="mx-auto flex items-center justify-center gap-1 text-forest-600">{icon}<span className="hidden text-[10px] font-bold uppercase sm:inline">{label}</span></span>
+      <strong className="mt-1 block truncate text-xs text-forest-900 sm:text-sm">{value}</strong>
     </div>
   );
+}
+
+function getActivityHook(name: string, category: string, description: string) {
+  const searchable = normalizeUiText(`${name} ${category}`);
+  const cleanDescription = description.trim();
+  if (cleanDescription && !normalizeUiText(cleanDescription).includes("l'app pourra l'enrichir")) {
+    return cleanDescription.length > 125 ? `${cleanDescription.slice(0, 122).trim()}...` : cleanDescription;
+  }
+  if (/therm|spa|bien-etre|detente/.test(searchable)) return "Le moment détente qui fait du bien après une journée dehors.";
+  if (/parapente|vol|aerien/.test(searchable)) return "L'option grand frisson pour repartir avec un souvenir fort.";
+  if (/rando|marche|sentier|trek|refuge|lac/.test(searchable)) return "Une belle sortie pour marcher ensemble et prendre le temps de regarder autour.";
+  if (/rafting|canoe|kayak|riviere|eau vive|paddle/.test(searchable)) return "Une parenthèse sur l'eau pour partager de l'énergie et quelques éclats de rire.";
+  if (/ferme|producteur/.test(searchable)) return "Une rencontre simple et authentique avec celles et ceux qui font vivre le territoire.";
+  if (/repas|diner|restaurant|fromage|degustation|marche/.test(searchable)) return "Un moment convivial pour découvrir le territoire autour d'une bonne table.";
+  if (/cheval|equestre/.test(searchable)) return "Une façon douce et dépaysante d'explorer les paysages autrement.";
+  if (/village|culture|patrimoine|musee/.test(searchable)) return "Une immersion locale à vivre tranquillement au rythme du lieu.";
+  return "Une expérience à partager pour donner une vraie saveur au voyage.";
+}
+
+function getActivityHighlights(display: {
+  bookingRequired: boolean;
+  supervisionRequired: boolean;
+  weatherDependent: boolean;
+  groupFriendly: boolean;
+  risk: string;
+}) {
+  const highlights: Array<{ label: string; weather?: boolean }> = [];
+  if (display.supervisionRequired) highlights.push({ label: "Encadrement conseillé" });
+  if (display.bookingRequired) highlights.push({ label: "Réservation conseillée" });
+  if (display.weatherDependent) highlights.push({ label: "Météo à vérifier", weather: true });
+  if (!highlights.length && display.groupFriendly) highlights.push({ label: "Idéal en groupe" });
+  if (highlights.length < 2 && normalizeUiText(display.risk) === "faible") highlights.push({ label: "Risque faible" });
+  return highlights.slice(0, 2);
+}
+
+function getActivityPhotos(name: string, category: string, primaryImage: string) {
+  const searchable = normalizeUiText(`${name} ${category}`);
+  const image = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=82`;
+  const pools = {
+    mountain: [image("photo-1551632811-561732d1e306"), image("photo-1464822759023-fed622ff2c3b"), image("photo-1506744038136-46273834b3fb"), image("photo-1470770841072-f978cf4d019e")],
+    wellness: [image("photo-1540555700478-4be289fbecef"), image("photo-1600334089648-b0d9d3028eb2"), image("photo-1544161515-4ab6ce6db874"), image("photo-1570172619644-dfd03ed5d881")],
+    aerial: ["https://images.pexels.com/photos/17913420/pexels-photo-17913420.jpeg?auto=compress&cs=tinysrgb&w=900", "https://images.pexels.com/photos/14760650/pexels-photo-14760650.jpeg?auto=compress&cs=tinysrgb&w=900", image("photo-1500534314209-a25ddb2bd429"), image("photo-1464822759023-fed622ff2c3b")],
+    water: [image("photo-1508166466920-f65aa51f727c"), image("photo-1544550285-f813152fb2fd"), image("photo-1500530855697-b586d89ba3ee"), image("photo-1507525428034-b723cf961d3e")],
+    farm: [image("photo-1500595046743-cd271d694d30"), image("photo-1486297678162-eb2a19b0a32d"), image("photo-1452195100486-9cc805987862"), image("photo-1504674900247-0877df9cc836")],
+    food: [image("photo-1551218808-94e220e084d2"), image("photo-1504674900247-0877df9cc836"), image("photo-1414235077428-338989a2e8c0"), image("photo-1547592180-85f173990554")],
+    horse: [image("photo-1553284965-83fd3e82fa5a"), image("photo-1598974357801-cbca100e65d3"), image("photo-1464822759023-fed622ff2c3b"), image("photo-1500534314209-a25ddb2bd429")],
+    culture: [image("photo-1519677100203-a0e668c92439"), image("photo-1500534314209-a25ddb2bd429"), image("photo-1499856871958-5b9627545d1a"), image("photo-1500530855697-b586d89ba3ee")],
+    forest: [image("photo-1448375240586-882707db888b"), image("photo-1551632811-561732d1e306"), image("photo-1470770841072-f978cf4d019e"), image("photo-1500530855697-b586d89ba3ee")]
+  };
+  const contextual = /therm|spa|bien-etre|detente/.test(searchable)
+    ? pools.wellness
+    : /parapente|vol|aerien/.test(searchable)
+      ? pools.aerial
+      : /rafting|canoe|kayak|riviere|eau vive|paddle|plage|surf/.test(searchable)
+        ? pools.water
+        : /ferme|producteur/.test(searchable)
+          ? pools.farm
+          : /repas|diner|restaurant|fromage|degustation|marche/.test(searchable)
+            ? pools.food
+            : /cheval|equestre/.test(searchable)
+              ? pools.horse
+              : /village|culture|patrimoine|musee/.test(searchable)
+                ? pools.culture
+                : /foret/.test(searchable)
+                  ? pools.forest
+                  : pools.mountain;
+  const imageOrder = category === "Activité proposée" ? [...contextual, primaryImage] : [primaryImage, ...contextual];
+  return Array.from(new Set(imageOrder.filter(Boolean))).slice(0, 4);
 }
 
 function referenceLabel(source?: MockLocalActivity["source"]) {
