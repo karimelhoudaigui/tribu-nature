@@ -7265,8 +7265,20 @@ type ActivityExperiencePhoto = {
 };
 
 function buildPexelsActivityQuery(activity: Activity | MockLocalActivity, destination: string) {
-  const destinationParts = destination.split(">").map((part) => part.trim()).filter(Boolean);
-  const preciseDestination = destinationParts.slice(-2).join(" ");
+  const searchable = normalizeUiText(`${activity.name} ${activity.category}`);
+  const destinationParts = destination.split(/[>,]/).map((part) => part.trim()).filter(Boolean);
+  const preciseDestination = destinationParts.slice(0, 2).join(" ");
+  const mountainHint = /luchon|pyrenees|aspe|lescun|cauterets|gavarnie|louron|bareges|ax-les-thermes/.test(normalizeUiText(destination)) ? "Pyrénées" : "montagne";
+
+  if (searchable.includes("hospice de france")) return "Hospice de France Pyrénées randonnée";
+  if (searchable.includes("superbagneres")) return "Luchon Superbagnères panorama Pyrénées";
+  if (/therm|spa|bien-etre|balneo|bains chaud/.test(searchable)) return `${preciseDestination} thermes spa montagne`.trim();
+  if (/parapente|vol|aerien/.test(searchable)) return `${preciseDestination} parapente ${mountainHint}`.trim();
+  if (/rando|marche|sentier|trek|refuge|lac/.test(searchable)) return `${activity.name} ${mountainHint} randonnée`.trim();
+  if (/rafting|canoe|kayak|riviere|eau vive|paddle/.test(searchable)) return `${preciseDestination} ${activity.category} aventure eau`.trim();
+  if (/ferme|producteur|fromage|degustation/.test(searchable)) return `${preciseDestination} ferme produits locaux`.trim();
+  if (/repas|diner|restaurant|gastronomie/.test(searchable)) return `${preciseDestination} cuisine locale restaurant`.trim();
+  if (/cheval|equestre/.test(searchable)) return `${preciseDestination} cheval paysage`.trim();
   return `${activity.name} ${preciseDestination}`.trim().slice(0, 120);
 }
 
