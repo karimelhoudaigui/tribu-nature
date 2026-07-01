@@ -5,17 +5,26 @@ loadDotEnv(".env.local");
 const accessToken = process.env.SUPABASE_ACCESS_TOKEN ?? "";
 const supabaseUrl = (process.env.VITE_SUPABASE_URL ?? "").replace(/\/$/, "");
 const projectRef = supabaseUrl.match(/^https:\/\/([^.]+)\.supabase\.co$/)?.[1] ?? "";
-const migrationPath = "supabase/migrations/202606300003_prepare_public_beta.sql";
+const migrationPaths = [
+  "supabase/migrations/202606300003_prepare_public_beta.sql",
+  "supabase/migrations/202607020001_add_trust_and_account_controls.sql"
+];
 
 if (!accessToken || !projectRef) {
   throw new Error("SUPABASE_ACCESS_TOKEN ou VITE_SUPABASE_URL manquant.");
 }
 
-const source = readFileSync(migrationPath, "utf8");
 const requestedSteps = new Set((process.env.BETA_STEPS ?? "").split(",").map((value) => value.trim()).filter(Boolean));
-const steps = source.split(/^-- beta-step: /m).map((part) => part.trim()).filter(Boolean).map((part) => {
-  const newline = part.indexOf("\n");
-  return { name: part.slice(0, newline).trim(), sql: part.slice(newline + 1).trim() };
+const steps = migrationPaths.flatMap((migrationPath) => {
+  const source = readFileSync(migrationPath, "utf8");
+  if (!source.includes("-- beta-step: ")) {
+    const name = migrationPath.split("/").pop()?.replace(/\.sql$/, "") ?? migrationPath;
+    return [{ name, sql: source }];
+  }
+  return source.split(/^-- beta-step: /m).map((part) => part.trim()).filter(Boolean).map((part) => {
+    const newline = part.indexOf("\n");
+    return { name: part.slice(0, newline).trim(), sql: part.slice(newline + 1).trim() };
+  });
 }).filter((step) => requestedSteps.size === 0 || requestedSteps.has(step.name));
 
 for (const [index, step] of steps.entries()) {

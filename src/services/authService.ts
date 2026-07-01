@@ -35,6 +35,8 @@ export type UserProfileRecord = {
   is_seed_profile?: boolean | null;
   last_seen_at?: string | null;
   preferred_language?: string | null;
+  account_status?: "active" | "disabled" | "deleted";
+  deleted_at?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -110,7 +112,42 @@ export async function signInWithEmail(email: string, password: string): Promise<
   }
 
   storeSession(session);
-  await upsertCurrentProfile(session);
+  try {
+    await upsertCurrentProfile(session);
+    return session;
+  } catch (error) {
+    clearStoredSession();
+    throw error;
+  }
+}
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  ensureAuthConfig();
+  const redirectTo = typeof window === "undefined" ? undefined : `${window.location.origin}${window.location.pathname}`;
+  await requestAuth<Record<string, never>>("recover", {
+    method: "POST",
+    body: JSON.stringify({ email, ...(redirectTo ? { redirect_to: redirectTo } : {}) })
+  });
+}
+
+export async function getPasswordRecoverySessionFromUrl(): Promise<AuthSession | null> {
+  if (typeof window === "undefined" || !window.location.hash) return null;
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  if (params.get("type") !== "recovery" || !params.get("access_token")) return null;
+
+  const accessToken = params.get("access_token") ?? "";
+  const response = await fetch(`${getSupabaseUrl()}/auth/v1/user`, { headers: getAuthHeaders(accessToken) });
+  if (!response.ok) throw new Error(`Lien de récupération invalide ou expiré : ${await getErrorMessage(response)}`);
+  const user = await response.json() as AuthUser;
+  const expiresIn = Number(params.get("expires_in") ?? 3600);
+  const session: AuthSession = {
+    access_token: accessToken,
+    refresh_token: params.get("refresh_token") ?? undefined,
+    expires_at: Math.floor(Date.now() / 1000) + expiresIn,
+    user
+  };
+  storeSession(session);
+  window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.search}`);
   return session;
 }
 
@@ -157,6 +194,9 @@ export async function getCurrentProfile(session: AuthSession): Promise<UserProfi
   }
 
   const rows = (await response.json()) as UserProfileRecord[];
+  if (rows[0]?.account_status && rows[0].account_status !== "active") {
+    throw new Error("Ce compte a été désactivé. Contacte le support si tu souhaites le réactiver.");
+  }
   if (rows[0]) return rows[0];
 
   return upsertCurrentProfile(session);
@@ -232,6 +272,28 @@ export async function updatePassword(password: string, accessToken: string): Pro
   }
 }
 
+export async function exportMyData(accessToken: string): Promise<unknown> {
+  ensureAuthConfig();
+  const response = await fetch(`${getSupabaseUrl()}/rest/v1/rpc/export_my_data`, {
+    method: "POST",
+    headers: { ...getRestHeaders(accessToken), "Content-Type": "application/json" },
+    body: "{}"
+  });
+  if (!response.ok) throw new Error(`Export impossible : ${await getErrorMessage(response)}`);
+  return response.json();
+}
+
+export async function deactivateMyAccount(accessToken: string): Promise<string> {
+  ensureAuthConfig();
+  const response = await fetch(`${getSupabaseUrl()}/rest/v1/rpc/deactivate_my_account`, {
+    method: "POST",
+    headers: { ...getRestHeaders(accessToken), "Content-Type": "application/json" },
+    body: "{}"
+  });
+  if (!response.ok) throw new Error(`Suppression impossible : ${await getErrorMessage(response)}`);
+  return response.json() as Promise<string>;
+}
+
 export async function touchPresence(accessToken: string): Promise<string> {
   ensureAuthConfig();
   const response = await fetch(`${getSupabaseUrl()}/rest/v1/rpc/touch_my_presence`, {
@@ -256,10 +318,10 @@ export async function upsertCurrentProfile(session: AuthSession, displayName?: s
     email: session.user.email ?? null,
     display_name: displayName?.trim() || fallbackName,
     avatar_url: session.user.user_metadata?.avatar_url ?? null,
-    verified: true,
+    verified: false,
     preferred_ambiences: ["Nature", "Découverte locale"],
-    safety_preferences: ["Profil connecté"],
-    badges: ["profil connecté"],
+    safety_preferences: [],
+    badges: [],
     is_seed_profile: false
   };
 
@@ -280,7 +342,15 @@ export async function upsertCurrentProfile(session: AuthSession, displayName?: s
   const rows = (await response.json()) as UserProfileRecord[];
   if (rows[0]) return rows[0];
 
-  const existingProfile = await getProfileById(session.user.id, session.access_token);
+  const existingResponse = await fetch(`${getSupabaseUrl()}/rest/v1/profiles?id=eq.${encodeURIComponent(session.user.id)}&select=*&limit=1`, {
+    headers: getRestHeaders(session.access_token)
+  });
+  if (!existingResponse.ok) throw new Error(`Profil introuvable : ${await getErrorMessage(existingResponse)}`);
+  const existingRows = await existingResponse.json() as UserProfileRecord[];
+  const existingProfile = existingRows[0];
+  if (existingProfile?.account_status && existingProfile.account_status !== "active") {
+    throw new Error("Ce compte a été désactivé. Contacte le support si tu souhaites le réactiver.");
+  }
   if (existingProfile) return existingProfile;
   throw new Error("Profil introuvable après la connexion.");
 }

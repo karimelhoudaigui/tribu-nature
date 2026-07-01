@@ -16,6 +16,7 @@ import {
   Euro,
   ExternalLink,
   FileText,
+  Flag,
   Heart,
   HeartHandshake,
   Home,
@@ -38,6 +39,7 @@ import {
   SlidersHorizontal,
   Sparkles,
   Trash2,
+  UserX,
   UserRound,
   Users,
   X
@@ -45,6 +47,7 @@ import {
 import { activities, destination, providers, trips as localTrips, mockLocalActivities as localActivities } from "./data";
 import {
   getCurrentProfile,
+  getPasswordRecoverySessionFromUrl,
   getProfileById,
   getProfilesByIds,
   getStoredSession,
@@ -52,21 +55,32 @@ import {
   signOut,
   signInWithEmail,
   signUpWithEmail,
+  requestPasswordReset,
   touchPresence,
   updatePassword,
   updateProfile,
+  deactivateMyAccount,
+  exportMyData,
   type AuthSession,
   type UserProfileUpdate,
   type UserProfileRecord
 } from "./services/authService";
 import { createTrip, deleteTrip, hasSupabaseCatalogConfig, loadTripCatalog, type TripCatalog } from "./services/tripCatalogService";
 import {
-  createNotification,
   deleteNotification,
   getMyNotifications,
   markNotificationAsRead,
   type NotificationRecord
 } from "./services/notificationService";
+import {
+  blockUser,
+  createUserReport,
+  getMyBlocks,
+  unblockUser,
+  type ReportReason,
+  type ReportTarget,
+  type UserBlock
+} from "./services/trustSafetyService";
 import {
   addTripToFavorites,
   getMyFavoriteTrips,
@@ -305,7 +319,7 @@ const moreFilterGroups = [
   },
   {
     title: "Sécurité et confiance",
-    options: ["Sécurité renforcée", "Profils vérifiés uniquement", "Groupe avec organisateur identifié", "Expérience encadrée par professionnel", "Niveau physique cohérent", "Plan B météo prévu"]
+    options: ["Sécurité renforcée", "Profils avec identité claire", "Groupe avec organisateur identifié", "Expérience encadrée par professionnel", "Niveau physique cohérent", "Plan B météo prévu"]
   },
   {
     title: "Organisation",
@@ -523,7 +537,7 @@ function fallbackProfileRecord(profileId: string): UserProfileRecord {
     city: null,
     bio: "Ce profil est en cours de chargement. Les informations publiques apparaîtront ici dès qu'elles seront disponibles.",
     age_range: "Membre",
-    verified: true,
+    verified: false,
     physical_level: "À préciser",
     budget_range: "À préciser",
     adventure_style: "Nature",
@@ -697,6 +711,10 @@ function App() {
   const [selectedTribeMessageMemberId, setSelectedTribeMessageMemberId] = useState<string | null>(null);
   const [tribeUnreadMessageCounts, setTribeUnreadMessageCounts] = useState<Record<string, number>>({});
   const [tripConversationSummaries, setTripConversationSummaries] = useState<TripConversationSummary[]>([]);
+  const [userBlocks, setUserBlocks] = useState<UserBlock[]>([]);
+  const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
+  const [blockTarget, setBlockTarget] = useState<{ id: string; name: string } | null>(null);
+  const [passwordRecoveryOpen, setPasswordRecoveryOpen] = useState(false);
   const [initialTripLinkHandled, setInitialTripLinkHandled] = useState(false);
   const [socialNotice, setSocialNotice] = useState("");
   const [catalogLoaded, setCatalogLoaded] = useState(!hasSupabaseCatalogConfig());
@@ -723,9 +741,11 @@ function App() {
       }
 
       try {
-        const session = await getStoredSession();
+        const recoverySession = await getPasswordRecoverySessionFromUrl();
+        const session = recoverySession ?? await getStoredSession();
         if (!mounted) return;
         setAuthSession(session);
+        setPasswordRecoveryOpen(Boolean(recoverySession));
 
         if (session) {
           const profile = await getCurrentProfile(session);
@@ -784,14 +804,15 @@ function App() {
 
   const refreshSocialData = async (session: AuthSession) => {
     try {
-      const [actions, favorites, nextNotifications, profiles, requests, invitations, tripConversations] = await Promise.all([
+      const [actions, favorites, nextNotifications, profiles, requests, invitations, tripConversations, blocks] = await Promise.all([
         getUserTripActions(session.user.id, session.access_token),
         getMyFavoriteTrips(session.user.id, session.access_token),
         getMyNotifications(session.user.id, session.access_token),
         getCompatibleProfiles(session.user.id, session.access_token),
         getMyTribeRequests(session.user.id, session.access_token),
         getMyTripInvitations(session.user.id, session.access_token),
-        getMyTripConversationSummaries(session.user.id, session.access_token)
+        getMyTripConversationSummaries(session.user.id, session.access_token),
+        getMyBlocks(session.user.id, session.access_token)
       ]);
 
       setUserTripActions((previous) => keepPreviousIfEqual(previous, actions));
@@ -801,6 +822,7 @@ function App() {
       setTribeRequests((previous) => keepPreviousIfEqual(previous, requests));
       setTripInvitations((previous) => keepPreviousIfEqual(previous, invitations));
       setTripConversationSummaries((previous) => keepPreviousIfEqual(previous, tripConversations));
+      setUserBlocks((previous) => keepPreviousIfEqual(previous, blocks));
 
       try {
         const unreadTribeMessages = await getUnreadTribeMessageCounts(session.user.id, requests.accepted, session.access_token);
@@ -824,6 +846,7 @@ function App() {
       setCurrentTravelPreferences(null);
       setTribeUnreadMessageCounts({});
       setTripConversationSummaries([]);
+      setUserBlocks([]);
       return;
     }
 
@@ -961,11 +984,13 @@ function App() {
   const acceptedTribeMemberIds = useMemo(() => new Set(
     tribeRequests.accepted.map((request) => request.requester_id === currentUser.id ? request.receiver_id : request.requester_id)
   ), [currentUser.id, tribeRequests.accepted]);
+  const blockedUserIds = useMemo(() => new Set(userBlocks.map((block) => block.blocked_id)), [userBlocks]);
+  const visibleTribeProfiles = useMemo(() => tribeProfiles.filter((profile) => !blockedUserIds.has(profile.id)), [blockedUserIds, tribeProfiles]);
   const tribeShareMembers = useMemo(
-    () => tribeProfiles
+    () => visibleTribeProfiles
       .filter((profile) => acceptedTribeMemberIds.has(profile.id))
       .map((profile) => profileRecordToUserProfile(profile)),
-    [acceptedTribeMemberIds, tribeProfiles]
+    [acceptedTribeMemberIds, visibleTribeProfiles]
   );
   const getAcceptedTribeConnection = (memberId: string) => tribeRequests.accepted.find((request) =>
     (request.requester_id === currentUser.id && request.receiver_id === memberId) ||
@@ -1170,7 +1195,50 @@ function App() {
     setCurrentTravelPreferences(null);
     setTribeUnreadMessageCounts({});
     setTripConversationSummaries([]);
+    setUserBlocks([]);
     setSocialNotice("");
+  };
+
+  const openReportDialog = (target: ReportTarget) => {
+    const session = requireAuth("Connecte-toi pour envoyer un signalement.");
+    if (!session) return;
+    setReportTarget(target);
+  };
+  const submitReport = async (reason: ReportReason, details: string) => {
+    const session = requireAuth("Connecte-toi pour envoyer un signalement.");
+    if (!session || !reportTarget) return;
+    await createUserReport(session.user.id, reportTarget, reason, details, session.access_token);
+    setReportTarget(null);
+    setSocialNotice("Signalement envoyé. Notre équipe pourra l'examiner.");
+  };
+  const requestUserBlock = (userId: string, name: string) => {
+    const session = requireAuth("Connecte-toi pour bloquer cette personne.");
+    if (!session || userId === session.user.id) return;
+    setBlockTarget({ id: userId, name });
+  };
+  const confirmUserBlock = async () => {
+    const session = requireAuth("Connecte-toi pour bloquer cette personne.");
+    if (!session || !blockTarget) return;
+    const block = await blockUser(session.user.id, blockTarget.id, session.access_token);
+    setUserBlocks((current) => [...current.filter((item) => item.blocked_id !== block.blocked_id), block]);
+    setTribeProfiles((current) => current.filter((profile) => profile.id !== block.blocked_id));
+    setBlockTarget(null);
+    setSocialNotice("Utilisateur bloqué. Il ne peut plus t'envoyer de message privé.");
+    await refreshSocialData(session);
+  };
+  const unblockUserFlow = async (blockedId: string) => {
+    const session = requireAuth("Connecte-toi pour gérer tes blocages.");
+    if (!session) return;
+    await unblockUser(session.user.id, blockedId, session.access_token);
+    setUserBlocks((current) => current.filter((item) => item.blocked_id !== blockedId));
+    setSocialNotice("Utilisateur débloqué.");
+    await refreshSocialData(session);
+  };
+  const deactivateAccountFlow = async () => {
+    if (!authSession) return;
+    await deactivateMyAccount(authSession.access_token);
+    await handleSignOut();
+    go("dashboard", { replace: true });
   };
   const requireAuth = (prompt: string) => {
     if (authSession && currentProfile) return authSession;
@@ -1241,14 +1309,6 @@ function App() {
 
     try {
       await inviteUserToFavoriteTrip(trip.id, member.id, session.user.id, session.access_token);
-      await createNotification({
-        user_id: member.id,
-        type: "trip_invitation_received",
-        title: `${currentProfile.display_name} t'a invité à rejoindre un Trip`,
-        body: `${currentProfile.display_name} t'a invité à rejoindre "${trip.title}".`,
-        related_trip_id: trip.id,
-        related_user_id: session.user.id
-      }, session.access_token);
       setSocialNotice(`Invitation envoyée à ${member.name} pour ${trip.title}.`);
       await refreshSocialData(session);
     } catch (error) {
@@ -1268,29 +1328,14 @@ function App() {
     }
 
     try {
-      const updatedInvitation = action === "accept"
-        ? await acceptTripInvitation(invitationId, session.access_token)
-        : await rejectTripInvitation(invitationId, session.access_token);
+      if (action === "accept") await acceptTripInvitation(invitationId, session.access_token);
+      else await rejectTripInvitation(invitationId, session.access_token);
 
       if (action === "accept") {
         if (getTripCardType(trip) === "catalog") {
           await expressInterestInCatalogTrip(trip.id, session.user.id, session.access_token);
         }
       }
-
-      await createNotification({
-        user_id: invitation.inviter_id,
-        type: action === "accept" ? "trip_invitation_accepted" : "trip_invitation_rejected",
-        title: action === "accept"
-          ? `${currentProfile.display_name} a accepté ton invitation`
-          : `${currentProfile.display_name} a répondu à ton invitation`,
-        body: action === "accept"
-          ? `${currentProfile.display_name} a accepté l'invitation pour "${trip.title}".`
-          : `${currentProfile.display_name} n'a pas retenu l'invitation pour "${trip.title}".`,
-        related_trip_id: trip.id,
-        related_user_id: session.user.id,
-        related_request_id: updatedInvitation.id
-      }, session.access_token);
 
       setSocialNotice(action === "accept" ? "Invitation acceptée. Tu as été ajouté à la conversation." : "Invitation refusée.");
       await refreshSocialData(session);
@@ -1306,13 +1351,6 @@ function App() {
 
     try {
       await sendTribeRequest(member.id, session.user.id, session.access_token);
-      await createNotification({
-        user_id: member.id,
-        type: "friend_request_received",
-        title: `${currentProfile.display_name} souhaite t'ajouter à sa tribu`,
-        body: "Tu peux accepter ou refuser cette demande depuis ton espace Tribu.",
-        related_user_id: session.user.id
-      }, session.access_token);
       setSocialNotice(`Demande envoyée à ${member.name}.`);
       await refreshSocialData(session);
     } catch (error) {
@@ -1325,21 +1363,9 @@ function App() {
     if (!session || !currentProfile) return;
 
     try {
-      const connection = action === "accept"
-        ? await acceptTribeRequest(connectionId, session.access_token)
-        : action === "reject"
-          ? await rejectTribeRequest(connectionId, session.access_token)
-          : await cancelTribeRequest(connectionId, session.access_token);
-
-      if (action === "accept") {
-        await createNotification({
-          user_id: connection.requester_id,
-          type: "friend_request_accepted",
-          title: `${currentProfile.display_name} a accepté ta demande`,
-          body: `${currentProfile.display_name} fait maintenant partie de ta tribu.`,
-          related_user_id: session.user.id
-        }, session.access_token);
-      }
+      if (action === "accept") await acceptTribeRequest(connectionId, session.access_token);
+      else if (action === "reject") await rejectTribeRequest(connectionId, session.access_token);
+      else await cancelTribeRequest(connectionId, session.access_token);
 
       setSocialNotice(action === "accept" ? "Demande Tribu acceptée." : action === "reject" ? "Demande Tribu refusée." : "Demande annulée.");
       await refreshSocialData(session);
@@ -1361,15 +1387,6 @@ function App() {
 
     try {
       await acceptJoinRequest(request.id, session.access_token);
-      await createNotification({
-        user_id: request.requester_id,
-        type: "join_request_accepted",
-        title: `Ta demande pour "${trip.title}" a été acceptée`,
-        body: "Tu as été ajouté à la conversation du groupe.",
-        related_trip_id: trip.id,
-        related_user_id: session.user.id,
-        related_request_id: request.id
-      }, session.access_token);
       setSocialNotice("Demande acceptée. Le membre a été ajouté au Trip et à la conversation.");
       await refreshSocialData(session);
       await loadTripMembers(trip, session);
@@ -1391,15 +1408,6 @@ function App() {
 
     try {
       await rejectJoinRequest(request.id, session.access_token);
-      await createNotification({
-        user_id: request.requester_id,
-        type: "join_request_rejected",
-        title: `Réponse pour "${trip.title}"`,
-        body: "Le créateur n'a pas retenu ta demande pour ce Trip.",
-        related_trip_id: trip.id,
-        related_user_id: session.user.id,
-        related_request_id: request.id
-      }, session.access_token);
       setSocialNotice("Demande refusée.");
       await refreshSocialData(session);
     } catch (error) {
@@ -1661,16 +1669,7 @@ function App() {
         await loadTripMembers(trip, session);
         await openTripConversation(trip, conversation.id);
       } else if (trip.creator_id) {
-        const request = await requestToJoinTrip(trip.id, session.user.id, trip.creator_id, session.access_token);
-        await createNotification({
-          user_id: trip.creator_id,
-          type: "join_request_received",
-          title: `${currentProfile.display_name} souhaite rejoindre ton Trip`,
-          body: `${currentProfile.display_name} souhaite rejoindre ton Trip "${trip.title}". Consulte son profil pour accepter ou refuser.`,
-          related_trip_id: trip.id,
-          related_user_id: session.user.id,
-          related_request_id: request.id
-        }, session.access_token);
+        await requestToJoinTrip(trip.id, session.user.id, trip.creator_id, session.access_token);
         setSocialNotice("Demande envoyée au créateur du Trip.");
         await refreshUserTripActions(session);
       } else {
@@ -1762,12 +1761,12 @@ function App() {
           />
         )}
         {page === "create-trip" && <CreateTripPage proposerName={currentUser.name} initialTrip={createTripSeed} onPublish={publishCommunityTrip} />}
-        {page === "trip" && <TripDetail trip={selectedTrip} match={selectedTripMatch} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} onShareTrip={setShareTrip} creatorProfile={getKnownProfileRecord(selectedTrip.creator_id)} onViewProfile={openProfile} currentUserId={currentProfile?.id} acceptedTribeMemberIds={acceptedTribeMemberIds} onAddFriend={sendTribeConnectionRequest} onLeaveTrip={leaveTripFlow} onDeleteTrip={deleteTripFlow} />}
-        {page === "conversation" && <ConversationPage conversation={conversation} go={go} currentUser={currentUser} accessToken={authSession?.access_token} isAuthenticated={isAuthenticated} onRequireAuth={() => openAuthModal("Connecte-toi pour écrire dans la conversation.")} onFormalizeTrip={formalizeCatalogTrip} onViewProfile={openProfile} acceptedTribeMemberIds={acceptedTribeMemberIds} onAddFriend={sendTribeConnectionRequest} onLeaveTrip={leaveTripFlow} onDeleteTrip={deleteTripFlow} onRefresh={async () => { if (authSession) await refreshSocialData(authSession); await refreshCatalog(); }} />}
+        {page === "trip" && <TripDetail trip={selectedTrip} match={selectedTripMatch} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} onShareTrip={setShareTrip} creatorProfile={getKnownProfileRecord(selectedTrip.creator_id)} onViewProfile={openProfile} currentUserId={currentProfile?.id} acceptedTribeMemberIds={acceptedTribeMemberIds} onAddFriend={sendTribeConnectionRequest} onLeaveTrip={leaveTripFlow} onDeleteTrip={deleteTripFlow} onReportTrip={(trip) => openReportDialog({ type: "trip", label: trip.title, reportedTripId: trip.id, reportedUserId: trip.creator_id })} />}
+        {page === "conversation" && <ConversationPage conversation={conversation} go={go} currentUser={currentUser} accessToken={authSession?.access_token} isAuthenticated={isAuthenticated} onRequireAuth={() => openAuthModal("Connecte-toi pour écrire dans la conversation.")} onFormalizeTrip={formalizeCatalogTrip} onViewProfile={openProfile} acceptedTribeMemberIds={acceptedTribeMemberIds} onAddFriend={sendTribeConnectionRequest} onLeaveTrip={leaveTripFlow} onDeleteTrip={deleteTripFlow} blockedUserIds={blockedUserIds} onReport={openReportDialog} onRefresh={async () => { if (authSession) await refreshSocialData(authSession); await refreshCatalog(); }} />}
         {page === "messages" && (
           <MessagesPage
             currentUser={currentUser}
-            profiles={tribeProfiles}
+            profiles={visibleTribeProfiles}
             tribeRequests={tribeRequests}
             trips={availableTrips}
             accessToken={authSession?.access_token}
@@ -1781,6 +1780,8 @@ function App() {
             onViewProfile={openProfile}
             onInviteToTrip={sendFavoriteTripInvitation}
             favoriteTrips={favoriteTrips}
+            onReport={openReportDialog}
+            onBlockUser={requestUserBlock}
           />
         )}
         {page === "communaute" && (
@@ -1788,7 +1789,7 @@ function App() {
             currentUser={currentUser}
             trips={availableTrips}
             favoriteTrips={favoriteTrips}
-            profiles={tribeProfiles}
+            profiles={visibleTribeProfiles}
             tribeRequests={tribeRequests}
             isAuthenticated={isAuthenticated}
             initialTab={communityInitialTab}
@@ -1816,11 +1817,15 @@ function App() {
             trips={availableTrips}
             userTripActions={userTripActions}
             tribeMemberCount={tribeRequests.accepted.length}
+            isBlocked={blockedUserIds.has(profilePageUser.id)}
+            onReportUser={(user) => openReportDialog({ type: "user", label: user.name, reportedUserId: user.id })}
+            onBlockUser={(user) => requestUserBlock(user.id, user.name)}
+            onUnblockUser={(user) => unblockUserFlow(user.id)}
           />
         )}
         {page === "prestataires" && <Providers />}
         {page === "securite" && <Safety />}
-        {page === "settings" && <SettingsPage profile={currentProfile} accessToken={authSession?.access_token} onRequireAuth={() => openAuthModal("Connecte-toi pour gérer ton compte.")} onProfileUpdated={(profile) => setCurrentProfile(profile)} />}
+        {page === "settings" && <SettingsPage profile={currentProfile} accessToken={authSession?.access_token} blocks={userBlocks} onRequireAuth={() => openAuthModal("Connecte-toi pour gérer ton compte.")} onProfileUpdated={(profile) => setCurrentProfile(profile)} onSignOut={handleSignOut} onUnblock={unblockUserFlow} onDeactivate={deactivateAccountFlow} />}
         {page === "cgu" && <LegalPage kind="cgu" />}
         {page === "privacy" && <LegalPage kind="privacy" />}
         {page === "about" && <AboutPage />}
@@ -1837,6 +1842,18 @@ function App() {
         </div>
       )}
       {authModalOpen && <AuthModal prompt={authPrompt} onClose={() => setAuthModalOpen(false)} onAuthenticated={handleAuthSuccess} />}
+      {passwordRecoveryOpen && authSession && <PasswordRecoveryDialog accessToken={authSession.access_token} onClose={() => setPasswordRecoveryOpen(false)} />}
+      {reportTarget && <ReportDialog target={reportTarget} onCancel={() => setReportTarget(null)} onSubmit={submitReport} />}
+      {blockTarget && (
+        <ConfirmDialog
+          title={`Bloquer ${blockTarget.name} ?`}
+          description="Cette personne ne pourra plus t'envoyer de message privé et ne sera plus proposée dans ta Tribu. Votre relation actuelle sera retirée."
+          confirmLabel="Bloquer"
+          danger
+          onCancel={() => setBlockTarget(null)}
+          onConfirm={confirmUserBlock}
+        />
+      )}
       {shareTrip && (
         <ShareTripModal
           trip={shareTrip}
@@ -2016,6 +2033,23 @@ function AuthModal({
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const sendPasswordReset = async () => {
+    if (!email.includes("@")) {
+      setFeedback("Saisis d'abord l'adresse email de ton compte.");
+      return;
+    }
+    setIsSubmitting(true);
+    setFeedback("");
+    try {
+      await requestPasswordReset(email.trim());
+      setFeedback("Email envoyé. Ouvre le lien reçu pour choisir un nouveau mot de passe.");
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Impossible d'envoyer l'email de récupération.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const submit = async () => {
     if (isSubmitting) return;
     setFeedback("");
@@ -2118,8 +2152,73 @@ function AuthModal({
         <button className="btn-primary mt-5 w-full disabled:cursor-wait disabled:opacity-70" disabled={isSubmitting} onClick={submit}>
           {isSubmitting ? mode === "signup" ? "Création..." : "Connexion..." : mode === "signup" ? signupStep === 1 ? "Continuer" : "Créer mon profil" : "Me connecter"}
         </button>
+        {mode === "signin" && <button className="mt-3 w-full text-sm font-bold text-forest-700" disabled={isSubmitting} onClick={sendPasswordReset}>Mot de passe oublié ?</button>}
         {mode === "signup" && signupStep === 2 && <button className="mt-3 w-full text-sm font-bold text-forest-600" onClick={() => setSignupStep(1)}>Retour aux identifiants</button>}
       </div>
+    </div>
+  );
+}
+
+function PasswordRecoveryDialog({ accessToken, onClose }: { accessToken: string; onClose: () => void }) {
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    if (password.length < 8 || password !== confirmation) {
+      setFeedback("Utilise au moins 8 caractères et saisis deux fois le même mot de passe.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updatePassword(password, accessToken);
+      setFeedback("Mot de passe modifié. Tu peux continuer dans l'application.");
+      window.setTimeout(onClose, 900);
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Mot de passe impossible à modifier.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[95] grid place-items-center bg-forest-900/65 p-4 backdrop-blur-sm">
+      <section className="w-full max-w-md rounded-[1.5rem] bg-white p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="recovery-title">
+        <p className="pill">Sécurité du compte</p>
+        <h2 className="mt-3 text-2xl font-semibold" id="recovery-title">Choisis un nouveau mot de passe</h2>
+        <div className="mt-5 grid gap-3">
+          <input className="rounded-lg border border-forest-100 bg-forest-50 p-3" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Nouveau mot de passe" autoFocus />
+          <input className="rounded-lg border border-forest-100 bg-forest-50 p-3" type="password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder="Confirmer le mot de passe" />
+        </div>
+        {feedback && <p className="mt-4 rounded-lg bg-forest-50 p-3 text-sm font-semibold">{feedback}</p>}
+        <div className="mt-5 flex gap-3"><button className="btn-secondary flex-1" onClick={onClose}>Plus tard</button><button className="btn-primary flex-1" disabled={saving} onClick={save}>{saving ? "Enregistrement..." : "Enregistrer"}</button></div>
+      </section>
+    </div>
+  );
+}
+
+function ReportDialog({ target, onCancel, onSubmit }: { target: ReportTarget; onCancel: () => void; onSubmit: (reason: ReportReason, details: string) => void | Promise<void> }) {
+  const [reason, setReason] = useState<ReportReason>("harassment");
+  const [details, setDetails] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const reasons: Array<[ReportReason, string]> = [
+    ["harassment", "Harcèlement"], ["spam", "Spam"], ["fraud", "Fraude ou faux profil"],
+    ["unsafe", "Comportement dangereux"], ["hate", "Haine ou discrimination"],
+    ["inappropriate", "Contenu inapproprié"], ["other", "Autre"]
+  ];
+
+  return (
+    <div className="fixed inset-0 z-[95] grid place-items-center bg-forest-900/65 p-4 backdrop-blur-sm">
+      <section className="w-full max-w-lg rounded-[1.5rem] bg-white p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="report-title">
+        <div className="flex items-start justify-between gap-4"><div><p className="pill">Signalement confidentiel</p><h2 className="mt-3 text-2xl font-semibold" id="report-title">Signaler {target.label}</h2></div><button className="rounded-full bg-forest-50 p-2" onClick={onCancel} aria-label="Fermer"><X size={18} /></button></div>
+        <label className="mt-5 grid gap-2 text-sm font-bold">Motif<select className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal" value={reason} onChange={(event) => setReason(event.target.value as ReportReason)}>{reasons.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
+        <label className="mt-4 grid gap-2 text-sm font-bold">Précisions facultatives<textarea className="min-h-28 rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal" maxLength={2000} value={details} onChange={(event) => setDetails(event.target.value)} placeholder="Décris les faits sans partager de données sensibles." /></label>
+        <p className="mt-3 text-xs leading-5 text-forest-600">Le signalement n'est pas visible par la personne concernée.</p>
+        {feedback && <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{feedback}</p>}
+        <div className="mt-5 flex gap-3"><button className="btn-secondary flex-1" onClick={onCancel}>Annuler</button><button className="btn-primary flex-1" disabled={submitting} onClick={async () => { setSubmitting(true); setFeedback(""); try { await onSubmit(reason, details); } catch (error) { setFeedback(error instanceof Error ? error.message : "Signalement impossible."); setSubmitting(false); } }}>{submitting ? "Envoi..." : "Envoyer"}</button></div>
+      </section>
     </div>
   );
 }
@@ -2417,7 +2516,7 @@ function Landing({
             <p className="mt-4 leading-8 text-forest-700">Tribu Nature n'est pas une app de dating ni une agence qui vend un package fermé. C'est un espace pour composer une aventure avec des personnes compatibles et des prestataires locaux fiables.</p>
           </div>
           <div className="grid gap-3">
-            {["Profils vérifiés", "Avis et badges", "Groupes limités", "Activités encadrées", "Charte de comportement", "Signalement possible"].map((item) => (
+            {["Profils publics", "Signalement et blocage", "Groupes limités", "Activités encadrées", "Règles de comportement", "Demandes contrôlées"].map((item) => (
               <div className="flex items-center gap-3 rounded-lg bg-forest-50 p-4" key={item}>
                 <ShieldCheck className="text-forest-700" />
                 <span className="font-medium">{item}</span>
@@ -3164,7 +3263,7 @@ function inferSafetyNeeds(answers: Record<string, string | string[]>) {
       filter.toLowerCase().includes(keyword.toLowerCase())
     )
   );
-  return safetyFilters.length ? safetyFilters : ["Profils vérifiés"];
+  return safetyFilters.length ? safetyFilters : ["Profils publics"];
 }
 
 function inferDepartureCity(answers: Record<string, string | string[]>) {
@@ -3402,7 +3501,7 @@ function CreateTripPage({
           <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
             <h2 className="text-2xl font-semibold">Préférences du groupe</h2>
             <div className="mt-4 flex flex-wrap gap-2">
-              {["Profils vérifiés uniquement", "Activité encadrée si nécessaire", "Niveau physique clairement indiqué", "Groupe calme et respectueux", "Pas d'alcool si souhaité", "Pauses personnelles respectées", "Repas halal souhaité", "Repas végétarien souhaité"].map((preference) => (
+              {["Profils avec identité claire", "Activité encadrée si nécessaire", "Niveau physique clairement indiqué", "Groupe calme et respectueux", "Pas d'alcool si souhaité", "Pauses personnelles respectées", "Repas halal souhaité", "Repas végétarien souhaité"].map((preference) => (
                 <button className={`rounded-full px-3 py-2 text-sm font-semibold transition ${groupPreferences.includes(preference) ? "bg-forest-800 text-white" : "bg-forest-50 text-forest-800 hover:bg-forest-100"}`} key={preference} onClick={() => toggleValue(preference, groupPreferences, setGroupPreferences)}>
                   {preference}
                 </button>
@@ -4347,7 +4446,7 @@ function TripGrid({
             <div className="mt-4 flex flex-wrap gap-2 text-sm font-semibold text-forest-700">
               <span>{getTripDurationLabel(trip)}</span>
               <span className="text-forest-300">•</span>
-              <span>Profils vérifiés</span>
+              <span>{creatorUser?.verified ? "Créateur vérifié" : "Profil public"}</span>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               {trip.ambience_tags.slice(0, 2).map((tag) => <span className="pill text-xs" key={tag}>{tag}</span>)}
@@ -4468,7 +4567,8 @@ function TripDetail({
   acceptedTribeMemberIds,
   onAddFriend,
   onLeaveTrip,
-  onDeleteTrip
+  onDeleteTrip,
+  onReportTrip
 }: {
   trip: Trip;
   match: TripMatchResult;
@@ -4486,6 +4586,7 @@ function TripDetail({
   onAddFriend: (member: UserProfile) => void | Promise<void>;
   onLeaveTrip: (trip: Trip) => void | Promise<void>;
   onDeleteTrip: (trip: Trip) => void | Promise<void>;
+  onReportTrip: (trip: Trip) => void;
 }) {
   const tripActivities = getTripActivities(trip, catalogActivities);
   const actionState = getTripActionState(trip, userTripActions);
@@ -4513,6 +4614,10 @@ function TripDetail({
               <button className="inline-flex items-center gap-2 rounded-full bg-white/18 px-5 py-3 font-semibold text-white backdrop-blur transition hover:bg-white/25" onClick={() => onShareTrip(trip)}>
                 <Share2 size={18} />
                 Partager
+              </button>
+              <button className="inline-flex items-center gap-2 rounded-full bg-white/18 px-5 py-3 font-semibold text-white backdrop-blur transition hover:bg-white/25" onClick={() => onReportTrip(trip)}>
+                <Flag size={17} />
+                Signaler
               </button>
             </div>
           </div>
@@ -4898,6 +5003,8 @@ function ConversationPage({
   onAddFriend,
   onLeaveTrip,
   onDeleteTrip,
+  blockedUserIds,
+  onReport,
   onRefresh
 }: {
   conversation: Conversation | null;
@@ -4912,6 +5019,8 @@ function ConversationPage({
   onAddFriend: (member: UserProfile) => void | Promise<void>;
   onLeaveTrip: (trip: Trip) => void | Promise<void>;
   onDeleteTrip: (trip: Trip) => void | Promise<void>;
+  blockedUserIds: Set<string>;
+  onReport: (target: ReportTarget) => void;
   onRefresh: () => void | Promise<void>;
 }) {
   const [draft, setDraft] = useState("");
@@ -4930,8 +5039,10 @@ function ConversationPage({
   const messageScrollRef = useRef<HTMLDivElement | null>(null);
   const displayMessages = useMemo(() => {
     const systemMessages = conversation?.messages?.filter((message) => message.system) ?? [];
-    return [...systemMessages, ...[...remoteMessages].sort((a, b) => new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime())];
-  }, [conversation?.messages, remoteMessages]);
+    return [...systemMessages, ...[...remoteMessages]
+      .filter((message) => !message.authorId || !blockedUserIds.has(message.authorId))
+      .sort((a, b) => new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime())];
+  }, [blockedUserIds, conversation?.messages, remoteMessages]);
 
   useEffect(() => {
     setParticipants(conversation?.participants ?? []);
@@ -5123,6 +5234,9 @@ function ConversationPage({
               </button>
               <p className="mt-2 text-center text-xs font-semibold text-forest-600">{confirmations.length}/{participants.length} confirmations</p>
               <button className="btn-secondary mt-5 w-full" onClick={() => go("trip")}>Retour au Trip</button>
+              <button className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-forest-200 px-4 py-2.5 text-sm font-bold text-forest-700" onClick={() => onReport({ type: "conversation", label: conversation.trip.title, reportedConversationId: conversation.id, reportedTripId: conversation.trip.id })}>
+                <Flag size={16} /> Signaler la conversation
+              </button>
               <button className="mt-3 w-full rounded-full border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700" onClick={() => setTripAction(conversation.trip.creator_id === currentUser.id ? "delete" : "leave")}>
                 {conversation.trip.creator_id === currentUser.id ? "Supprimer le Trip" : "Quitter le Trip"}
               </button>
@@ -5152,7 +5266,7 @@ function ConversationPage({
           <div className="border-b border-forest-100 bg-white p-5">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-forest-700">Chat de groupe modéré</p>
+                <p className="text-sm font-semibold text-forest-700">Chat avec outils de signalement</p>
                 <h2 className="text-2xl font-semibold">Préparer l'aventure ensemble</h2>
               </div>
               <span className="pill">{participants.length} membre{participants.length > 1 ? "s" : ""}</span>
@@ -5168,7 +5282,14 @@ function ConversationPage({
               >
                 <div className="mb-1 flex items-center justify-between gap-4 text-xs font-semibold opacity-80">
                   <span>{message.author}</span>
-                  <span>{message.time}</span>
+                  <span className="flex items-center gap-2">
+                    <span>{message.time}</span>
+                    {!message.system && message.authorId && message.authorId !== currentUser.id && (
+                      <button className="rounded-full p-1 hover:bg-forest-50" onClick={(event) => { event.stopPropagation(); onReport({ type: "message", label: `Message de ${message.author}`, reportedMessageId: message.id, reportedUserId: message.authorId, reportedConversationId: conversation.id }); }} aria-label="Signaler ce message">
+                        <Flag size={13} />
+                      </button>
+                    )}
+                  </span>
                 </div>
                 {editingMessageId === message.id ? (
                   <div className="mt-2 grid gap-2" onClick={(event) => event.stopPropagation()}>
@@ -5263,7 +5384,9 @@ function MessagesPage({
   onConversationRead,
   onOpenTripConversation,
   onViewProfile,
-  onInviteToTrip
+  onInviteToTrip,
+  onReport,
+  onBlockUser
 }: {
   currentUser: UserProfile;
   profiles: UserProfileRecord[];
@@ -5280,6 +5403,8 @@ function MessagesPage({
   onOpenTripConversation: (trip: Trip, conversationId: string) => void | Promise<void>;
   onViewProfile: (profileId: string) => void;
   onInviteToTrip: (trip: Trip, member: UserProfile) => void | Promise<void>;
+  onReport: (target: ReportTarget) => void;
+  onBlockUser: (userId: string, name: string) => void;
 }) {
   const [activeMemberId, setActiveMemberId] = useState<string | null>(initialMemberId);
   const [inviteTarget, setInviteTarget] = useState<CompatibleTribeProfile | null>(null);
@@ -5343,6 +5468,8 @@ function MessagesPage({
           onViewProfile={onViewProfile}
           onInvite={setInviteTarget}
           onRequireAuth={onRequireAuth}
+          onReport={onReport}
+          onBlockUser={onBlockUser}
         />
       ) : (
         <EmptyState title="Aucune conversation" text="Ajoute d'abord une personne depuis Tribu. La conversation apparaîtra ici après acceptation." />
@@ -5611,7 +5738,9 @@ function TribeInbox({
   onConversationRead,
   onViewProfile,
   onInvite,
-  onRequireAuth
+  onRequireAuth,
+  onReport,
+  onBlockUser
 }: {
   people: CompatibleTribeProfile[];
   selectedMember: CompatibleTribeProfile | null;
@@ -5625,6 +5754,8 @@ function TribeInbox({
   onViewProfile: (profileId: string) => void;
   onInvite: (member: CompatibleTribeProfile) => void;
   onRequireAuth: () => void;
+  onReport: (target: ReportTarget) => void;
+  onBlockUser: (userId: string, name: string) => void;
 }) {
   return (
     <section className="mt-6 grid gap-4 lg:mt-8 lg:grid-cols-[0.86fr_1.14fr] lg:gap-6">
@@ -5685,6 +5816,8 @@ function TribeInbox({
         onViewProfile={onViewProfile}
         onInvite={onInvite}
         onRequireAuth={onRequireAuth}
+        onReport={onReport}
+        onBlockUser={onBlockUser}
       />
     </section>
   );
@@ -5698,7 +5831,9 @@ function TribeDirectConversation({
   onConversationRead,
   onViewProfile,
   onInvite,
-  onRequireAuth
+  onRequireAuth,
+  onReport,
+  onBlockUser
 }: {
   member: CompatibleTribeProfile | null;
   connection?: TribeConnection;
@@ -5708,6 +5843,8 @@ function TribeDirectConversation({
   onViewProfile: (profileId: string) => void;
   onInvite: (member: CompatibleTribeProfile) => void;
   onRequireAuth: () => void;
+  onReport: (target: ReportTarget) => void;
+  onBlockUser: (userId: string, name: string) => void;
 }) {
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState<TribeMessage[]>([]);
@@ -5847,6 +5984,8 @@ function TribeDirectConversation({
           <div className="flex flex-wrap gap-2">
             <button className="btn-secondary py-2 text-sm" onClick={() => onViewProfile(member.id)}>Profil</button>
             <button className="btn-secondary py-2 text-sm" onClick={() => onInvite(member)}>Inviter</button>
+            <button className="rounded-full border border-forest-200 p-2 text-forest-700" onClick={() => onReport({ type: "user", label: member.name, reportedUserId: member.id })} aria-label={`Signaler ${member.name}`}><Flag size={16} /></button>
+            <button className="rounded-full border border-red-200 p-2 text-red-700" onClick={() => onBlockUser(member.id, member.name)} aria-label={`Bloquer ${member.name}`}><UserX size={16} /></button>
           </div>
         </div>
         {notice && <p className="mt-3 rounded-lg bg-sun/15 px-3 py-2 text-sm font-semibold text-forest-800">{notice}</p>}
@@ -5868,7 +6007,10 @@ function TribeDirectConversation({
             <div className={`max-w-[86%] rounded-2xl p-3 ${mine ? "ml-auto cursor-pointer bg-forest-800 text-white" : "bg-white"}`} key={message.id} onClick={() => mine && setSelectedMessageId((current) => current === message.id ? null : message.id)}>
               <div className="mb-1 flex justify-between gap-3 text-xs font-semibold opacity-75">
                 <span>{mine ? "Toi" : member.name}</span>
-                <span>{formatConversationTime(message.created_at)}</span>
+                <span className="flex items-center gap-2">
+                  <span>{formatConversationTime(message.created_at)}</span>
+                  {!mine && <button className="rounded-full p-1 hover:bg-forest-50" onClick={(event) => { event.stopPropagation(); onReport({ type: "message", label: `Message de ${member.name}`, reportedMessageId: message.id, reportedUserId: member.id }); }} aria-label="Signaler ce message"><Flag size={13} /></button>}
+                </span>
               </div>
               {editingMessageId === message.id ? (
                 <div className="grid gap-2" onClick={(event) => event.stopPropagation()}>
@@ -6516,7 +6658,11 @@ function Profile({
   onOpenTrip,
   trips: availableTrips,
   userTripActions,
-  tribeMemberCount
+  tribeMemberCount,
+  isBlocked,
+  onReportUser,
+  onBlockUser,
+  onUnblockUser
 }: {
   profileRecord: UserProfileRecord | null;
   profileUser: UserProfile;
@@ -6533,6 +6679,10 @@ function Profile({
   trips: Trip[];
   userTripActions: UserTripActions | null;
   tribeMemberCount: number;
+  isBlocked: boolean;
+  onReportUser: (user: UserProfile) => void;
+  onBlockUser: (user: UserProfile) => void;
+  onUnblockUser: (user: UserProfile) => void | Promise<void>;
 }) {
   if (!isAuthenticated || !currentProfile) {
     return (
@@ -6578,7 +6728,11 @@ function Profile({
           </p>
         </div>
         {!isOwnProfile && (
-          <button className="btn-secondary" onClick={onShowOwnProfile}>Revenir à mon profil</button>
+          <div className="flex flex-wrap gap-2">
+            <button className="btn-secondary" onClick={onShowOwnProfile}>Revenir à mon profil</button>
+            <button className="inline-flex items-center gap-2 rounded-full border border-forest-200 px-4 py-2.5 text-sm font-bold text-forest-700" onClick={() => onReportUser(profileUser)}><Flag size={16} />Signaler</button>
+            <button className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-bold ${isBlocked ? "border-forest-200 text-forest-700" : "border-red-200 text-red-700"}`} onClick={() => isBlocked ? onUnblockUser(profileUser) : onBlockUser(profileUser)}><UserX size={16} />{isBlocked ? "Débloquer" : "Bloquer"}</button>
+          </div>
         )}
       </div>
 
@@ -7119,15 +7273,15 @@ function Safety() {
       </div>
       <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {[
-          "Les profils peuvent être vérifiés",
+          "Les badges vérifiés sont réservés aux profils réellement contrôlés",
           "Les groupes sont limités",
           "Les activités à risque doivent être encadrées",
-          "Les utilisateurs peuvent signaler un comportement",
+          "Les utilisateurs peuvent signaler et bloquer un comportement",
           "Chaque Trip peut avoir un référent",
           "Le niveau physique est indiqué clairement",
           "Des groupes plus rassurants peuvent être choisis",
           "Des groupes femmes-only peuvent exister",
-          "Chat de groupe modéré et charte comportementale"
+          "Signalements de chat transmis à la modération"
         ].map((item) => (
           <div className="card p-5" key={item}>
             <ShieldCheck className="mb-4 text-forest-700" />
@@ -7139,12 +7293,14 @@ function Safety() {
   );
 }
 
-function SettingsPage({ profile, accessToken, onRequireAuth, onProfileUpdated }: { profile: UserProfileRecord | null; accessToken?: string; onRequireAuth: () => void; onProfileUpdated: (profile: UserProfileRecord) => void }) {
+function SettingsPage({ profile, accessToken, blocks, onRequireAuth, onProfileUpdated, onSignOut, onUnblock, onDeactivate }: { profile: UserProfileRecord | null; accessToken?: string; blocks: UserBlock[]; onRequireAuth: () => void; onProfileUpdated: (profile: UserProfileRecord) => void; onSignOut: () => void | Promise<void>; onUnblock: (blockedId: string) => void | Promise<void>; onDeactivate: () => void | Promise<void> }) {
   const [language, setLanguage] = useState(profile?.preferred_language ?? "fr");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [feedback, setFeedback] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   if (!profile || !accessToken) {
     return <section className="container-page py-10"><EmptyState title="Connecte-toi pour ouvrir les paramètres" text="La langue et la sécurité du compte sont liées à ton profil." /><div className="mt-5 text-center"><button className="btn-primary" onClick={onRequireAuth}>Se connecter</button></div></section>;
@@ -7182,13 +7338,39 @@ function SettingsPage({ profile, accessToken, onRequireAuth, onProfileUpdated }:
     }
   };
 
+  const downloadData = async () => {
+    setSaving(true);
+    setFeedback("");
+    try {
+      const data = await exportMyData(accessToken);
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `tribu-nature-export-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      setFeedback("Export préparé.");
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Export impossible.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <section className="container-page py-10">
       <p className="pill">Paramètres</p><h1 className="mt-3 text-4xl font-semibold">Mon compte</h1>
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <Panel title="Langue"><label className="grid gap-2 text-sm font-bold">Langue préférée<select className="rounded-lg border border-forest-100 bg-forest-50 p-3" value={language} onChange={(event) => setLanguage(event.target.value)}><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="ar">العربية</option></select></label><button className="btn-primary mt-4" disabled={saving} onClick={saveLanguage}><Languages className="mr-2 inline" size={17} />Enregistrer</button></Panel>
         <Panel title="Changer de mot de passe"><div className="grid gap-3"><input className="rounded-lg border border-forest-100 bg-forest-50 p-3" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Nouveau mot de passe" /><input className="rounded-lg border border-forest-100 bg-forest-50 p-3" type="password" value={passwordConfirmation} onChange={(event) => setPasswordConfirmation(event.target.value)} placeholder="Confirmer le mot de passe" /><button className="btn-primary" disabled={saving} onClick={changePassword}>Modifier le mot de passe</button></div></Panel>
+        <Panel title="Données et session"><div className="grid gap-3"><button className="btn-secondary" disabled={saving} onClick={downloadData}>Exporter mes données</button><button className="btn-secondary inline-flex items-center justify-center gap-2" onClick={onSignOut}><LogOut size={17} />Déconnexion</button></div></Panel>
+        <Panel title="Utilisateurs bloqués">{blocks.length > 0 ? <div className="grid gap-2">{blocks.map((block, index) => <div className="flex items-center justify-between gap-3 rounded-lg bg-forest-50 p-3" key={block.id}><span className="text-sm font-semibold">Utilisateur bloqué {index + 1}</span><button className="rounded-full bg-white px-3 py-2 text-xs font-bold" onClick={() => onUnblock(block.blocked_id)}>Débloquer</button></div>)}</div> : <p className="text-sm text-forest-700">Aucun utilisateur bloqué.</p>}</Panel>
       </div>
+      <section className="mt-6 rounded-[1.5rem] border border-red-200 bg-white p-5 shadow-sm">
+        <h2 className="text-xl font-semibold text-red-800">Supprimer mon compte</h2>
+        <p className="mt-2 text-sm leading-6 text-forest-700">Ton profil sera désactivé et anonymisé, tes Trips publics seront fermés et tu quitteras les conversations. Cette action nécessite une confirmation.</p>
+        {!showDeleteConfirmation ? <button className="mt-4 rounded-full border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700" onClick={() => setShowDeleteConfirmation(true)}>Commencer la suppression</button> : <div className="mt-4 grid max-w-lg gap-3"><label className="grid gap-2 text-sm font-bold">Écris SUPPRIMER pour confirmer<input className="rounded-lg border border-red-200 bg-red-50 p-3 font-normal" value={deleteConfirmation} onChange={(event) => setDeleteConfirmation(event.target.value)} /></label><div className="flex gap-2"><button className="btn-secondary" onClick={() => { setShowDeleteConfirmation(false); setDeleteConfirmation(""); }}>Annuler</button><button className="rounded-full bg-red-700 px-5 py-3 font-bold text-white disabled:opacity-40" disabled={deleteConfirmation !== "SUPPRIMER" || saving} onClick={async () => { setSaving(true); setFeedback(""); try { await onDeactivate(); } catch (error) { setFeedback(error instanceof Error ? error.message : "Suppression impossible."); setSaving(false); } }}>Désactiver et anonymiser</button></div></div>}
+      </section>
       {feedback && <p className="mt-5 rounded-xl bg-white p-4 font-semibold text-forest-700">{feedback}</p>}
     </section>
   );

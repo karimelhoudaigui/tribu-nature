@@ -7,8 +7,10 @@ export type NotificationType =
   | "trip_invitation_rejected"
   | "friend_request_received"
   | "friend_request_accepted"
+  | "friend_request_rejected"
   | "conversation_new_member"
-  | "trip_message_received";
+  | "trip_message_received"
+  | "private_message_received";
 
 export type NotificationRecord = {
   id: string;
@@ -23,35 +25,8 @@ export type NotificationRecord = {
   created_at: string;
 };
 
-export type NotificationPayload = {
-  user_id: string;
-  type: NotificationType;
-  title: string;
-  body?: string;
-  related_trip_id?: string;
-  related_user_id?: string;
-  related_request_id?: string;
-};
-
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export async function createNotification(payload: NotificationPayload, accessToken: string): Promise<void> {
-  await requestRest<void>("notifications", {
-    method: "POST",
-    accessToken,
-    prefer: "return=minimal",
-    body: {
-      user_id: payload.user_id,
-      type: payload.type,
-      title: payload.title,
-      body: payload.body ?? null,
-      related_trip_id: payload.related_trip_id ?? null,
-      related_user_id: payload.related_user_id ?? null,
-      related_request_id: payload.related_request_id ?? null
-    }
-  });
-}
 
 export async function getMyNotifications(userId: string, accessToken: string): Promise<NotificationRecord[]> {
   return requestRest<NotificationRecord[]>(

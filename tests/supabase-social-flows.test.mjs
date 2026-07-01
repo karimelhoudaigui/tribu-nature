@@ -30,7 +30,7 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
     const requester = await signUpTestUser(runId, "requester", "Karim Test");
     cleanup.userIds.push(owner.user.id, requester.user.id);
 
-    await upsertProfile(owner, {
+    const ownerProfile = await upsertProfile(owner, {
       display_name: "Samy Test",
       city: "Bordeaux",
       bio: "Compte automatisé pour stabiliser le parcours social.",
@@ -42,6 +42,7 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
       safety_preferences: ["Profil connecté", "Petit groupe"],
       badges: ["test", "profil connecté"]
     });
+    assert.equal(ownerProfile.verified, false, "Un utilisateur ne doit pas pouvoir s'auto-attribuer le badge vérifié.");
     await upsertProfile(requester, {
       display_name: "Karim Test",
       city: "Paris",
@@ -144,12 +145,21 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
     assert.equal(cancelledRequest[0].status, "cancelled");
 
     const joinRequest = await requestToJoinTrip(userTripId, requester.user.id, owner.user.id, requester.access_token);
-    await createNotification(owner.user.id, requester.user.id, userTripId, joinRequest.id, requester.access_token);
-
     const ownerNotifications = await rest(`notifications?user_id=eq.${encodeURIComponent(owner.user.id)}&related_request_id=eq.${encodeURIComponent(joinRequest.id)}&select=*`, {
       token: owner.access_token
     });
     assert.equal(ownerNotifications.length, 1);
+
+    const forgedNotification = await rawRest("notifications", {
+      method: "POST",
+      token: requester.access_token,
+      body: {
+        user_id: owner.user.id,
+        type: "friend_request_received",
+        title: "Notification falsifiée"
+      }
+    });
+    assert.equal(forgedNotification.ok, false, "Un client authentifié ne doit jamais pouvoir fabriquer une notification.");
 
     const acceptedRequest = await rest("rpc/accept_trip_join_request", {
       method: "POST",
@@ -264,6 +274,11 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
     });
     assert.ok(requesterPrivateMessages.some((message) => message.id === privateMessage[0].id));
 
+    const privateMessageNotifications = await rest(`notifications?user_id=eq.${encodeURIComponent(requester.user.id)}&type=eq.private_message_received&related_user_id=eq.${encodeURIComponent(owner.user.id)}&select=*`, {
+      token: requester.access_token
+    });
+    assert.ok(privateMessageNotifications.length > 0, "Un message privé doit créer une notification par trigger.");
+
     const readReceipt = await rest("tribe_message_reads?on_conflict=connection_id,user_id&select=*", {
       method: "POST",
       token: requester.access_token,
@@ -276,6 +291,55 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
     });
     assert.equal(readReceipt[0].connection_id, tribeConnection[0].id);
     assert.equal(readReceipt[0].user_id, requester.user.id);
+
+    const report = await rest("user_reports?select=*", {
+      method: "POST",
+      token: owner.access_token,
+      prefer: "return=representation",
+      body: {
+        reporter_id: owner.user.id,
+        target_type: "user",
+        reason: "unsafe",
+        details: "Signalement automatisé de sécurité.",
+        reported_user_id: requester.user.id,
+        status: "pending"
+      }
+    });
+    assert.equal(report[0].reporter_id, owner.user.id);
+    const reportsVisibleToOtherUser = await rest(`user_reports?id=eq.${encodeURIComponent(report[0].id)}&select=*`, { token: requester.access_token });
+    assert.equal(reportsVisibleToOtherUser.length, 0, "Un utilisateur ne doit pas voir les signalements d'un autre.");
+
+    const block = await rest("user_blocks?select=*", {
+      method: "POST",
+      token: owner.access_token,
+      prefer: "return=representation",
+      body: { blocker_id: owner.user.id, blocked_id: requester.user.id }
+    });
+    assert.equal(block[0].blocker_id, owner.user.id);
+    const blockedPublicProfile = await rest(`public_profiles?id=eq.${encodeURIComponent(requester.user.id)}&select=*`, { token: owner.access_token });
+    assert.equal(blockedPublicProfile.length, 0, "Un profil bloqué ne doit plus être proposé au bloqueur.");
+    const blockedMessageAttempt = await rawRest("tribe_messages", {
+      method: "POST",
+      token: requester.access_token,
+      body: { connection_id: tribeConnection[0].id, sender_id: requester.user.id, body: "Ce message doit être refusé." }
+    });
+    assert.equal(blockedMessageAttempt.ok, false, "Un utilisateur bloqué ne doit plus pouvoir envoyer de message privé.");
+    const cancelledConnection = await rest(`tribe_connections?id=eq.${encodeURIComponent(tribeConnection[0].id)}&select=status`, { token: owner.access_token });
+    assert.equal(cancelledConnection[0].status, "cancelled");
+
+    const exportedData = await rest("rpc/export_my_data", { method: "POST", token: owner.access_token, body: {} });
+    assert.equal(exportedData.profile.id, owner.user.id);
+    assert.ok(Array.isArray(exportedData.reports));
+
+    const deletedUser = await signUpTestUser(runId, "deleted", "Compte supprimé Test");
+    cleanup.userIds.push(deletedUser.user.id);
+    await upsertProfile(deletedUser, { display_name: "Compte supprimé Test", city: "Nantes" });
+    await rest("rpc/deactivate_my_account", { method: "POST", token: deletedUser.access_token, body: {} });
+    const deactivatedPrivateProfile = await rest(`profiles?id=eq.${encodeURIComponent(deletedUser.user.id)}&select=account_status,display_name,email`, { token: deletedUser.access_token });
+    assert.equal(deactivatedPrivateProfile[0].account_status, "deleted");
+    assert.equal(deactivatedPrivateProfile[0].email, null);
+    const deactivatedPublicProfile = await rest(`public_profiles?id=eq.${encodeURIComponent(deletedUser.user.id)}&select=*`, { token: owner.access_token });
+    assert.equal(deactivatedPublicProfile.length, 0);
   } finally {
     await cleanupTestData(cleanup);
   }
@@ -480,23 +544,6 @@ async function requestToJoinTrip(tripId, requesterId, creatorId, token) {
   return rows[0];
 }
 
-async function createNotification(userId, relatedUserId, tripId, requestId, token) {
-  await rest("notifications", {
-    method: "POST",
-    token,
-    prefer: "return=minimal",
-    body: {
-      user_id: userId,
-      type: "join_request_received",
-      title: "Demande test reçue",
-      body: "Un membre test souhaite rejoindre ton Trip.",
-      related_trip_id: tripId,
-      related_user_id: relatedUserId,
-      related_request_id: requestId
-    }
-  });
-}
-
 async function ensureTripConversation(tripId, conversationType, token) {
   const id = `${conversationType}-${tripId}`;
   const rows = await rest("conversations?on_conflict=id&select=*", {
@@ -561,6 +608,19 @@ async function rest(path, { method = "GET", token, prefer, body } = {}) {
   const text = await response.text();
   if (!text) return undefined;
   return JSON.parse(text);
+}
+
+async function rawRest(path, { method = "GET", token, prefer, body } = {}) {
+  return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    method,
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${token ?? SUPABASE_ANON_KEY}`,
+      ...(prefer ? { Prefer: prefer } : {}),
+      ...(body === undefined ? {} : { "Content-Type": "application/json" })
+    },
+    body: body === undefined ? undefined : JSON.stringify(body)
+  });
 }
 
 async function uploadStorageObject(bucket, path, token) {
@@ -654,6 +714,8 @@ async function cleanupTestData(cleanup) {
   if (userIds.length) {
     const ids = userIds.map((id) => `'${id}'`).join(",");
     statements.push(`delete from public.notifications where user_id in (${ids}) or related_user_id in (${ids});`);
+    statements.push(`delete from public.user_reports where reporter_id in (${ids}) or reported_user_id in (${ids});`);
+    statements.push(`delete from public.user_blocks where blocker_id in (${ids}) or blocked_id in (${ids});`);
     statements.push(`delete from public.trip_interests where user_id in (${ids});`);
     statements.push(`delete from public.trip_join_requests where requester_id in (${ids}) or creator_id in (${ids});`);
     statements.push(`delete from public.trip_participants where user_id in (${ids});`);
