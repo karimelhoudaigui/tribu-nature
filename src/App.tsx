@@ -7218,7 +7218,22 @@ function LegalPage({ kind }: { kind: "cgu" | "privacy" }) {
 }
 
 function AboutPage() {
-  return <section className="container-page py-10"><div className="mx-auto max-w-4xl"><p className="pill">À propos</p><h1 className="mt-4 text-4xl font-semibold">Faire passer une envie de voyage du « peut-être » au « on y va ».</h1><p className="mt-5 text-lg leading-8 text-forest-700">Tribu Nature est née d'une idée simple : beaucoup de personnes veulent partir, mais pas forcément seules, et ne trouvent ni le bon groupe ni le bon cadre pour commencer.</p><div className="mt-8 grid gap-5 md:grid-cols-3"><InfoBlock eyebrow="Mission" title="Créer le bon groupe" text="Faire rencontrer des profils compatibles autour d'un projet concret, avec un cadre clair et humain." /><InfoBlock eyebrow="Produit" title="Des Trips réelles" text="Les idées de destination, les projets membres et les conversations servent à construire une aventure ensemble." /><InfoBlock eyebrow="Cap" title="Voyager mieux" text="Mettre en avant la nature, les acteurs locaux, la confiance et des groupes à taille humaine." /></div></div></section>;
+  return (
+    <VideoPageBackground source="videos/about-background.m4v" label="Des randonneurs avancent ensemble dans une gorge naturelle">
+      <section className="container-page flex min-h-[calc(100vh-8rem)] items-center py-12 text-white sm:py-16">
+        <div className="max-w-5xl">
+          <p className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-bold backdrop-blur">À propos</p>
+          <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">Faire passer une envie de voyage du « peut-être » au « on y va ».</h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg sm:leading-8">Tribu Nature est née d'une idée simple : beaucoup de personnes veulent partir, mais pas forcément seules. Nous créons le cadre qui permet de trouver le bon groupe et de commencer.</p>
+          <div className="mt-10 grid gap-3 md:grid-cols-3">
+            <AboutValue eyebrow="Mission" title="Créer le bon groupe" text="Réunir des profils compatibles autour d'un projet concret et humain." />
+            <AboutValue eyebrow="Produit" title="Des Trips réelles" text="Passer d'une idée de destination à une organisation construite ensemble." />
+            <AboutValue eyebrow="Cap" title="Voyager mieux" text="Valoriser la nature, les acteurs locaux et les groupes à taille humaine." />
+          </div>
+        </div>
+      </section>
+    </VideoPageBackground>
+  );
 }
 
 function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | null; accessToken?: string }) {
@@ -7228,7 +7243,61 @@ function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | nu
   const [feedback, setFeedback] = useState("");
   const [sending, setSending] = useState(false);
   return (
-    <section className="container-page py-10"><div className="mx-auto max-w-2xl"><p className="pill">Nous contacter</p><h1 className="mt-3 text-4xl font-semibold">Parlons de ton expérience.</h1><form className="mt-8 grid gap-4 rounded-[1.5rem] bg-white p-5 shadow-soft" onSubmit={async (event) => { event.preventDefault(); if (!email.includes("@") || !subject.trim() || !body.trim()) { setFeedback("Complète tous les champs."); return; } setSending(true); try { await sendContactMessage({ userId: profile?.id, email, subject, body }, accessToken); setSubject(""); setBody(""); setFeedback("Message envoyé. Merci pour ton retour."); } catch (error) { setFeedback(error instanceof Error ? error.message : "Message impossible à envoyer."); } finally { setSending(false); } }}><label className="grid gap-2 text-sm font-bold">Email<input className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></label><label className="grid gap-2 text-sm font-bold">Sujet<input className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal" value={subject} onChange={(event) => setSubject(event.target.value)} /></label><label className="grid gap-2 text-sm font-bold">Message<textarea className="min-h-40 rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal" value={body} onChange={(event) => setBody(event.target.value)} /></label><button className="btn-primary" disabled={sending} type="submit"><Mail className="mr-2 inline" size={18} />{sending ? "Envoi..." : "Envoyer"}</button>{feedback && <p className="rounded-lg bg-forest-50 p-3 text-sm font-semibold">{feedback}</p>}</form></div></section>
+    <VideoPageBackground source="videos/contact-background.m4v" label="Une personne contemple une cascade au cœur de la nature">
+      <section className="container-page grid min-h-[calc(100vh-8rem)] items-center gap-8 py-10 lg:grid-cols-[0.8fr_1.2fr] lg:py-14">
+        <div className="max-w-xl text-white">
+          <p className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-bold backdrop-blur">Nous contacter</p>
+          <h1 className="mt-5 text-4xl font-semibold leading-tight sm:text-5xl">Parlons de ton expérience.</h1>
+          <p className="mt-4 max-w-lg text-base leading-7 text-white/85 sm:text-lg">Une question, une idée ou un problème pendant la beta ? Écris-nous directement. Chaque retour nous aide à rendre les prochains départs plus simples.</p>
+        </div>
+        <form
+          className="grid gap-4 rounded-lg bg-white/95 p-5 text-forest-900 shadow-2xl backdrop-blur sm:p-7"
+          onSubmit={async (event) => {
+            event.preventDefault();
+            if (!email.includes("@") || !subject.trim() || !body.trim()) { setFeedback("Complète tous les champs."); return; }
+            setSending(true);
+            try {
+              await sendContactMessage({ userId: profile?.id, email, subject, body }, accessToken);
+              setSubject("");
+              setBody("");
+              setFeedback("Message envoyé. Merci pour ton retour.");
+            } catch (error) {
+              setFeedback(error instanceof Error ? error.message : "Message impossible à envoyer.");
+            } finally {
+              setSending(false);
+            }
+          }}
+        >
+          <label className="grid gap-2 text-sm font-bold">Email<input className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal outline-none focus:ring-2 focus:ring-forest-600" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" /></label>
+          <label className="grid gap-2 text-sm font-bold">Sujet<input className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal outline-none focus:ring-2 focus:ring-forest-600" value={subject} onChange={(event) => setSubject(event.target.value)} /></label>
+          <label className="grid gap-2 text-sm font-bold">Message<textarea className="min-h-36 resize-y rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal outline-none focus:ring-2 focus:ring-forest-600" value={body} onChange={(event) => setBody(event.target.value)} /></label>
+          <button className="btn-primary" disabled={sending} type="submit"><Mail className="mr-2 inline" size={18} />{sending ? "Envoi..." : "Envoyer"}</button>
+          {feedback && <p className="rounded-lg bg-forest-50 p-3 text-sm font-semibold">{feedback}</p>}
+        </form>
+      </section>
+    </VideoPageBackground>
+  );
+}
+
+function VideoPageBackground({ source, label, children }: { source: string; label: string; children: React.ReactNode }) {
+  return (
+    <div className="relative isolate min-h-[calc(100vh-4rem)] overflow-hidden bg-forest-900">
+      <video className="absolute inset-0 -z-20 h-full w-full object-cover object-center motion-reduce:hidden" autoPlay loop muted playsInline preload="metadata" aria-label={label}>
+        <source src={`${import.meta.env.BASE_URL}${source}`} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 -z-10 bg-forest-900/68" />
+      {children}
+    </div>
+  );
+}
+
+function AboutValue({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
+  return (
+    <article className="rounded-lg border border-white/20 bg-white/12 p-5 backdrop-blur-md">
+      <p className="text-xs font-bold uppercase text-white/65">{eyebrow}</p>
+      <h2 className="mt-2 text-xl font-semibold">{title}</h2>
+      <p className="mt-2 text-sm leading-6 text-white/80">{text}</p>
+    </article>
   );
 }
 
