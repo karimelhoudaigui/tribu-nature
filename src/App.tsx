@@ -135,6 +135,7 @@ import {
 import { sendContactMessage } from "./services/contactService";
 import { calculateTripMatch, type TripMatchResult } from "./services/matchService";
 import { searchPexelsActivityPhotos, type PexelsActivityPhoto } from "./services/pexelsService";
+import { getActivityImageRotation } from "./services/tripActivityMediaService";
 import {
   getTravelPreferences,
   upsertTravelPreferences,
@@ -252,19 +253,6 @@ const ambienceCards = [
     examples: ["gîte", "bon repas", "organisation fluide"]
   }
 ];
-
-const calendarMonth = {
-  label: "Juin 2026",
-  weekdays: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
-  days: Array.from({ length: 30 }, (_, index) => {
-    const day = index + 1;
-    return {
-      date: `2026-06-${String(day).padStart(2, "0")}`,
-      day,
-      disabled: day < 23
-    };
-  })
-};
 
 const filterGroups = [
   {
@@ -1037,6 +1025,55 @@ function App() {
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  useEffect(() => {
+    if (page === "dashboard" || authModalOpen || shareTrip || joinRequestConfirmationTrip) return;
+    let startX = 0;
+    let startY = 0;
+    let startedAt = 0;
+    let tracking = false;
+    const edgeSize = 32;
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      const startsAtLeftEdge = touch.clientX <= edgeSize;
+      const startsAtRightEdge = touch.clientX >= window.innerWidth - edgeSize;
+      if (!startsAtLeftEdge && !startsAtRightEdge) return;
+      startX = touch.clientX;
+      startY = touch.clientY;
+      startedAt = Date.now();
+      tracking = true;
+    };
+    const handleTouchMove = (event: TouchEvent) => {
+      if (!tracking || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      const horizontalDistance = Math.abs(touch.clientX - startX);
+      const verticalDistance = Math.abs(touch.clientY - startY);
+      if (horizontalDistance > 12 && horizontalDistance > verticalDistance * 1.2) event.preventDefault();
+    };
+    const handleTouchEnd = (event: TouchEvent) => {
+      if (!tracking || event.changedTouches.length !== 1) return;
+      tracking = false;
+      const touch = event.changedTouches[0];
+      const deltaX = touch.clientX - startX;
+      const deltaY = touch.clientY - startY;
+      const fromLeftEdge = startX <= edgeSize && deltaX >= 72;
+      const fromRightEdge = startX >= window.innerWidth - edgeSize && deltaX <= -72;
+      if ((fromLeftEdge || fromRightEdge) && Math.abs(deltaY) < 60 && Date.now() - startedAt < 900) goBack();
+    };
+    const cancelTouch = () => { tracking = false; };
+
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", cancelTouch, { passive: true });
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", cancelTouch);
+    };
+  }, [authModalOpen, joinRequestConfirmationTrip, page, shareTrip]);
   const openTrip = (id: string) => {
     setSelectedTripId(id);
     go("trip");
@@ -2478,6 +2515,102 @@ function Onboarding({ isGenerating, onGeneratedTrip }: { isGenerating: boolean; 
   );
 }
 
+function DateRangeCalendar({
+  startDate,
+  endDate,
+  onChange,
+  invalid = false
+}: {
+  startDate: string;
+  endDate: string;
+  onChange: (startDate: string, endDate: string) => void;
+  invalid?: boolean;
+}) {
+  const today = getLocalIsoDate(new Date());
+  const initialDate = startDate ? new Date(`${startDate}T12:00:00`) : new Date();
+  const [visibleMonth, setVisibleMonth] = useState(() => new Date(initialDate.getFullYear(), initialDate.getMonth(), 1));
+
+  useEffect(() => {
+    if (!startDate) return;
+    const selectedDate = new Date(`${startDate}T12:00:00`);
+    setVisibleMonth(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
+  }, [startDate]);
+
+  const year = visibleMonth.getFullYear();
+  const month = visibleMonth.getMonth();
+  const firstWeekday = (new Date(year, month, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const calendarDays = [
+    ...Array.from({ length: firstWeekday }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, index) => {
+      const day = index + 1;
+      const date = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      return { day, date, disabled: date < today };
+    })
+  ];
+  const currentMonth = new Date();
+  const canGoPrevious = year > currentMonth.getFullYear() || (year === currentMonth.getFullYear() && month > currentMonth.getMonth());
+  const monthLabel = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(visibleMonth);
+
+  const selectDate = (value: string) => {
+    if (!startDate || endDate || value < startDate) {
+      onChange(value, "");
+      return;
+    }
+    onChange(startDate, value);
+  };
+
+  return (
+    <div className={`rounded-lg border bg-white p-3 ${invalid ? "border-red-400 ring-2 ring-red-200" : "border-forest-100"}`}>
+      <div className="flex items-center justify-between gap-3 px-1 pb-3">
+        <button aria-label="Mois précédent" className="grid h-10 w-10 place-items-center rounded-full text-forest-800 transition hover:bg-forest-50 disabled:opacity-25" disabled={!canGoPrevious} onClick={() => setVisibleMonth(new Date(year, month - 1, 1))} type="button">
+          <ChevronLeft size={19} />
+        </button>
+        <strong className="capitalize text-forest-900">{monthLabel}</strong>
+        <button aria-label="Mois suivant" className="grid h-10 w-10 place-items-center rounded-full text-forest-800 transition hover:bg-forest-50" onClick={() => setVisibleMonth(new Date(year, month + 1, 1))} type="button">
+          <ChevronRight size={19} />
+        </button>
+      </div>
+      <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-forest-500">
+        {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((weekday) => <span className="py-1.5" key={weekday}>{weekday}</span>)}
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {calendarDays.map((day, index) => {
+          if (!day) return <span className="aspect-square" key={`empty-${index}`} />;
+          const selectedStart = day.date === startDate;
+          const selectedEnd = day.date === endDate;
+          const inRange = Boolean(startDate && endDate && day.date > startDate && day.date < endDate);
+          return (
+            <button
+              className={[
+                "aspect-square rounded-lg text-sm font-semibold transition",
+                day.disabled ? "cursor-not-allowed text-forest-200" : "hover:bg-forest-100",
+                inRange ? "bg-forest-100 text-forest-900" : "",
+                selectedStart || selectedEnd ? "bg-forest-800 text-white hover:bg-forest-800" : "",
+                !day.disabled && !inRange && !selectedStart && !selectedEnd ? "text-forest-900" : ""
+              ].join(" ")}
+              disabled={day.disabled}
+              key={day.date}
+              onClick={() => selectDate(day.date)}
+              type="button"
+            >
+              {day.day}
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2 border-t border-forest-100 pt-3 text-sm">
+        <MiniFact label="Départ" value={startDate ? formatFrenchDate(startDate) : "À choisir"} />
+        <MiniFact label="Retour" value={endDate ? formatFrenchDate(endDate) : "À choisir"} />
+      </div>
+    </div>
+  );
+}
+
+function getLocalIsoDate(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
 function AvailabilityPicker({
   answers,
   setAnswers
@@ -2491,22 +2624,11 @@ function AvailabilityPicker({
   const startDate = selectedDates[0];
   const endDate = selectedDates[1];
 
-  const selectDate = (value: string) => {
+  const setDateRange = (nextStartDate: string, nextEndDate: string) => {
     setAnswers((prev) => {
       const list = Array.isArray(prev.availability) ? prev.availability : [];
       const base = list.filter((item) => !isIsoDate(item));
-      const dates = list.filter(isIsoDate).sort();
-      let nextDates: string[];
-
-      if (dates.length === 0 || dates.length === 2 || value < dates[0]) {
-        nextDates = [value];
-      } else if (value === dates[0]) {
-        nextDates = [];
-      } else {
-        nextDates = [dates[0], value];
-      }
-
-      return { ...prev, availability: [...nextDates, ...base] };
+      return { ...prev, availability: [nextStartDate, nextEndDate, ...base].filter(Boolean) };
     });
   };
 
@@ -2523,44 +2645,8 @@ function AvailabilityPicker({
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
       <div>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm font-semibold text-forest-700">
-            <CalendarDays size={18} />
-            Sélectionne une date de départ puis une date de retour
-          </div>
-          <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-forest-800 shadow-sm">{calendarMonth.label}</span>
-        </div>
-
-        <div className="mt-4 rounded-[1.5rem] bg-white p-3 shadow-sm">
-          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-forest-600">
-            {calendarMonth.weekdays.map((weekday) => (
-              <span className="py-2" key={weekday}>{weekday}</span>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-1">
-            {calendarMonth.days.map((day) => {
-            const selectedStart = day.date === startDate;
-            const selectedEnd = day.date === endDate;
-            const inRange = Boolean(startDate && endDate && day.date > startDate && day.date < endDate);
-            return (
-              <button
-                className={[
-                  "aspect-square rounded-2xl text-sm font-semibold transition",
-                  day.disabled ? "cursor-not-allowed text-forest-200" : "hover:bg-forest-100",
-                  inRange ? "bg-forest-100 text-forest-900" : "",
-                  selectedStart || selectedEnd ? "bg-forest-800 text-white shadow-soft hover:bg-forest-800" : "",
-                  !day.disabled && !inRange && !selectedStart && !selectedEnd ? "bg-forest-50 text-forest-900" : ""
-                ].join(" ")}
-                disabled={day.disabled}
-                key={day.date}
-                onClick={() => selectDate(day.date)}
-              >
-                {day.day}
-              </button>
-            );
-          })}
-          </div>
-        </div>
+        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-forest-700"><CalendarDays size={18} />Sélectionne le départ puis le retour</div>
+        <DateRangeCalendar startDate={startDate ?? ""} endDate={endDate ?? ""} onChange={setDateRange} />
 
         <div className="mt-5 flex flex-wrap gap-2">
           {["Journée", "Week-end", "2-3 jours", "Semaine"].map((item) => (
@@ -3102,8 +3188,6 @@ function CreateTripPage({
   const [departureText, setDepartureText] = useState("");
   const [selectedDeparture, setSelectedDeparture] = useState<LocationSuggestion | null>(null);
   const [duration, setDuration] = useState("Week-end");
-  const [dateMode, setDateMode] = useState<"month" | "exact">("month");
-  const [tripMonth, setTripMonth] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [budget, setBudget] = useState("200 à 350 €");
@@ -3113,7 +3197,6 @@ function CreateTripPage({
   const [brief, setBrief] = useState("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [selectedZones, setSelectedZones] = useState<string[]>([]);
   const [ambiences, setAmbiences] = useState<string[]>([]);
   const [activitiesWanted, setActivitiesWanted] = useState<string[]>([]);
   const [groupPreferences, setGroupPreferences] = useState<string[]>([]);
@@ -3132,10 +3215,11 @@ function CreateTripPage({
     setDepartureText(initialTrip.departure_city ?? "");
     setSelectedDeparture(initialTrip.departure_city ? { id: `departure-${initialTrip.id}`, label: initialTrip.departure_city, name: initialTrip.departure_city, country: "", latitude: initialTrip.departure_lat ?? 0, longitude: initialTrip.departure_lng ?? 0, source: "curated" } : null);
     setDuration(initialTrip.duration || "Week-end");
+    setStartDate(initialTrip.start_date ?? "");
+    setEndDate(initialTrip.end_date ?? "");
     setBudget(numbersToBudgetRange(initialTrip.budget_min, initialTrip.budget_max));
     setLevel(initialTrip.physical_level);
     setBrief(initialTrip.description || initialTrip.brief || "Je veux transformer cette idée de voyage en vraie Trip avec un groupe motivé.");
-    setSelectedZones([inferZoneFromDestination(initialTrip.destination)]);
     setAmbiences(initialTrip.ambience_tags.length ? initialTrip.ambience_tags.slice(0, 4) : ["Découverte locale"]);
     setActivitiesWanted(initialTrip.activities.length ? initialTrip.activities : ["Activité locale", "Découverte nature"]);
     setShowPreview(true);
@@ -3143,14 +3227,13 @@ function CreateTripPage({
 
   useEffect(() => () => imagePreviews.forEach((preview) => URL.revokeObjectURL(preview)), [imagePreviews]);
 
-  const selectedDates = buildTripDates(dateMode, tripMonth, startDate, endDate);
+  const selectedDates = buildTripDates(startDate, endDate);
 
   const previewTrip = {
     ...buildCommunityTrip({
       proposerName,
       title,
       destinationText,
-      selectedZones,
       duration,
       budget,
       level,
@@ -3165,7 +3248,7 @@ function CreateTripPage({
       dateLabel: selectedDates.label,
       startDate: selectedDates.startDate,
       endDate: selectedDates.endDate,
-      datePrecision: dateMode,
+      datePrecision: "exact",
       departureCity: departureText,
       departureLat: selectedDeparture?.latitude,
       departureLng: selectedDeparture?.longitude
@@ -3184,13 +3267,6 @@ function CreateTripPage({
     setActivitiesWanted((prev) => (prev.includes(value) ? prev : [...prev, value]));
     setCustomActivity("");
   };
-  const toggleZone = (value: string) => {
-    if (value === "Peu m'importe") {
-      setSelectedZones([]);
-      return;
-    }
-    setSelectedZones((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]));
-  };
   const publishTrip = async () => {
     if (isPublishing) return;
     setPublishError("");
@@ -3200,7 +3276,7 @@ function CreateTripPage({
       ...(!departureText.trim() || !selectedDeparture ? ["departure"] : []),
       ...(!brief.trim() ? ["brief"] : []),
       ...(!selectedDates.startDate || !selectedDates.endDate ? ["dates"] : []),
-      ...(dateMode === "exact" && endDate < startDate ? ["dates"] : [])
+      ...(endDate && endDate < startDate ? ["dates"] : [])
     ];
     setInvalidFields(missing);
     if (missing.length > 0) {
@@ -3340,19 +3416,20 @@ function CreateTripPage({
             <h2 className="text-2xl font-semibold">Cadre du voyage</h2>
             <div className="mt-5 grid gap-4">
               <div className={`rounded-xl p-3 ${invalidFields.includes("dates") ? "bg-red-50 ring-2 ring-red-400" : "bg-forest-50"}`}>
-                <RequiredLabel label="Dates du Trip" invalid={invalidFields.includes("dates")} />
-                <div className="mt-3 grid grid-cols-2 gap-2 rounded-full bg-white p-1">
-                  <button className={`rounded-full px-3 py-2 text-sm font-bold ${dateMode === "month" ? "bg-forest-900 text-white" : "text-forest-700"}`} onClick={() => setDateMode("month")}>Mois</button>
-                  <button className={`rounded-full px-3 py-2 text-sm font-bold ${dateMode === "exact" ? "bg-forest-900 text-white" : "text-forest-700"}`} onClick={() => setDateMode("exact")}>Dates précises</button>
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <span className={`text-sm font-semibold ${invalidFields.includes("dates") ? "text-red-700" : "text-forest-700"}`}>Dates du Trip</span>
+                  <span className="text-xs font-bold text-red-600">Obligatoire</span>
                 </div>
-                {dateMode === "month" ? (
-                  <input className="mt-3 w-full rounded-lg border border-forest-100 bg-white px-4 py-3" type="month" min={new Date().toISOString().slice(0, 7)} value={tripMonth} onChange={(event) => setTripMonth(event.target.value)} />
-                ) : (
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <label className="grid gap-1 text-xs font-bold text-forest-600">Début<input className="rounded-lg border border-forest-100 bg-white px-3 py-3 text-sm" type="date" min={new Date().toISOString().slice(0, 10)} value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label>
-                    <label className="grid gap-1 text-xs font-bold text-forest-600">Fin<input className="rounded-lg border border-forest-100 bg-white px-3 py-3 text-sm" type="date" min={startDate || new Date().toISOString().slice(0, 10)} value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label>
-                  </div>
-                )}
+                <DateRangeCalendar
+                  startDate={startDate}
+                  endDate={endDate}
+                  invalid={invalidFields.includes("dates")}
+                  onChange={(nextStartDate, nextEndDate) => {
+                    setStartDate(nextStartDate);
+                    setEndDate(nextEndDate);
+                    setInvalidFields((fields) => fields.filter((field) => field !== "dates"));
+                  }}
+                />
               </div>
               <ChipSelect label="Durée indicative" value={duration} options={["Week-end", "2-3 jours", "Une semaine", "10 jours"]} onChange={setDuration} />
               <ChipSelect label="Budget estimé" value={budget} options={["Moins de 100 €", "100 à 200 €", "200 à 350 €", "350 à 500 €", "500 € et plus", "Budget à définir ensemble"]} onChange={setBudget} />
@@ -3370,11 +3447,6 @@ function CreateTripPage({
                 ))}
               </div>
             </div>
-          </section>
-
-          <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
-            <h2 className="text-2xl font-semibold">Zone de destination</h2>
-            <DestinationMapPicker selectedZones={selectedZones} onToggleZone={toggleZone} onRemoveZone={(zone) => setSelectedZones((prev) => prev.filter((item) => item !== zone))} />
           </section>
 
           {showPreview && <CreateTripPreview trip={previewTrip} />}
@@ -3492,19 +3564,7 @@ function RequiredLabel({ label, invalid }: { label: string; invalid: boolean }) 
   );
 }
 
-function buildTripDates(mode: "month" | "exact", month: string, startDate: string, endDate: string) {
-  if (mode === "month") {
-    if (!/^\d{4}-\d{2}$/.test(month)) return { label: "Mois à préciser", startDate: "", endDate: "" };
-    const [year, monthNumber] = month.split("-").map(Number);
-    const lastDay = new Date(year, monthNumber, 0).getDate();
-    const label = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(new Date(year, monthNumber - 1, 1));
-    return {
-      label: label.charAt(0).toUpperCase() + label.slice(1),
-      startDate: `${month}-01`,
-      endDate: `${month}-${String(lastDay).padStart(2, "0")}`
-    };
-  }
-
+function buildTripDates(startDate: string, endDate: string) {
   if (!startDate || !endDate) return { label: "Dates à préciser", startDate, endDate };
   const format = (date: string) => new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${date}T12:00:00`));
   return { label: `Du ${format(startDate)} au ${format(endDate)}`, startDate, endDate };
@@ -3559,7 +3619,6 @@ function buildCommunityTrip({
   proposerName,
   title,
   destinationText,
-  selectedZones,
   duration,
   budget,
   level,
@@ -3582,7 +3641,6 @@ function buildCommunityTrip({
   proposerName: string;
   title: string;
   destinationText: string;
-  selectedZones: string[];
   duration: string;
   budget: string;
   level: string;
@@ -3603,7 +3661,8 @@ function buildCommunityTrip({
   departureLng?: number;
 }): Trip {
   const [budgetMin, budgetMax] = budgetRangeToNumbers(budget);
-  const destinationLabel = [selectedZones.join(" > "), destinationText.trim()].filter(Boolean).join(" > ") || "Destination à préciser";
+  const destinationLabel = destinationText.trim() || "Destination à préciser";
+  const inferredRegion = inferZoneFromDestination(destinationLabel);
   const displayName = creatorName.trim() || proposerName;
   const maxParticipants = maxParticipantsFromGroupSize(groupSize);
   const normalizedGroupPreferences = groupPreferences.map((preference) => normalizeUiText(preference));
@@ -3642,7 +3701,7 @@ function buildCommunityTrip({
     departure_lng: departureLng,
     max_participants: maxParticipants,
     current_participants: 1,
-    region: selectedZones.find((zone) => zone !== "Peu m'importe"),
+    region: inferredRegion === "Peu m'importe" ? undefined : inferredRegion,
     activity_tags: activitiesWanted,
     group_tags: [groupType, groupSize, ...groupPreferences.filter((_, index) => ["groupe", "calme", "pause"].some((keyword) => normalizedGroupPreferences[index].includes(keyword)))],
     food_tags: groupPreferences.filter((_, index) => ["halal", "vegetarien", "alcool", "repas"].some((keyword) => normalizedGroupPreferences[index].includes(keyword))),
@@ -4484,7 +4543,7 @@ function TripDetail({
             </div>
           </section>
         )}
-        <ActivitiesSection activities={tripActivities} destination={trip.destination} />
+        <ActivitiesSection activities={tripActivities} destination={trip.destination} usePexels={getTripCardType(trip) === "catalog"} />
         <TripMatchSection match={match} />
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
           <TripMembersSection members={validatedMembers} currentUserId={currentUserId} acceptedTribeMemberIds={acceptedTribeMemberIds} onViewProfile={onViewProfile} onAddFriend={onAddFriend} />
@@ -4642,7 +4701,7 @@ function TripTypeSection({
   );
 }
 
-function ActivitiesSection({ activities: tripActivities, destination }: { activities: Array<Activity | MockLocalActivity>; destination: string }) {
+function ActivitiesSection({ activities: tripActivities, destination, usePexels }: { activities: Array<Activity | MockLocalActivity>; destination: string; usePexels: boolean }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [pexelsPhotos, setPexelsPhotos] = useState<Record<string, PexelsActivityPhoto[]>>({});
@@ -4651,6 +4710,7 @@ function ActivitiesSection({ activities: tripActivities, destination }: { activi
   useEffect(() => {
     const controller = new AbortController();
     setPexelsPhotos({});
+    if (!usePexels) return () => controller.abort();
     tripActivities.slice(0, 8).forEach((activity) => {
       const query = buildPexelsActivityQuery(activity, destination);
       void searchPexelsActivityPhotos(query, controller.signal)
@@ -4664,7 +4724,7 @@ function ActivitiesSection({ activities: tripActivities, destination }: { activi
         });
     });
     return () => controller.abort();
-  }, [activitySearchKey, destination]);
+  }, [activitySearchKey, destination, usePexels]);
 
   const scrollToActivity = (index: number) => {
     const carousel = carouselRef.current;
@@ -4795,23 +4855,27 @@ function BudgetSection({ trip }: { trip: Trip }) {
 
 function getTripActivities(trip: Trip, catalogActivities: MockLocalActivity[]): Array<Activity | MockLocalActivity> {
   if (trip.community) {
-    return trip.activities.map((activity, index) => ({
-      id: `${trip.id}-activity-${index}`,
-      destinationId: trip.id,
-      name: activity,
-      category: "Activité proposée",
-      duration: "À définir",
-      estimated_price: 0,
-      physical_level: trip.physical_level,
-      ambience: trip.ambience_tags,
-      weather_compatible: ["soleil", "nuageux", "pluie"],
-      risk: "faible",
-      booking_required: false,
-      group_friendly: true,
-      description: "Activité proposée par le membre. L'app pourra l'enrichir via le Local Activity Graph.",
-      image: trip.image_url,
-      source: "mock"
-    }));
+    return trip.activities.map((activity, index) => {
+      const assignedImages = getActivityImageRotation(trip.image_urls, trip.image_url, index);
+      return {
+        id: `${trip.id}-activity-${index}`,
+        destinationId: trip.id,
+        name: activity,
+        category: "Activité proposée",
+        duration: "À définir",
+        estimated_price: 0,
+        physical_level: trip.physical_level,
+        ambience: trip.ambience_tags,
+        weather_compatible: ["soleil", "nuageux", "pluie"],
+        risk: "faible",
+        booking_required: false,
+        group_friendly: true,
+        description: "Activité proposée par le membre. L'app pourra l'enrichir via le Local Activity Graph.",
+        image: assignedImages[0] ?? trip.image_url,
+        images: assignedImages,
+        source: "mock" as const
+      };
+    });
   }
 
   if (trip.generated_activity_ids?.length) {
@@ -7202,6 +7266,7 @@ function ActivityCard({ activity, pexelsPhotos }: { activity: Activity | MockLoc
         supervisionRequired: activity.risk === "moyen" || activity.risk === "élevé",
         description: activity.description,
         image: activity.image,
+        images: activity.images ?? [activity.image],
         mapUrl: activity.lat && activity.lng ? `https://www.google.com/maps/search/?api=1&query=${activity.lat},${activity.lng}` : "",
         referenceUrl: activity.external_url ?? "",
         referenceLabel: activity.external_url ? referenceLabel(activity.source) : ""
@@ -7219,11 +7284,12 @@ function ActivityCard({ activity, pexelsPhotos }: { activity: Activity | MockLoc
         supervisionRequired: activity.professional_supervision_required,
         description: "",
         image: "",
+        images: [],
         mapUrl: `https://www.google.com/maps/search/?api=1&query=${activity.lat},${activity.lng}`,
         referenceUrl: "",
         referenceLabel: ""
       };
-  const photos = getActivityPhotos(display.name, display.category, display.image, pexelsPhotos);
+  const photos = getActivityPhotos(display.name, display.category, display.image, display.images, pexelsPhotos);
   const highlights = getActivityHighlights(display);
   const hook = getActivityHook(display.name, display.category, display.description);
   const creditedPhoto = photos.find((photo) => photo.pexelsUrl);
@@ -7234,19 +7300,15 @@ function ActivityCard({ activity, pexelsPhotos }: { activity: Activity | MockLoc
         {photos.map((photo, index) => {
           const layoutClass = `overflow-hidden ${index === 0 ? "col-span-2 row-span-2" : index === 3 ? "col-span-2" : "col-span-1"}`;
           const image = <img className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" loading="lazy" src={photo.src} alt={photo.alt || `${display.name}, vue ${index + 1}`} />;
-          return photo.pexelsUrl ? (
-            <a className={layoutClass} href={photo.pexelsUrl} target="_blank" rel="noreferrer" title={`Photo de ${photo.photographer} sur Pexels`} key={`${photo.src}-${index}`}>{image}</a>
-          ) : (
-            <div className={layoutClass} key={`${photo.src}-${index}`}>{image}</div>
-          );
+          return <div className={layoutClass} key={`${photo.src}-${index}`}>{image}</div>;
         })}
         <span className="absolute left-3 top-3 rounded-full bg-white/92 px-3 py-1.5 text-xs font-bold text-forest-900 shadow-sm backdrop-blur">
           {display.category}
         </span>
         {creditedPhoto && (
-          <a className="absolute bottom-3 left-3 max-w-[55%] truncate rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold text-forest-900 backdrop-blur" href={creditedPhoto.pexelsUrl} target="_blank" rel="noreferrer">
+          <span className="absolute bottom-3 left-3 max-w-[55%] truncate rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold text-forest-900 backdrop-blur">
             Pexels · {creditedPhoto.photographer}
-          </a>
+          </span>
         )}
         <span className="absolute bottom-3 right-3 rounded-full bg-forest-900/80 px-2.5 py-1 text-xs font-bold text-white backdrop-blur">
           4 photos
@@ -7366,7 +7428,7 @@ function buildPexelsActivityQuery(activity: { name: string; category: string }, 
   return `${activity.name} ${preciseDestination}`.trim().slice(0, 120);
 }
 
-function getActivityPhotos(name: string, category: string, primaryImage: string, pexelsPhotos: PexelsActivityPhoto[]): ActivityExperiencePhoto[] {
+function getActivityPhotos(name: string, category: string, primaryImage: string, activityImages: string[], pexelsPhotos: PexelsActivityPhoto[]): ActivityExperiencePhoto[] {
   const searchable = normalizeUiText(`${name} ${category}`);
   const image = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=82`;
   const pools = {
@@ -7397,7 +7459,8 @@ function getActivityPhotos(name: string, category: string, primaryImage: string,
                 : /foret/.test(searchable)
                   ? pools.forest
                   : pools.mountain;
-  const imageOrder = category === "Activité proposée" ? [...contextual, primaryImage] : [primaryImage, ...contextual];
+  const preferredImages = Array.from(new Set([...(activityImages ?? []), primaryImage].filter(Boolean)));
+  const imageOrder = preferredImages.length > 0 ? [...preferredImages, ...contextual] : contextual;
   const fallbackPhotos = Array.from(new Set(imageOrder.filter(Boolean))).map((src) => ({ src, alt: `${name}, aperçu de l'expérience` }));
   const apiPhotos = pexelsPhotos.map((photo) => ({
     src: photo.src,

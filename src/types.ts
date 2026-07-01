@@ -173,6 +173,7 @@ export type MockLocalActivity = {
   group_friendly: boolean;
   description: string;
   image: string;
+  images?: string[];
   source?: "mock" | "openstreetmap" | "google_places" | "datatourisme";
   external_url?: string;
 };
