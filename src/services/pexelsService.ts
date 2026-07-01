@@ -20,21 +20,22 @@ export function hasPexelsSearchConfig() {
   return Boolean(supabaseUrl && supabaseAnonKey);
 }
 
-export async function searchPexelsActivityPhotos(query: string, signal?: AbortSignal): Promise<PexelsActivityPhoto[]> {
+export async function searchPexelsActivityPhotos(query: string, signal?: AbortSignal, perPage = 4): Promise<PexelsActivityPhoto[]> {
   const normalizedQuery = query.trim().replace(/\s+/g, " ");
   if (!normalizedQuery || !hasPexelsSearchConfig()) return [];
+  const resultLimit = Math.max(1, Math.min(perPage, 4));
 
   const cacheKey = normalizedQuery.toLocaleLowerCase("fr-FR");
   const memoryResult = memoryCache.get(cacheKey);
-  if (memoryResult) return memoryResult;
+  if (memoryResult && memoryResult.length >= resultLimit) return memoryResult.slice(0, resultLimit);
 
   const storedResult = readStoredPhotos(cacheKey);
-  if (storedResult) {
+  if (storedResult && storedResult.length >= resultLimit) {
     memoryCache.set(cacheKey, storedResult);
-    return storedResult;
+    return storedResult.slice(0, resultLimit);
   }
 
-  const response = await fetch(`${supabaseUrl}/functions/v1/pexels-search?query=${encodeURIComponent(normalizedQuery)}&per_page=4`, {
+  const response = await fetch(`${supabaseUrl}/functions/v1/pexels-search?query=${encodeURIComponent(normalizedQuery)}&per_page=${resultLimit}`, {
     headers: {
       apikey: supabaseAnonKey ?? "",
       Authorization: `Bearer ${supabaseAnonKey}`
@@ -48,7 +49,7 @@ export async function searchPexelsActivityPhotos(query: string, signal?: AbortSi
   }
 
   const payload = await response.json() as PexelsSearchResponse;
-  const photos = Array.isArray(payload.photos) ? payload.photos.slice(0, 4) : [];
+  const photos = Array.isArray(payload.photos) ? payload.photos.slice(0, resultLimit) : [];
   memoryCache.set(cacheKey, photos);
   storePhotos(cacheKey, photos);
   return photos;

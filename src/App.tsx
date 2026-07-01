@@ -1692,10 +1692,11 @@ function App() {
             onDeleteNotification={deleteNotificationFlow}
           />
         )}
-        {page === "landing" && <Landing trips={availableTrips} go={go} openTrip={openTrip} onTripAction={joinTrip} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={toggleTripFavorite} />}
+        {page === "landing" && <Landing trips={availableTrips} catalogActivities={catalog.activities} go={go} openTrip={openTrip} onTripAction={joinTrip} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={toggleTripFavorite} />}
         {page === "dashboard" && (
           <Dashboard
             trips={availableTrips}
+            catalogActivities={catalog.activities}
             isGenerating={false}
             openTrip={openTrip}
             onTripAction={joinTrip}
@@ -2294,6 +2295,7 @@ function SwipeToDeleteNotification({
 
 function Landing({
   trips,
+  catalogActivities,
   go,
   openTrip,
   onTripAction,
@@ -2302,6 +2304,7 @@ function Landing({
   onToggleFavorite
 }: {
   trips: Trip[];
+  catalogActivities: MockLocalActivity[];
   go: (page: Page) => void;
   openTrip: (id: string) => void;
   onTripAction: (trip: Trip) => void | Promise<void>;
@@ -2366,7 +2369,7 @@ function Landing({
           </div>
           <button className="btn-secondary" onClick={() => go("dashboard")}>Tout voir</button>
         </div>
-        <TripGrid trips={trips.slice(0, 3)} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} />
+        <TripGrid trips={trips.slice(0, 3)} catalogActivities={catalogActivities} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} />
       </section>
 
       <section className="container-page pb-16">
@@ -3695,6 +3698,7 @@ function inferCommunityTripImage(destinationLabel: string, activitiesWanted: str
 
 function Dashboard({
   trips: dashboardTrips,
+  catalogActivities,
   isGenerating,
   openTrip,
   onTripAction,
@@ -3707,6 +3711,7 @@ function Dashboard({
   matchProfile
 }: {
   trips: Trip[];
+  catalogActivities: MockLocalActivity[];
   isGenerating: boolean;
   openTrip: (id: string) => void;
   onTripAction: (trip: Trip) => void | Promise<void>;
@@ -3814,7 +3819,7 @@ function Dashboard({
             </div>
           </div>
         ) : (
-          <TripGrid trips={filteredTrips} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} getCreatorProfile={getCreatorProfile} onViewProfile={onViewProfile} matchProfile={matchProfile} />
+          <TripGrid trips={filteredTrips} catalogActivities={catalogActivities} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} getCreatorProfile={getCreatorProfile} onViewProfile={onViewProfile} matchProfile={matchProfile} />
         )
       )}
     </section>
@@ -4167,6 +4172,7 @@ function normalizeUiText(value: string) {
 
 function TripGrid({
   trips: tripList,
+  catalogActivities,
   openTrip,
   onTripAction,
   userTripActions,
@@ -4177,6 +4183,7 @@ function TripGrid({
   matchProfile = null
 }: {
   trips: Trip[];
+  catalogActivities: MockLocalActivity[];
   openTrip: (id: string) => void;
   onTripAction: (trip: Trip) => void | Promise<void>;
   userTripActions: UserTripActions | null;
@@ -4213,6 +4220,7 @@ function TripGrid({
         const isFavorite = favoriteTripIds.includes(trip.id);
         const match = matchByTripId.get(trip.id) ?? calculateTripMatch(matchProfile, trip);
         const isUserProject = getTripCardType(trip) === "user_project";
+        const coverActivity = isUserProject ? null : getRepresentativeTripActivity(trip, catalogActivities);
         const creatorProfile = isUserProject ? getCreatorProfile?.(trip.creator_id) : null;
         const creatorUser = isUserProject
           ? profileRecordToUserProfile(creatorProfile ?? {
@@ -4230,7 +4238,7 @@ function TripGrid({
             <Heart size={19} fill={isFavorite ? "currentColor" : "none"} />
           </button>
           <button className="relative block h-80 w-full overflow-hidden text-left" onClick={() => openTrip(trip.id)} aria-label={`Voir le détail de ${trip.title}`}>
-            <img className="h-full w-full object-cover transition duration-700 group-hover:scale-105" src={trip.image_url} alt={trip.destination} />
+            <TripCardCover trip={trip} activity={coverActivity} />
             <div className="absolute inset-0 bg-gradient-to-t from-forest-900/90 via-forest-900/25 to-transparent" />
             <span
               className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-2 text-xs font-bold text-forest-900 backdrop-blur"
@@ -4298,6 +4306,82 @@ function TripGrid({
       })}
     </div>
   );
+}
+
+type TripCoverActivity = Pick<MockLocalActivity, "name" | "category">;
+
+function TripCardCover({ trip, activity }: { trip: Trip; activity: TripCoverActivity | null }) {
+  const imageRef = useRef<HTMLImageElement>(null);
+  const [photo, setPhoto] = useState<PexelsActivityPhoto | null>(null);
+
+  useEffect(() => {
+    if (!activity || getTripCardType(trip) !== "catalog") return;
+    const imageElement = imageRef.current;
+    if (!imageElement) return;
+    const controller = new AbortController();
+    const loadCover = () => {
+      void searchPexelsActivityPhotos(buildPexelsActivityQuery(activity, trip.destination), controller.signal, 1)
+        .then(([result]) => {
+          if (!controller.signal.aborted && result) setPhoto(result);
+        })
+        .catch(() => {
+          // La photo catalogue d'origine reste disponible si Pexels ne répond pas.
+        });
+    };
+    if (!("IntersectionObserver" in window)) {
+      loadCover();
+      return () => controller.abort();
+    }
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        observer.disconnect();
+        loadCover();
+      }
+    }, { rootMargin: "320px 0px" });
+    observer.observe(imageElement);
+    return () => {
+      observer.disconnect();
+      controller.abort();
+    };
+  }, [activity?.category, activity?.name, trip.destination, trip.id]);
+
+  return (
+    <>
+      <img
+        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+        src={photo?.src ?? trip.image_url}
+        alt={photo?.alt || `${activity?.name ?? trip.title} à ${trip.destination}`}
+        ref={imageRef}
+      />
+      {photo && (
+        <span className="absolute left-4 top-[4.25rem] z-10 max-w-[58%] truncate rounded-full bg-black/45 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur" title={`Photo de ${photo.photographer} sur Pexels`}>
+          Pexels · {photo.photographer}
+        </span>
+      )}
+    </>
+  );
+}
+
+function getRepresentativeTripActivity(trip: Trip, catalogActivities: MockLocalActivity[]): TripCoverActivity | null {
+  const generatedActivities = (trip.generated_activity_ids ?? [])
+    .map((activityId) => catalogActivities.find((activity) => activity.id === activityId))
+    .filter((activity): activity is MockLocalActivity => Boolean(activity));
+  const candidates: TripCoverActivity[] = generatedActivities.length > 0
+    ? generatedActivities
+    : trip.activities.map((name) => ({ name, category: "Expérience" }));
+  if (!candidates.length) return null;
+  return [...candidates].sort((left, right) => getActivityVisualScore(right) - getActivityVisualScore(left))[0];
+}
+
+function getActivityVisualScore(activity: TripCoverActivity) {
+  const searchable = normalizeUiText(`${activity.name} ${activity.category}`);
+  if (/parapente|montgolfiere|panorama|belvedere|point de vue/.test(searchable)) return 100;
+  if (/hospice de france|rando|marche|sentier|trek|refuge|lac|cascade/.test(searchable)) return 95;
+  if (/rafting|canoe|kayak|riviere|eau vive|paddle|surf/.test(searchable)) return 90;
+  if (/therm|spa|bien-etre|balneo|bains chaud/.test(searchable)) return 85;
+  if (/cheval|equestre|ferme|producteur/.test(searchable)) return 75;
+  if (/village|culture|patrimoine/.test(searchable)) return 70;
+  return 60;
 }
 
 function MiniFact({ label, value }: { label: string; value: string }) {
@@ -7264,7 +7348,7 @@ type ActivityExperiencePhoto = {
   pexelsUrl?: string;
 };
 
-function buildPexelsActivityQuery(activity: Activity | MockLocalActivity, destination: string) {
+function buildPexelsActivityQuery(activity: { name: string; category: string }, destination: string) {
   const searchable = normalizeUiText(`${activity.name} ${activity.category}`);
   const destinationParts = destination.split(/[>,]/).map((part) => part.trim()).filter(Boolean);
   const preciseDestination = destinationParts.slice(0, 2).join(" ");
