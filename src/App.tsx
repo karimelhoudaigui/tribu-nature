@@ -134,6 +134,7 @@ import {
 } from "./services/mediaService";
 import { sendContactMessage } from "./services/contactService";
 import { calculateTripMatch, type TripMatchResult } from "./services/matchService";
+import { searchPexelsActivityPhotos, type PexelsActivityPhoto } from "./services/pexelsService";
 import {
   getTravelPreferences,
   upsertTravelPreferences,
@@ -4399,7 +4400,7 @@ function TripDetail({
             </div>
           </section>
         )}
-        <ActivitiesSection activities={tripActivities} />
+        <ActivitiesSection activities={tripActivities} destination={trip.destination} />
         <TripMatchSection match={match} />
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
           <TripMembersSection members={validatedMembers} currentUserId={currentUserId} acceptedTribeMemberIds={acceptedTribeMemberIds} onViewProfile={onViewProfile} onAddFriend={onAddFriend} />
@@ -4498,6 +4499,21 @@ function TripTypeSection({
 }) {
   const isUserProject = getTripCardType(trip) === "user_project";
   const creatorUser = creatorProfile ? profileRecordToUserProfile(creatorProfile) : null;
+  if (!isUserProject) {
+    return (
+      <section className="flex flex-col gap-3 rounded-lg border border-forest-100 bg-white px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <p className="pill text-xs">{getTripTypeLabel(trip)}</p>
+          <h2 className="text-lg font-semibold">À co-construire</h2>
+          <p className="text-sm text-forest-600">Le groupe choisit les dates et l'organisation.</p>
+        </div>
+        <div className="flex shrink-0 flex-wrap gap-2 text-xs font-bold text-forest-700">
+          <span className="rounded-full bg-forest-50 px-3 py-1.5">{getTripDateLabel(trip)}</span>
+          {trip.max_participants && <span className="rounded-full bg-forest-50 px-3 py-1.5">Jusqu'à {trip.max_participants} personnes</span>}
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -4542,9 +4558,29 @@ function TripTypeSection({
   );
 }
 
-function ActivitiesSection({ activities: tripActivities }: { activities: Array<Activity | MockLocalActivity> }) {
+function ActivitiesSection({ activities: tripActivities, destination }: { activities: Array<Activity | MockLocalActivity>; destination: string }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [pexelsPhotos, setPexelsPhotos] = useState<Record<string, PexelsActivityPhoto[]>>({});
+  const activitySearchKey = tripActivities.map((activity) => `${activity.id}:${activity.name}`).join("|");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setPexelsPhotos({});
+    tripActivities.slice(0, 8).forEach((activity) => {
+      const query = buildPexelsActivityQuery(activity, destination);
+      void searchPexelsActivityPhotos(query, controller.signal)
+        .then((photos) => {
+          if (!controller.signal.aborted && photos.length) {
+            setPexelsPhotos((current) => ({ ...current, [activity.id]: photos }));
+          }
+        })
+        .catch(() => {
+          // Les images locales restent affichées si Pexels ou le réseau est indisponible.
+        });
+    });
+    return () => controller.abort();
+  }, [activitySearchKey, destination]);
 
   const scrollToActivity = (index: number) => {
     const carousel = carouselRef.current;
@@ -4608,7 +4644,7 @@ function ActivitiesSection({ activities: tripActivities }: { activities: Array<A
         ref={carouselRef}
         role="region"
       >
-        {tripActivities.map((activity) => <ActivityCard activity={activity} key={activity.id} />)}
+        {tripActivities.map((activity) => <ActivityCard activity={activity} pexelsPhotos={pexelsPhotos[activity.id] ?? []} key={activity.id} />)}
       </div>
       {tripActivities.length > 1 && (
         <div className="mt-1 flex items-center justify-between sm:justify-end">
@@ -7067,7 +7103,7 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function ActivityCard({ activity }: { activity: Activity | MockLocalActivity }) {
+function ActivityCard({ activity, pexelsPhotos }: { activity: Activity | MockLocalActivity; pexelsPhotos: PexelsActivityPhoto[] }) {
   const display = "duration" in activity
     ? {
         name: activity.name,
@@ -7103,25 +7139,31 @@ function ActivityCard({ activity }: { activity: Activity | MockLocalActivity }) 
         referenceUrl: "",
         referenceLabel: ""
       };
-  const photos = getActivityPhotos(display.name, display.category, display.image);
+  const photos = getActivityPhotos(display.name, display.category, display.image, pexelsPhotos);
   const highlights = getActivityHighlights(display);
   const hook = getActivityHook(display.name, display.category, display.description);
+  const creditedPhoto = photos.find((photo) => photo.pexelsUrl);
 
   return (
     <article className="group w-[86vw] max-w-[460px] shrink-0 snap-start overflow-hidden rounded-lg bg-white shadow-soft transition duration-300 hover:-translate-y-1">
       <div className="relative grid h-64 grid-cols-4 grid-rows-2 gap-1 overflow-hidden bg-forest-100 sm:h-72">
-        {photos.map((photo, index) => (
-          <img
-            className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${index === 0 ? "col-span-2 row-span-2" : index === 3 ? "col-span-2" : "col-span-1"}`}
-            loading="lazy"
-            src={photo}
-            alt={`${display.name}, vue ${index + 1}`}
-            key={`${photo}-${index}`}
-          />
-        ))}
+        {photos.map((photo, index) => {
+          const layoutClass = `overflow-hidden ${index === 0 ? "col-span-2 row-span-2" : index === 3 ? "col-span-2" : "col-span-1"}`;
+          const image = <img className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" loading="lazy" src={photo.src} alt={photo.alt || `${display.name}, vue ${index + 1}`} />;
+          return photo.pexelsUrl ? (
+            <a className={layoutClass} href={photo.pexelsUrl} target="_blank" rel="noreferrer" title={`Photo de ${photo.photographer} sur Pexels`} key={`${photo.src}-${index}`}>{image}</a>
+          ) : (
+            <div className={layoutClass} key={`${photo.src}-${index}`}>{image}</div>
+          );
+        })}
         <span className="absolute left-3 top-3 rounded-full bg-white/92 px-3 py-1.5 text-xs font-bold text-forest-900 shadow-sm backdrop-blur">
           {display.category}
         </span>
+        {creditedPhoto && (
+          <a className="absolute bottom-3 left-3 max-w-[55%] truncate rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold text-forest-900 backdrop-blur" href={creditedPhoto.pexelsUrl} target="_blank" rel="noreferrer">
+            Pexels · {creditedPhoto.photographer}
+          </a>
+        )}
         <span className="absolute bottom-3 right-3 rounded-full bg-forest-900/80 px-2.5 py-1 text-xs font-bold text-white backdrop-blur">
           4 photos
         </span>
@@ -7215,13 +7257,26 @@ function getActivityHighlights(display: {
   return highlights.slice(0, 2);
 }
 
-function getActivityPhotos(name: string, category: string, primaryImage: string) {
+type ActivityExperiencePhoto = {
+  src: string;
+  alt: string;
+  photographer?: string;
+  pexelsUrl?: string;
+};
+
+function buildPexelsActivityQuery(activity: Activity | MockLocalActivity, destination: string) {
+  const destinationParts = destination.split(">").map((part) => part.trim()).filter(Boolean);
+  const preciseDestination = destinationParts.slice(-2).join(" ");
+  return `${activity.name} ${preciseDestination}`.trim().slice(0, 120);
+}
+
+function getActivityPhotos(name: string, category: string, primaryImage: string, pexelsPhotos: PexelsActivityPhoto[]): ActivityExperiencePhoto[] {
   const searchable = normalizeUiText(`${name} ${category}`);
   const image = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=82`;
   const pools = {
     mountain: [image("photo-1551632811-561732d1e306"), image("photo-1464822759023-fed622ff2c3b"), image("photo-1506744038136-46273834b3fb"), image("photo-1470770841072-f978cf4d019e")],
     wellness: [image("photo-1540555700478-4be289fbecef"), image("photo-1600334089648-b0d9d3028eb2"), image("photo-1544161515-4ab6ce6db874"), image("photo-1570172619644-dfd03ed5d881")],
-    aerial: ["https://images.pexels.com/photos/17913420/pexels-photo-17913420.jpeg?auto=compress&cs=tinysrgb&w=900", "https://images.pexels.com/photos/14760650/pexels-photo-14760650.jpeg?auto=compress&cs=tinysrgb&w=900", image("photo-1500534314209-a25ddb2bd429"), image("photo-1464822759023-fed622ff2c3b")],
+    aerial: [image("photo-1500534314209-a25ddb2bd429"), image("photo-1464822759023-fed622ff2c3b"), image("photo-1506744038136-46273834b3fb"), image("photo-1470770841072-f978cf4d019e")],
     water: [image("photo-1508166466920-f65aa51f727c"), image("photo-1544550285-f813152fb2fd"), image("photo-1500530855697-b586d89ba3ee"), image("photo-1507525428034-b723cf961d3e")],
     farm: [image("photo-1500595046743-cd271d694d30"), image("photo-1486297678162-eb2a19b0a32d"), image("photo-1452195100486-9cc805987862"), image("photo-1504674900247-0877df9cc836")],
     food: [image("photo-1551218808-94e220e084d2"), image("photo-1504674900247-0877df9cc836"), image("photo-1414235077428-338989a2e8c0"), image("photo-1547592180-85f173990554")],
@@ -7247,7 +7302,14 @@ function getActivityPhotos(name: string, category: string, primaryImage: string)
                   ? pools.forest
                   : pools.mountain;
   const imageOrder = category === "Activité proposée" ? [...contextual, primaryImage] : [primaryImage, ...contextual];
-  return Array.from(new Set(imageOrder.filter(Boolean))).slice(0, 4);
+  const fallbackPhotos = Array.from(new Set(imageOrder.filter(Boolean))).map((src) => ({ src, alt: `${name}, aperçu de l'expérience` }));
+  const apiPhotos = pexelsPhotos.map((photo) => ({
+    src: photo.src,
+    alt: photo.alt || name,
+    photographer: photo.photographer,
+    pexelsUrl: photo.pexelsUrl
+  }));
+  return [...apiPhotos, ...fallbackPhotos].filter((photo, index, allPhotos) => allPhotos.findIndex((candidate) => candidate.src === photo.src) === index).slice(0, 4);
 }
 
 function referenceLabel(source?: MockLocalActivity["source"]) {
