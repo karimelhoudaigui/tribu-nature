@@ -18,6 +18,23 @@ export type TravelPreferences = {
   max_distance_km: number | null;
   preferred_group_size_min: number | null;
   preferred_group_size_max: number | null;
+  departure_city: string | null;
+  departure_lat: number | null;
+  departure_lng: number | null;
+  availability_start: string | null;
+  availability_end: string | null;
+  availability_flexible: boolean;
+  budget_min: number | null;
+  budget_max: number | null;
+  physical_level: string | null;
+  nature_types: string[];
+  preferred_ambiences: string[];
+  preferred_trip_durations: string[];
+  onboarding_step: number;
+  onboarding_status: "draft" | "skipped" | "completed";
+  onboarding_started_at: string | null;
+  onboarding_completed_at: string | null;
+  onboarding_skipped_at: string | null;
   updated_at?: string;
 };
 

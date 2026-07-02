@@ -75,6 +75,16 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
       prefer: "resolution=merge-duplicates,return=representation",
       body: {
         user_id: owner.user.id,
+        departure_city: "Bordeaux",
+        availability_start: "2029-07-01",
+        availability_end: "2029-07-15",
+        availability_flexible: false,
+        budget_min: 200,
+        budget_max: 350,
+        physical_level: "Intermédiaire",
+        nature_types: ["Montagne"],
+        preferred_ambiences: ["Calme & déconnexion"],
+        preferred_trip_durations: ["Week-end"],
         preferred_destinations: ["Valais"],
         preferred_activities: ["Randonnée"],
         preferred_accommodation: ["Refuge"],
@@ -84,11 +94,24 @@ test("Supabase social flows: profil, trips, notifications, conversations et trib
         availability_periods: ["Week-end"],
         max_distance_km: 500,
         preferred_group_size_min: 3,
-        preferred_group_size_max: 6
+        preferred_group_size_max: 6,
+        onboarding_step: 4,
+        onboarding_status: "draft",
+        onboarding_started_at: new Date().toISOString()
       }
     });
     assert.equal(ownerPreferences[0].user_id, owner.user.id);
     assert.deepEqual(ownerPreferences[0].preferred_activities, ["Randonnée"]);
+    assert.equal(ownerPreferences[0].budget_min, 200);
+    assert.equal(ownerPreferences[0].onboarding_step, 4);
+
+    const resumedOwner = await signInTestUser(owner.test_email, owner.test_password);
+    const resumedPreferences = await rest(`travel_preferences?user_id=eq.${encodeURIComponent(owner.user.id)}&select=*`, {
+      token: resumedOwner.access_token
+    });
+    assert.equal(resumedPreferences[0].departure_city, "Bordeaux", "L'onboarding doit reprendre depuis Supabase après une nouvelle session.");
+    assert.equal(resumedPreferences[0].onboarding_step, 4);
+    assert.equal(resumedPreferences[0].onboarding_status, "draft");
 
     const privatePreferences = await rest(`travel_preferences?user_id=eq.${encodeURIComponent(owner.user.id)}&select=*`, {
       token: requester.access_token
@@ -386,7 +409,8 @@ async function signUpTestUser(runId, role, displayName) {
 
   if (!response.ok) throw new Error(`Admin user creation ${role} failed: ${await response.text()}`);
 
-  return signInTestUser(email, password);
+  const session = await signInTestUser(email, password);
+  return { ...session, test_email: email, test_password: password };
 }
 
 async function signInTestUser(email, password) {

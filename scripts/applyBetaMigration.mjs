@@ -7,7 +7,8 @@ const supabaseUrl = (process.env.VITE_SUPABASE_URL ?? "").replace(/\/$/, "");
 const projectRef = supabaseUrl.match(/^https:\/\/([^.]+)\.supabase\.co$/)?.[1] ?? "";
 const migrationPaths = [
   "supabase/migrations/202606300003_prepare_public_beta.sql",
-  "supabase/migrations/202607020001_add_trust_and_account_controls.sql"
+  "supabase/migrations/202607020001_add_trust_and_account_controls.sql",
+  "supabase/migrations/202607020002_connect_onboarding_and_realtime.sql"
 ];
 
 if (!accessToken || !projectRef) {

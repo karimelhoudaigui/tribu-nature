@@ -1,6 +1,6 @@
 import type { TravelPreferences } from "../types";
 
-export type TravelPreferencesUpdate = Omit<TravelPreferences, "user_id" | "updated_at">;
+export type TravelPreferencesUpdate = Partial<Omit<TravelPreferences, "user_id" | "updated_at">>;
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -18,12 +18,15 @@ export async function upsertTravelPreferences(
   updates: TravelPreferencesUpdate,
   accessToken: string
 ): Promise<TravelPreferences> {
-  const rows = await requestRest<TravelPreferences[]>("travel_preferences?on_conflict=user_id&select=*", {
-    method: "POST",
+  const existing = await getTravelPreferences(userId, accessToken);
+  const rows = await requestRest<TravelPreferences[]>(existing
+    ? `travel_preferences?user_id=eq.${encodeURIComponent(userId)}&select=*`
+    : "travel_preferences?select=*", {
+    method: existing ? "PATCH" : "POST",
     accessToken,
-    prefer: "resolution=merge-duplicates,return=representation",
+    prefer: "return=representation",
     body: {
-      user_id: userId,
+      ...(existing ? {} : { user_id: userId }),
       ...updates,
       updated_at: new Date().toISOString()
     }
@@ -45,14 +48,31 @@ function normalizeTravelPreferences(row: TravelPreferences): TravelPreferences {
     availability_periods: row.availability_periods ?? [],
     max_distance_km: row.max_distance_km ?? null,
     preferred_group_size_min: row.preferred_group_size_min ?? null,
-    preferred_group_size_max: row.preferred_group_size_max ?? null
+    preferred_group_size_max: row.preferred_group_size_max ?? null,
+    departure_city: row.departure_city ?? null,
+    departure_lat: row.departure_lat ?? null,
+    departure_lng: row.departure_lng ?? null,
+    availability_start: row.availability_start ?? null,
+    availability_end: row.availability_end ?? null,
+    availability_flexible: row.availability_flexible ?? true,
+    budget_min: row.budget_min ?? null,
+    budget_max: row.budget_max ?? null,
+    physical_level: row.physical_level ?? null,
+    nature_types: row.nature_types ?? [],
+    preferred_ambiences: row.preferred_ambiences ?? [],
+    preferred_trip_durations: row.preferred_trip_durations ?? [],
+    onboarding_step: row.onboarding_step ?? 0,
+    onboarding_status: row.onboarding_status ?? "draft",
+    onboarding_started_at: row.onboarding_started_at ?? null,
+    onboarding_completed_at: row.onboarding_completed_at ?? null,
+    onboarding_skipped_at: row.onboarding_skipped_at ?? null
   };
 }
 
 async function requestRest<T>(
   path: string,
   options: {
-    method?: "GET" | "POST";
+    method?: "GET" | "POST" | "PATCH";
     accessToken: string;
     prefer?: string;
     body?: unknown;

@@ -1,4 +1,4 @@
-import { type ChangeEvent, type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, type ChangeEvent, type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import {
   ArrowLeft,
@@ -147,7 +147,7 @@ import {
   validateImageFiles
 } from "./services/mediaService";
 import { sendContactMessage } from "./services/contactService";
-import { calculateTripMatch, type TripMatchResult } from "./services/matchService";
+import { calculateGroupMatch, calculateTripMatch, calculateUserMatch, type MatchResult, type TripMatchResult } from "./services/matchService";
 import { searchPexelsActivityPhotos, type PexelsActivityPhoto } from "./services/pexelsService";
 import { getActivityImageRotation } from "./services/tripActivityMediaService";
 import {
@@ -156,8 +156,13 @@ import {
   type TravelPreferencesUpdate
 } from "./services/travelPreferenceService";
 import type { Activity, MockLocalActivity, OnboardingProfile, TravelPreferences, Trip, UserProfile } from "./types";
+import { calculateProfileCompletion } from "./features/onboarding/profileCompletion";
+import { subscribeToTripConversation, subscribeToTribeConversation, subscribeToUserSocialUpdates } from "./services/realtimeService";
 
-type Page = "landing" | "dashboard" | "my-trips" | "create-trip" | "trip" | "conversation" | "messages" | "notifications" | "communaute" | "profil" | "prestataires" | "securite" | "settings" | "cgu" | "privacy" | "about" | "contact";
+const OnboardingFlow = lazy(() => import("./features/onboarding/OnboardingFlow").then((module) => ({ default: module.OnboardingFlow })));
+const TripMatchPanel = lazy(() => import("./features/trips/TripMatchPanel").then((module) => ({ default: module.TripMatchPanel })));
+
+type Page = "landing" | "onboarding" | "dashboard" | "my-trips" | "create-trip" | "trip" | "conversation" | "messages" | "notifications" | "communaute" | "profil" | "prestataires" | "securite" | "settings" | "cgu" | "privacy" | "about" | "contact";
 type CommunityTab = "compatibles" | "tribe";
 
 type NavigationSnapshot = {
@@ -506,6 +511,11 @@ function getFallbackAvatar(name: string) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
+function FeatureLoading({ label, fullPage = false }: { label: string; fullPage?: boolean }) {
+  const content = <div className="rounded-[1.5rem] bg-white p-8 text-center font-semibold text-forest-700 shadow-soft">{label}</div>;
+  return fullPage ? <div className="container-page py-10">{content}</div> : content;
+}
+
 function profileRecordToUserProfile(profile: UserProfileRecord, travelPreferences?: TravelPreferences | null): UserProfile {
   const avatarUrl = resolveProfileAvatarUrl(profile.avatar_url, profile.avatar_path);
   return {
@@ -515,12 +525,12 @@ function profileRecordToUserProfile(profile: UserProfileRecord, travelPreference
     city: profile.city ?? "Ville à préciser",
     photo_url: avatarUrl ?? getFallbackAvatar(profile.display_name),
     bio: profile.bio ?? "Profil Tribu Nature en construction.",
-    verified: Boolean(profile.verified ?? true),
+    verified: Boolean(profile.verified),
     physical_level: profile.physical_level ?? "À préciser",
     budget_range: profile.budget_range ?? "À préciser",
-    adventure_style: profile.adventure_style ?? "Nature",
-    preferred_ambiences: profile.preferred_ambiences?.length ? profile.preferred_ambiences : ["Nature", "Découverte locale"],
-    safety_preferences: profile.safety_preferences?.length ? profile.safety_preferences : ["Profil connecté"],
+    adventure_style: profile.adventure_style ?? "À préciser",
+    preferred_ambiences: profile.preferred_ambiences ?? [],
+    safety_preferences: profile.safety_preferences ?? [],
     past_trips: profile.past_trips ?? 0,
     badges: profile.badges?.length ? profile.badges : ["profil connecté"],
     last_seen_at: profile.last_seen_at ?? null,
@@ -903,11 +913,13 @@ function App() {
         refreshing = false;
       }
     };
-    const interval = window.setInterval(() => void refresh(), 5_000);
+    const unsubscribe = subscribeToUserSocialUpdates(authSession.user.id, authSession.access_token, () => void refresh());
+    const interval = window.setInterval(() => void refresh(), 45_000);
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
 
     return () => {
+      unsubscribe();
       window.clearInterval(interval);
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", refresh);
@@ -980,7 +992,9 @@ function App() {
   const profilePageRecord = selectedProfileId ? viewedProfile ?? fallbackProfileRecord(selectedProfileId) : currentProfile;
   const profilePageUser = profilePageRecord ? profileRecordToUserProfile(profilePageRecord) : currentUser;
   const isOwnProfilePage = !selectedProfileId || selectedProfileId === currentProfile?.id;
+  const profileCompletion = calculateProfileCompletion(currentProfile, currentTravelPreferences);
   const validatedMembers = tripMemberProfiles[selectedTrip.id] ?? getTripMembers(selectedTrip);
+  const selectedGroupMatch = calculateGroupMatch(isAuthenticated ? currentUser : null, selectedTrip, validatedMembers);
   const acceptedTribeMemberIds = useMemo(() => new Set(
     tribeRequests.accepted.map((request) => request.requester_id === currentUser.id ? request.receiver_id : request.requester_id)
   ), [currentUser.id, tribeRequests.accepted]);
@@ -1036,6 +1050,15 @@ function App() {
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  useEffect(() => {
+    const shouldResumeOnboarding = Boolean(
+      authSession
+      && currentTravelPreferences?.onboarding_status === "draft"
+      && currentTravelPreferences.onboarding_started_at
+      && page === "dashboard"
+    );
+    if (shouldResumeOnboarding) go("onboarding");
+  }, [authSession, currentTravelPreferences?.onboarding_started_at, currentTravelPreferences?.onboarding_status, page]);
   const goBack = () => {
     const previous = navigationStack.current.pop();
     if (!previous) {
@@ -1173,12 +1196,13 @@ function App() {
     loadTripMembers(selectedTrip, authSession);
   }, [authSession, selectedTrip.id, userTripActions]);
 
-  const handleAuthSuccess = async (session: AuthSession) => {
+  const handleAuthSuccess = async (session: AuthSession, isNewAccount = false) => {
     const profile = await getCurrentProfile(session);
     setAuthSession(session);
     setCurrentProfile(profile);
     await refreshSocialData(session);
     setAuthModalOpen(false);
+    if (isNewAccount) go("onboarding");
   };
   const handleSignOut = async () => {
     await signOut(authSession?.access_token);
@@ -1729,6 +1753,17 @@ function App() {
           />
         )}
         {page === "landing" && <Landing trips={availableTrips} catalogActivities={catalog.activities} go={go} openTrip={openTrip} onTripAction={joinTrip} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={toggleTripFavorite} />}
+        {page === "onboarding" && currentProfile && (
+          <Suspense fallback={<FeatureLoading label="Chargement de ton profil d'aventure..." fullPage />}>
+            <OnboardingFlow
+              profile={currentProfile}
+              preferences={currentTravelPreferences}
+              onSavePreferences={updateTravelPreferencesFlow}
+              onUpdateProfile={updateProfileFlow}
+              onDone={() => go("dashboard")}
+            />
+          </Suspense>
+        )}
         {page === "dashboard" && (
           <Dashboard
             trips={availableTrips}
@@ -1761,7 +1796,7 @@ function App() {
           />
         )}
         {page === "create-trip" && <CreateTripPage proposerName={currentUser.name} initialTrip={createTripSeed} onPublish={publishCommunityTrip} />}
-        {page === "trip" && <TripDetail trip={selectedTrip} match={selectedTripMatch} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} onShareTrip={setShareTrip} creatorProfile={getKnownProfileRecord(selectedTrip.creator_id)} onViewProfile={openProfile} currentUserId={currentProfile?.id} acceptedTribeMemberIds={acceptedTribeMemberIds} onAddFriend={sendTribeConnectionRequest} onLeaveTrip={leaveTripFlow} onDeleteTrip={deleteTripFlow} onReportTrip={(trip) => openReportDialog({ type: "trip", label: trip.title, reportedTripId: trip.id, reportedUserId: trip.creator_id })} />}
+        {page === "trip" && <TripDetail trip={selectedTrip} match={selectedTripMatch} groupMatch={selectedGroupMatch} catalogActivities={catalog.activities} validatedMembers={validatedMembers} joinTrip={joinTrip} userTripActions={userTripActions} isFavorite={favoriteTripIds.includes(selectedTrip.id)} onToggleFavorite={toggleTripFavorite} onShareTrip={setShareTrip} creatorProfile={getKnownProfileRecord(selectedTrip.creator_id)} onViewProfile={openProfile} currentUserId={currentProfile?.id} acceptedTribeMemberIds={acceptedTribeMemberIds} onAddFriend={sendTribeConnectionRequest} onLeaveTrip={leaveTripFlow} onDeleteTrip={deleteTripFlow} onReportTrip={(trip) => openReportDialog({ type: "trip", label: trip.title, reportedTripId: trip.id, reportedUserId: trip.creator_id })} />}
         {page === "conversation" && <ConversationPage conversation={conversation} go={go} currentUser={currentUser} accessToken={authSession?.access_token} isAuthenticated={isAuthenticated} onRequireAuth={() => openAuthModal("Connecte-toi pour écrire dans la conversation.")} onFormalizeTrip={formalizeCatalogTrip} onViewProfile={openProfile} acceptedTribeMemberIds={acceptedTribeMemberIds} onAddFriend={sendTribeConnectionRequest} onLeaveTrip={leaveTripFlow} onDeleteTrip={deleteTripFlow} blockedUserIds={blockedUserIds} onReport={openReportDialog} onRefresh={async () => { if (authSession) await refreshSocialData(authSession); await refreshCatalog(); }} />}
         {page === "messages" && (
           <MessagesPage
@@ -1817,6 +1852,8 @@ function App() {
             trips={availableTrips}
             userTripActions={userTripActions}
             tribeMemberCount={tribeRequests.accepted.length}
+            profileCompletion={profileCompletion}
+            onResumeOnboarding={() => go("onboarding")}
             isBlocked={blockedUserIds.has(profilePageUser.id)}
             onReportUser={(user) => openReportDialog({ type: "user", label: user.name, reportedUserId: user.id })}
             onBlockUser={(user) => requestUserBlock(user.id, user.name)}
@@ -2017,7 +2054,7 @@ function AuthModal({
 }: {
   prompt: string;
   onClose: () => void;
-  onAuthenticated: (session: AuthSession) => Promise<void> | void;
+  onAuthenticated: (session: AuthSession, isNewAccount: boolean) => Promise<void> | void;
 }) {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [displayName, setDisplayName] = useState("");
@@ -2089,7 +2126,7 @@ function AuthModal({
         }, session.access_token);
       }
 
-      await onAuthenticated(session);
+      await onAuthenticated(session, mode === "signup");
     } catch (error) {
       setFeedback(getFriendlyAuthFeedback(error, mode));
     } finally {
@@ -4357,7 +4394,7 @@ function TripGrid({
   );
   const rankedTrips = useMemo(
     () => matchProfile
-      ? [...tripList].sort((left, right) => (matchByTripId.get(right.id)?.score ?? 0) - (matchByTripId.get(left.id)?.score ?? 0))
+      ? [...tripList].sort((left, right) => (matchByTripId.get(right.id)?.rankingScore ?? 0) - (matchByTripId.get(left.id)?.rankingScore ?? 0))
       : tripList,
     [matchByTripId, matchProfile, tripList]
   );
@@ -4400,11 +4437,13 @@ function TripGrid({
             <div className="absolute inset-0 bg-gradient-to-t from-forest-900/90 via-forest-900/25 to-transparent" />
             <span
               className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-2 text-xs font-bold text-forest-900 backdrop-blur"
-              title={match.reasons.join(" · ")}
+              title={match.positiveReasons.join(" · ")}
             >
-              {matchProfile
-                ? match.confidence === "élevée" ? `${match.score}% match avec toi` : `Match estimé : ${match.score}%`
-                : `Score estimé : ${match.score}%`}
+              {!matchProfile
+                ? "Idée à découvrir"
+                : match.score == null
+                  ? "Complète ton profil"
+                  : `${match.score}% match`}
             </span>
             <span className={`absolute right-4 top-4 rounded-full px-3 py-2 text-xs font-bold shadow-sm ${getTripCardType(trip) === "user_project" ? "bg-sun text-white" : "bg-white/90 text-forest-900 backdrop-blur"}`}>
               {getTripTypeLabel(trip)}
@@ -4451,9 +4490,9 @@ function TripGrid({
             <div className="mt-3 flex flex-wrap gap-2">
               {trip.ambience_tags.slice(0, 2).map((tag) => <span className="pill text-xs" key={tag}>{tag}</span>)}
             </div>
-            {matchProfile && match.confidence !== "élevée" && match.missingCriteria.length > 0 && (
-              <p className="mt-3 text-xs font-semibold text-forest-600">Complète ton profil pour affiner ce match.</p>
-            )}
+            {matchProfile && match.positiveReasons[0] && <p className="mt-3 text-sm font-semibold text-forest-800">{match.positiveReasons[0]}</p>}
+            {matchProfile && match.warningReasons[0] && <p className="mt-1 text-xs font-semibold text-amber-700">À vérifier : {match.warningReasons[0]}</p>}
+            {matchProfile && match.confidence !== "high" && match.missingFields.length > 0 && <p className="mt-1 text-xs font-semibold text-forest-600">Couverture {match.coverage}% · complète ton profil pour affiner.</p>}
             <div className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto]">
               <button className="btn-primary w-full disabled:cursor-default disabled:bg-forest-200 disabled:text-forest-700" disabled={actionState === "pending"} onClick={() => onTripAction(trip)}>{getTripActionLabel(trip, actionState)}</button>
               <button className="btn-secondary w-full py-3 sm:w-auto" onClick={() => openTrip(trip.id)}>Détails</button>
@@ -4554,6 +4593,7 @@ function MiniFact({ label, value }: { label: string; value: string }) {
 function TripDetail({
   trip,
   match,
+  groupMatch,
   catalogActivities,
   validatedMembers,
   joinTrip,
@@ -4572,6 +4612,7 @@ function TripDetail({
 }: {
   trip: Trip;
   match: TripMatchResult;
+  groupMatch: MatchResult;
   catalogActivities: MockLocalActivity[];
   validatedMembers: UserProfile[];
   joinTrip: (trip: Trip) => void | Promise<void>;
@@ -4649,7 +4690,9 @@ function TripDetail({
           </section>
         )}
         <ActivitiesSection activities={tripActivities} destination={trip.destination} usePexels={getTripCardType(trip) === "catalog"} />
-        <TripMatchSection match={match} />
+        <Suspense fallback={<FeatureLoading label="Calcul de ta compatibilité..." />}>
+          <TripMatchPanel tripMatch={match} groupMatch={groupMatch} />
+        </Suspense>
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
           <TripMembersSection members={validatedMembers} currentUserId={currentUserId} acceptedTribeMemberIds={acceptedTribeMemberIds} onViewProfile={onViewProfile} onAddFriend={onAddFriend} />
           <BudgetSection trip={trip} />
@@ -4680,59 +4723,6 @@ function TripDetail({
         />
       )}
     </>
-  );
-}
-
-function TripMatchSection({ match }: { match: TripMatchResult }) {
-  const requiresConnection = match.missingCriteria.includes("Connexion au profil");
-  const confidenceLabel = match.confidence === "élevée" ? "Précision élevée" : match.confidence === "moyenne" ? "Précision moyenne" : "Match estimé";
-
-  return (
-    <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <p className="pill">Match personnalisé</p>
-          <h2 className="mt-3 text-3xl font-semibold">
-            {requiresConnection
-              ? `${match.score}% score catalogue`
-              : match.confidence === "élevée" ? `${match.score}% match avec toi` : `Match estimé : ${match.score}%`}
-          </h2>
-          <p className="mt-2 text-sm font-semibold text-forest-600">{confidenceLabel}</p>
-        </div>
-        <div className="rounded-[1.25rem] bg-forest-900 px-6 py-4 text-center text-white">
-          <span className="text-4xl font-semibold">{match.score}%</span>
-          <span className="mt-1 block text-xs font-semibold text-white/70">compatibilité</span>
-        </div>
-      </div>
-
-      {requiresConnection ? (
-        <p className="mt-5 rounded-xl bg-skysoft p-4 font-semibold text-forest-800">Connecte-toi et complète ton profil pour voir ton match personnalisé.</p>
-      ) : (
-        <div className="mt-6 grid gap-5 lg:grid-cols-2">
-          <div>
-            <h3 className="font-semibold">Pourquoi ce Trip te correspond ?</h3>
-            <div className="mt-3 grid gap-2">
-              {match.reasons.slice(0, 4).map((reason) => (
-                <div className="flex items-start gap-2 rounded-xl bg-forest-50 px-3 py-2 text-sm font-semibold text-forest-800" key={reason}>
-                  <BadgeCheck className="mt-0.5 shrink-0 text-forest-700" size={16} />
-                  <span>{reason}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h3 className="font-semibold">Pour améliorer la précision</h3>
-            {match.missingCriteria.length > 0 ? (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {match.missingCriteria.slice(0, 5).map((criterion) => <span className="pill text-xs" key={criterion}>{criterion}</span>)}
-              </div>
-            ) : (
-              <p className="mt-3 text-sm text-forest-700">Ton profil contient assez d'informations pour un match précis.</p>
-            )}
-          </div>
-        </div>
-      )}
-    </section>
   );
 }
 
@@ -5116,10 +5106,12 @@ function ConversationPage({
     };
 
     loadConversationData();
-    const interval = window.setInterval(loadConversationData, 5_000);
+    const unsubscribe = subscribeToTripConversation(conversationId, accessToken, loadConversationData, conversation?.trip.id);
+    const interval = window.setInterval(loadConversationData, 30_000);
 
     return () => {
       mounted = false;
+      unsubscribe();
       window.clearInterval(interval);
     };
   }, [accessToken, conversation, conversationId, currentUser.id, currentUser.name]);
@@ -5364,7 +5356,9 @@ function ConversationPage({
 }
 
 type CompatibleTribeProfile = UserProfile & {
-  compatibilityScore: number;
+  compatibilityScore: number | null;
+  compatibilityRankingScore: number;
+  compatibilityMatch: MatchResult;
   compatibilityTags: string[];
   publicTrips: Trip[];
 };
@@ -5694,7 +5688,7 @@ function TribeProfileGrid({
           <div className="relative h-72 overflow-hidden">
             <img className="h-full w-full object-cover transition duration-700 group-hover:scale-105" src={member.photo_url} alt={member.name} />
             <div className="absolute inset-0 bg-gradient-to-t from-forest-900/90 via-forest-900/20 to-transparent" />
-            <span className="absolute left-4 top-4 rounded-full bg-white/92 px-3 py-2 text-xs font-bold text-forest-900 backdrop-blur">{member.compatibilityScore}% compatible</span>
+            <span className="absolute left-4 top-4 rounded-full bg-white/92 px-3 py-2 text-xs font-bold text-forest-900 backdrop-blur">{member.compatibilityScore == null ? "Profil à compléter" : `${member.compatibilityScore}% compatible`}</span>
             {member.verified && <span className="absolute right-4 top-4 rounded-full bg-sun px-3 py-2 text-xs font-bold text-white">Profil vérifié</span>}
             <div className="absolute inset-x-0 bottom-0 p-5 text-white">
               <h2 className="text-2xl font-semibold">{member.name}, {member.age_range}</h2>
@@ -5900,10 +5894,12 @@ function TribeDirectConversation({
     };
 
     loadMessages();
-    const interval = window.setInterval(loadMessages, 5_000);
+    const unsubscribe = subscribeToTribeConversation(connectionId, accessToken, loadMessages);
+    const interval = window.setInterval(loadMessages, 30_000);
 
     return () => {
       mounted = false;
+      unsubscribe();
       window.clearInterval(interval);
     };
   }, [accessToken, connectionId, currentUser.id, memberId, onConversationRead]);
@@ -5978,7 +5974,7 @@ function TribeDirectConversation({
             <img className="h-14 w-14 rounded-full object-cover" src={member.photo_url} alt={member.name} />
             <div>
               <p className="text-lg font-semibold">{member.name}</p>
-              <p className="text-sm text-forest-700">{isProfileOnline(member.last_seen_at) ? "En ligne" : "Déconnecté"} · {member.city} · {member.compatibilityScore}% compatible</p>
+              <p className="text-sm text-forest-700">{isProfileOnline(member.last_seen_at) ? "En ligne" : "Déconnecté"} · {member.city} · {member.compatibilityScore == null ? "compatibilité à préciser" : `${member.compatibilityScore}% compatible`}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -6402,15 +6398,22 @@ function getCompatiblePeople(userProfile: UserProfile, candidates: UserProfile[]
   return candidates
     .filter((candidate) => candidate.id !== userProfile.id)
     .map((candidate) => {
-      const compatibilityTags = getCompatibilityTags(userProfile, candidate);
-      const score = Math.min(98, 62 + compatibilityTags.length * 7 + (candidate.verified ? 8 : 0));
+      const compatibilityMatch = calculateUserMatch(userProfile, candidate);
+      const compatibilityTags = compatibilityMatch.positiveReasons;
       const publicTrips = availableTrips.filter((trip) => {
         const searchable = normalizeUiText(`${trip.title} ${trip.destination} ${trip.description} ${trip.activities.join(" ")} ${trip.ambience_tags.join(" ")}`);
         return candidate.preferred_ambiences.some((ambience) => searchable.includes(normalizeUiText(ambience))) || searchable.includes(normalizeUiText(candidate.adventure_style));
       }).slice(0, 2);
-      return { ...candidate, compatibilityScore: score, compatibilityTags: compatibilityTags.slice(0, 4), publicTrips };
+      return {
+        ...candidate,
+        compatibilityScore: compatibilityMatch.score,
+        compatibilityRankingScore: compatibilityMatch.rankingScore,
+        compatibilityMatch,
+        compatibilityTags: compatibilityTags.slice(0, 4),
+        publicTrips
+      };
     })
-    .sort((a, b) => b.compatibilityScore - a.compatibilityScore);
+    .sort((a, b) => b.compatibilityRankingScore - a.compatibilityRankingScore);
 }
 
 function getCompatibilityTags(userProfile: UserProfile, candidate: UserProfile) {
@@ -6659,6 +6662,8 @@ function Profile({
   trips: availableTrips,
   userTripActions,
   tribeMemberCount,
+  profileCompletion,
+  onResumeOnboarding,
   isBlocked,
   onReportUser,
   onBlockUser,
@@ -6679,6 +6684,8 @@ function Profile({
   trips: Trip[];
   userTripActions: UserTripActions | null;
   tribeMemberCount: number;
+  profileCompletion: ReturnType<typeof calculateProfileCompletion>;
+  onResumeOnboarding: () => void;
   isBlocked: boolean;
   onReportUser: (user: UserProfile) => void;
   onBlockUser: (user: UserProfile) => void;
@@ -6735,6 +6742,16 @@ function Profile({
           </div>
         )}
       </div>
+
+      {isOwnProfile && (
+        <section className="mt-8 rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div><p className="pill">Profil d'aventure</p><h2 className="mt-3 text-2xl font-semibold">Profil complété à {profileCompletion.percentage}%</h2><p className="mt-2 text-sm text-forest-700">{profileCompletion.missingFields.length ? `À préciser : ${profileCompletion.missingFields.slice(0, 3).join(", ")}.` : "Tes informations permettent un matching précis."}</p></div>
+            <button className="btn-primary shrink-0" onClick={onResumeOnboarding}>{profileCompletion.percentage >= 100 ? "Modifier mes préférences" : "Compléter mon profil"}</button>
+          </div>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-forest-100"><div className="h-full rounded-full bg-forest-800 transition-all" style={{ width: `${profileCompletion.percentage}%` }} /></div>
+        </section>
+      )}
 
       <ProfilePublicCard
         profileRecord={profile}
