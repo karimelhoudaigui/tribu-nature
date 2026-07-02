@@ -7426,14 +7426,20 @@ function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | nu
   const [sending, setSending] = useState(false);
   return (
     <VideoPageBackground source="videos/contact-background.m4v" label="Une personne contemple une cascade au cœur de la nature">
-      <section className="container-page grid min-h-[calc(100vh-8rem)] items-center gap-8 py-10 lg:grid-cols-[0.8fr_1.2fr] lg:py-14">
-        <div className="max-w-xl text-white">
-          <p className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-bold backdrop-blur">Nous contacter</p>
-          <h1 className="mt-5 text-4xl font-semibold leading-tight sm:text-5xl">Parlons de ton expérience.</h1>
-          <p className="mt-4 max-w-lg text-base leading-7 text-white/85 sm:text-lg">Une question, une idée ou un problème pendant la beta ? Écris-nous directement. Chaque retour nous aide à rendre les prochains départs plus simples.</p>
-        </div>
+      <section className="container-page flex min-h-[calc(100vh-8rem)] items-center py-10 text-white lg:py-14">
+        <div className="w-full max-w-5xl">
+          <div className="max-w-3xl">
+            <p className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-bold backdrop-blur">Nous contacter</p>
+            <h1 className="mt-5 text-4xl font-semibold leading-tight sm:text-5xl">Parlons de ton expérience.</h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">Une question, une idée ou un problème pendant la beta ? Écris-nous directement. Chaque retour nous aide à rendre les prochains départs plus simples.</p>
+          </div>
+          <div className="mt-8 grid gap-3 md:grid-cols-3">
+            <AboutValue eyebrow="Écoute" title="Chaque retour compte" text="Signale un problème ou partage ce qui pourrait rendre ton parcours plus simple." />
+            <AboutValue eyebrow="Aide" title="Une réponse humaine" text="Nous lisons les messages de la beta et revenons vers toi avec une réponse adaptée." />
+            <AboutValue eyebrow="Produit" title="Construire ensemble" text="Tes idées nous aident à prioriser les améliorations réellement utiles à la communauté." />
+          </div>
         <form
-          className="grid gap-4 rounded-lg bg-white/95 p-5 text-forest-900 shadow-2xl backdrop-blur sm:p-7"
+          className="mt-8 grid gap-4 rounded-lg bg-white/95 p-5 text-forest-900 shadow-2xl backdrop-blur sm:p-7 lg:max-w-3xl"
           onSubmit={async (event) => {
             event.preventDefault();
             if (!email.includes("@") || !subject.trim() || !body.trim()) { setFeedback("Complète tous les champs."); return; }
@@ -7456,6 +7462,7 @@ function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | nu
           <button className="btn-primary" disabled={sending} type="submit"><Mail className="mr-2 inline" size={18} />{sending ? "Envoi..." : "Envoyer"}</button>
           {feedback && <p className="rounded-lg bg-forest-50 p-3 text-sm font-semibold">{feedback}</p>}
         </form>
+        </div>
       </section>
     </VideoPageBackground>
   );
