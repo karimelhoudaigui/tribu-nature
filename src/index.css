@@ -12,6 +12,25 @@
   display: none;
 }
 
+.conversation-shell {
+  height: clamp(32rem, calc(100dvh - 7rem), 47rem);
+  min-height: 0;
+}
+
+.conversation-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 640px) {
+  .conversation-shell {
+    height: clamp(38rem, calc(100dvh - 7rem), 50rem);
+  }
+}
+
 @layer base {
   :root {
     color: #0c2b22;

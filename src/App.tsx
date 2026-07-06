@@ -5254,7 +5254,7 @@ function ConversationPage({
           </Panel>
         </aside>
 
-        <div className="card flex min-h-[560px] flex-col overflow-hidden sm:min-h-[680px]">
+        <div className="conversation-shell card flex flex-col overflow-hidden">
           <div className="border-b border-forest-100 bg-white p-5">
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -5265,7 +5265,7 @@ function ConversationPage({
             </div>
             {chatNotice && <p className="mt-3 rounded-lg bg-sun/15 px-3 py-2 text-sm font-semibold text-forest-800">{chatNotice}</p>}
           </div>
-          <div ref={messageScrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-forest-50 p-4 sm:p-6">
+          <div ref={messageScrollRef} className="conversation-scroll flex-1 space-y-4 bg-forest-50 p-4 sm:p-6">
             {displayMessages.map((message) => (
               <div
                 className={`rounded-lg p-4 ${message.system ? "bg-skysoft text-forest-900" : message.authorId === currentUser.id ? "ml-auto max-w-[88%] cursor-pointer bg-forest-800 text-white" : "max-w-[88%] bg-white"}`}
@@ -5752,13 +5752,13 @@ function TribeInbox({
   onBlockUser: (userId: string, name: string) => void;
 }) {
   return (
-    <section className="mt-6 grid gap-4 lg:mt-8 lg:grid-cols-[0.86fr_1.14fr] lg:gap-6">
-      <div className="overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
+    <section className="mt-6 grid gap-4 lg:mt-8 lg:grid-cols-[0.86fr_1.14fr] lg:items-stretch lg:gap-6">
+      <div className="flex min-h-0 flex-col overflow-hidden rounded-[1.5rem] bg-white shadow-soft lg:h-full">
         <div className="border-b border-forest-100 p-4">
           <p className="text-sm font-semibold text-forest-700">Ma tribu</p>
           <h2 className="text-2xl font-semibold">Tes amis</h2>
         </div>
-        <div className="flex gap-2 overflow-x-auto p-2 lg:block lg:max-h-[680px] lg:overflow-y-auto lg:p-0">
+        <div className="flex gap-2 overflow-x-auto p-2 lg:block lg:min-h-0 lg:flex-1 lg:overflow-x-hidden lg:overflow-y-auto lg:p-0">
           {people.map((member) => {
             const active = selectedMember?.id === member.id;
             const connection = connections.find((item) => (
@@ -5906,7 +5906,7 @@ function TribeDirectConversation({
 
   if (!member) {
     return (
-      <div className="grid min-h-[520px] place-items-center rounded-[1.5rem] bg-white p-8 text-center shadow-soft">
+      <div className="conversation-shell grid place-items-center rounded-[1.5rem] bg-white p-8 text-center shadow-soft">
         <div>
           <MessageCircle className="mx-auto text-forest-700" size={40} />
           <h2 className="mt-4 text-2xl font-semibold">Choisis une personne</h2>
@@ -5967,7 +5967,7 @@ function TribeDirectConversation({
   };
 
   return (
-    <div className="flex min-h-[560px] flex-col overflow-hidden rounded-[1.5rem] bg-white shadow-soft sm:min-h-[680px]">
+    <div className="conversation-shell flex flex-col overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
       <div className="border-b border-forest-100 p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
@@ -5987,7 +5987,7 @@ function TribeDirectConversation({
         {notice && <p className="mt-3 rounded-lg bg-sun/15 px-3 py-2 text-sm font-semibold text-forest-800">{notice}</p>}
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto bg-forest-50 p-4">
+      <div className="conversation-scroll flex-1 space-y-3 bg-forest-50 p-4">
         {messages.length === 0 && (
           <div className="grid h-full min-h-72 place-items-center text-center">
             <div>
