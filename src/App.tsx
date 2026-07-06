@@ -191,6 +191,9 @@ type Conversation = {
   }[];
 };
 
+const brandIconUrl = `${import.meta.env.BASE_URL}brand/tribu-nature-icon.png`;
+const brandLogoUrl = `${import.meta.env.BASE_URL}brand/tribu-nature-logo-display.png`;
+
 const navItems: { page: Page; label: string }[] = [
   { page: "dashboard", label: "Destination" },
   { page: "my-trips", label: "Mes Trips" },
@@ -1946,13 +1949,11 @@ function Header({
   const visibleNavItems = currentProfile ? navItems.filter((item) => item.page !== "profil") : navItems;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-forest-100 bg-cream/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full max-w-[100vw] overflow-x-clip border-b border-forest-100 bg-cream/90 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between">
-        <button className="flex items-center gap-2 font-semibold" onClick={() => go("dashboard")} aria-label="Accueil Tribu Nature">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-forest-800 text-white">
-            <Mountain size={19} />
-          </span>
-          <span>Tribu Nature</span>
+        <button className="flex items-center gap-2.5 font-semibold" onClick={() => go("dashboard")} aria-label="Accueil Tribu Nature">
+          <img className="h-11 w-11 shrink-0 object-contain" src={brandIconUrl} alt="" />
+          <span className="text-sm sm:text-base">Tribu Nature</span>
         </button>
         <nav className="hidden items-center gap-1 lg:flex">
           {visibleNavItems.map((item) => (
@@ -2138,10 +2139,13 @@ function AuthModal({
     <div className="fixed inset-0 z-[80] grid place-items-center bg-forest-900/60 p-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-[1.5rem] bg-white p-5 shadow-soft">
         <div className="flex items-start justify-between gap-4">
-          <div>
+          <div className="flex min-w-0 items-start gap-3">
+            <img className="h-16 w-16 shrink-0 object-contain" src={brandIconUrl} alt="Logo Tribu Nature" />
+            <div>
             <p className="pill">{mode === "signup" ? "Créer ton compte" : "Connexion"}</p>
             <h2 className="mt-3 text-2xl font-semibold">Entre dans ta tribu.</h2>
             <p className="mt-2 text-sm leading-6 text-forest-700">{prompt}</p>
+            </div>
           </div>
           <button className="rounded-full bg-forest-50 p-2" onClick={onClose} aria-label="Fermer">
             <X size={18} />
@@ -2492,6 +2496,9 @@ function Landing({
         <div className="absolute inset-0 bg-gradient-to-b from-forest-900/45 via-forest-900/25 to-cream" />
         <div className="container-page relative flex min-h-[720px] items-center py-20">
           <div className="max-w-3xl pt-12 text-white">
+            <div className="mb-5 grid h-32 w-32 place-items-center rounded-[1.25rem] bg-white/92 p-2 shadow-xl backdrop-blur">
+              <img className="h-full w-full object-contain" src={brandLogoUrl} alt="Tribu Nature" />
+            </div>
             <span className="mb-5 inline-flex rounded-full bg-white/18 px-4 py-2 text-sm font-semibold backdrop-blur-md">
               Plateforme sociale intelligente pour micro-aventures nature
             </span>
@@ -7891,9 +7898,12 @@ function Footer({ go }: { go: (page: Page) => void }) {
   return (
     <footer className="hidden border-t border-forest-100 bg-white lg:block">
       <div className="container-page grid gap-6 py-8 sm:grid-cols-[1fr_auto] sm:items-center">
-        <div>
-          <p className="font-semibold">Tribu Nature</p>
-          <p className="mt-1 text-sm text-forest-700">Une plateforme sociale intelligente qui transforme une envie individuelle de nature en aventure collective organisée.</p>
+        <div className="flex items-center gap-4">
+          <img className="h-20 w-20 shrink-0 object-contain" src={brandLogoUrl} alt="Tribu Nature" />
+          <div>
+            <p className="font-semibold">Tribu Nature</p>
+            <p className="mt-1 text-sm text-forest-700">Une plateforme sociale intelligente qui transforme une envie individuelle de nature en aventure collective organisée.</p>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           {[
