@@ -79,5 +79,5 @@ function storePhotos(cacheKey: string, photos: PexelsActivityPhoto[]) {
 }
 
 function getStorageKey(cacheKey: string) {
-  return `tribu-nature:pexels:${cacheKey}`;
+  return `tripeer:pexels:${cacheKey}`;
 }

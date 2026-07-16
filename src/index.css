@@ -25,6 +25,60 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.app-onboarding-card-flow {
+  animation: app-onboarding-card-flow 12s ease-in-out infinite alternate;
+}
+
+.app-onboarding-phone-scroll {
+  animation: app-onboarding-phone-scroll 8s ease-in-out infinite alternate;
+}
+
+.app-onboarding-form-fill {
+  animation: app-onboarding-form-fill 2.4s ease-in-out infinite both;
+  transform-origin: left center;
+}
+
+@keyframes app-onboarding-card-flow {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-38%);
+  }
+}
+
+@keyframes app-onboarding-phone-scroll {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-34%);
+  }
+}
+
+@keyframes app-onboarding-form-fill {
+  0% {
+    transform: scaleX(0.18);
+    opacity: 0.5;
+  }
+
+  55%,
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-onboarding-card-flow,
+  .app-onboarding-phone-scroll,
+  .app-onboarding-form-fill {
+    animation: none;
+  }
+}
+
 @media (min-width: 640px) {
   .conversation-shell {
     height: clamp(38rem, calc(100dvh - 7rem), 50rem);

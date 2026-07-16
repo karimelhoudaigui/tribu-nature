@@ -35,6 +35,11 @@ export type UserProfileRecord = {
   is_seed_profile?: boolean | null;
   last_seen_at?: string | null;
   preferred_language?: string | null;
+  app_onboarding_status?: "not_started" | "in_progress" | "completed" | "skipped";
+  app_onboarding_started_at?: string | null;
+  app_onboarding_completed_at?: string | null;
+  app_onboarding_skipped_at?: string | null;
+  app_onboarding_last_step?: number | null;
   account_status?: "active" | "disabled" | "deleted";
   deleted_at?: string | null;
   created_at?: string;
@@ -57,6 +62,11 @@ export type UserProfileUpdate = Partial<Pick<
   | "past_trips"
   | "badges"
   | "preferred_language"
+  | "app_onboarding_status"
+  | "app_onboarding_started_at"
+  | "app_onboarding_completed_at"
+  | "app_onboarding_skipped_at"
+  | "app_onboarding_last_step"
 >>;
 
 type AuthApiResponse = {
@@ -69,7 +79,8 @@ type AuthApiResponse = {
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const authStorageKey = "tribu_nature_auth_session";
+const authStorageKey = "tripeer_auth_session";
+const legacyAuthStorageKey = "tribu_nature_auth_session";
 
 export function hasSupabaseAuthConfig() {
   return Boolean(supabaseUrl && supabaseAnonKey);
@@ -312,7 +323,7 @@ export async function touchPresence(accessToken: string): Promise<string> {
 export async function upsertCurrentProfile(session: AuthSession, displayName?: string): Promise<UserProfileRecord> {
   ensureAuthConfig();
 
-  const fallbackName = session.user.user_metadata?.display_name ?? session.user.user_metadata?.name ?? session.user.email?.split("@")[0] ?? "Membre Tribu Nature";
+  const fallbackName = session.user.user_metadata?.display_name ?? session.user.user_metadata?.name ?? session.user.email?.split("@")[0] ?? "Membre tripeer";
   const row = {
     id: session.user.id,
     email: session.user.email ?? null,
@@ -400,11 +411,14 @@ async function requestAuth<T>(path: string, init: RequestInit): Promise<T> {
 
 function readStoredSession(): AuthSession | null {
   if (typeof window === "undefined") return null;
-  const raw = window.localStorage.getItem(authStorageKey);
+  const raw = window.localStorage.getItem(authStorageKey) ?? window.localStorage.getItem(legacyAuthStorageKey);
   if (!raw) return null;
 
   try {
-    return JSON.parse(raw) as AuthSession;
+    const session = JSON.parse(raw) as AuthSession;
+    window.localStorage.setItem(authStorageKey, JSON.stringify(session));
+    window.localStorage.removeItem(legacyAuthStorageKey);
+    return session;
   } catch {
     clearStoredSession();
     return null;
@@ -419,6 +433,7 @@ function storeSession(session: AuthSession) {
 function clearStoredSession() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(authStorageKey);
+  window.localStorage.removeItem(legacyAuthStorageKey);
 }
 
 function getSupabaseUrl() {

@@ -158,6 +158,8 @@ import {
 import type { Activity, MockLocalActivity, OnboardingProfile, TravelPreferences, Trip, UserProfile } from "./types";
 import { calculateProfileCompletion } from "./features/onboarding/profileCompletion";
 import { subscribeToTripConversation, subscribeToTribeConversation, subscribeToUserSocialUpdates } from "./services/realtimeService";
+import { AppOnboardingTutorial } from "./features/appOnboarding/AppOnboardingTutorial";
+import { useAppOnboarding } from "./features/appOnboarding/useAppOnboarding";
 
 const OnboardingFlow = lazy(() => import("./features/onboarding/OnboardingFlow").then((module) => ({ default: module.OnboardingFlow })));
 const TripMatchPanel = lazy(() => import("./features/trips/TripMatchPanel").then((module) => ({ default: module.TripMatchPanel })));
@@ -191,8 +193,8 @@ type Conversation = {
   }[];
 };
 
-const brandIconUrl = `${import.meta.env.BASE_URL}brand/tribu-nature-icon.png`;
-const brandLogoUrl = `${import.meta.env.BASE_URL}brand/tribu-nature-logo-display.png`;
+const brandIconUrl = `${import.meta.env.BASE_URL}brand/tripeer-icon.png`;
+const brandLogoUrl = `${import.meta.env.BASE_URL}brand/tripeer-logo-display.png`;
 
 const navItems: { page: Page; label: string }[] = [
   { page: "dashboard", label: "Destination" },
@@ -509,7 +511,7 @@ function getTripMembers(_trip?: Trip): UserProfile[] {
 }
 
 function getFallbackAvatar(name: string) {
-  const initials = (name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "TN").replace(/[^A-Z0-9À-ÖØ-Þ]/g, "");
+  const initials = (name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "TR").replace(/[^A-Z0-9À-ÖØ-Þ]/g, "");
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" rx="48" fill="#dfece3"/><text x="128" y="144" text-anchor="middle" font-family="Arial,sans-serif" font-size="78" font-weight="700" fill="#174a3a">${initials}</text></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
@@ -527,7 +529,7 @@ function profileRecordToUserProfile(profile: UserProfileRecord, travelPreference
     age_range: profile.age_range ?? "Membre",
     city: profile.city ?? "Ville à préciser",
     photo_url: avatarUrl ?? getFallbackAvatar(profile.display_name),
-    bio: profile.bio ?? "Profil Tribu Nature en construction.",
+    bio: profile.bio ?? "Profil tripeer en construction.",
     verified: Boolean(profile.verified),
     physical_level: profile.physical_level ?? "À préciser",
     budget_range: profile.budget_range ?? "À préciser",
@@ -545,7 +547,7 @@ function fallbackProfileRecord(profileId: string): UserProfileRecord {
   return {
     id: profileId,
     email: null,
-    display_name: "Profil Tribu",
+    display_name: "Profil tripeer",
     avatar_url: null,
     city: null,
     bio: "Ce profil est en cours de chargement. Les informations publiques apparaîtront ici dès qu'elles seront disponibles.",
@@ -577,16 +579,21 @@ function getTripCardType(trip: Trip) {
 }
 
 function isTripPubliclyVisible(trip: Trip) {
-  return (trip.visibility ?? "public") === "public" && (trip.moderation_status ?? "approved") === "approved";
+  return (trip.visibility ?? "public") === "public" && (trip.moderation_status ?? "approved") === "approved" && trip.planning_status !== "confirmed";
 }
 
 function getTripTypeLabel(trip: Trip) {
   return getTripCardType(trip) === "user_project" ? "Projet utilisateur" : "Idée de voyage";
 }
 
-function getTripContextText(trip: Trip) {
+function getTripCreatorDisplayName(trip: Trip, currentUserId?: string | null) {
+  if (trip.creator_id && trip.creator_id === currentUserId) return "Vous";
+  return trip.creator_name ?? trip.created_by ?? "un membre";
+}
+
+function getTripContextText(trip: Trip, currentUserId?: string | null) {
   if (getTripCardType(trip) === "user_project") {
-    return `Proposé par ${trip.creator_name ?? trip.created_by ?? "un membre"}`;
+    return `Proposé par ${getTripCreatorDisplayName(trip, currentUserId)}`;
   }
 
   return "À organiser ensemble";
@@ -705,11 +712,12 @@ function App() {
   const [tripMemberProfiles, setTripMemberProfiles] = useState<Record<string, UserProfile[]>>({});
   const [authSession, setAuthSession] = useState<AuthSession | null>(null);
   const [currentProfile, setCurrentProfile] = useState<UserProfileRecord | null>(null);
+  const [newAccountTutorialPending, setNewAccountTutorialPending] = useState(false);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
   const [viewedProfile, setViewedProfile] = useState<UserProfileRecord | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authPrompt, setAuthPrompt] = useState("Connecte-toi pour accéder aux actions sociales de Tribu Nature.");
+  const [authPrompt, setAuthPrompt] = useState("Connecte-toi pour accéder aux actions sociales de tripeer.");
   const [userTripActions, setUserTripActions] = useState<UserTripActions | null>(null);
   const [favoriteTripIds, setFavoriteTripIds] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
@@ -996,6 +1004,17 @@ function App() {
   const profilePageUser = profilePageRecord ? profileRecordToUserProfile(profilePageRecord) : currentUser;
   const isOwnProfilePage = !selectedProfileId || selectedProfileId === currentProfile?.id;
   const profileCompletion = calculateProfileCompletion(currentProfile, currentTravelPreferences);
+  const updateCurrentProfileFromOnboarding = useCallback((profile: UserProfileRecord) => {
+    setCurrentProfile(profile);
+    if (!selectedProfileId || selectedProfileId === profile.id) {
+      setViewedProfile(profile);
+    }
+  }, [selectedProfileId]);
+  const appOnboarding = useAppOnboarding({
+    profile: currentProfile,
+    accessToken: authSession?.access_token,
+    onProfileUpdated: updateCurrentProfileFromOnboarding
+  });
   const validatedMembers = tripMemberProfiles[selectedTrip.id] ?? getTripMembers(selectedTrip);
   const selectedGroupMatch = calculateGroupMatch(isAuthenticated ? currentUser : null, selectedTrip, validatedMembers);
   const acceptedTribeMemberIds = useMemo(() => new Set(
@@ -1125,6 +1144,11 @@ function App() {
       window.removeEventListener("touchcancel", cancelTouch);
     };
   }, [authModalOpen, joinRequestConfirmationTrip, page, shareTrip]);
+  useEffect(() => {
+    if ((!appOnboarding.shouldAutoOpen && !newAccountTutorialPending) || authModalOpen || passwordRecoveryOpen) return;
+    appOnboarding.openInitial();
+    setNewAccountTutorialPending(false);
+  }, [appOnboarding, authModalOpen, newAccountTutorialPending, passwordRecoveryOpen]);
   const openTrip = (id: string) => {
     setSelectedTripId(id);
     go("trip");
@@ -1140,6 +1164,18 @@ function App() {
   const openProfile = (profileId?: string | null) => {
     setSelectedProfileId(profileId && profileId !== currentProfile?.id ? profileId : null);
     go("profil", { keepSelectedProfile: true });
+  };
+  const skipAppOnboarding = async (step: number) => {
+    await appOnboarding.finish("skipped", step);
+    go("dashboard", { replace: true });
+  };
+  const completeAppOnboardingToProfile = async () => {
+    await appOnboarding.finish("completed", 5);
+    go("profil", { replace: true });
+  };
+  const completeAppOnboardingToExplore = async () => {
+    await appOnboarding.finish("completed", 5);
+    go("dashboard", { replace: true });
   };
   const openTribeInbox = (memberId?: string) => {
     setSelectedTribeMessageMemberId(memberId ?? null);
@@ -1205,12 +1241,14 @@ function App() {
     setCurrentProfile(profile);
     await refreshSocialData(session);
     setAuthModalOpen(false);
-    if (isNewAccount) go("onboarding");
+    setNewAccountTutorialPending(isNewAccount);
+    if (isNewAccount) go("dashboard", { replace: true });
   };
   const handleSignOut = async () => {
     await signOut(authSession?.access_token);
     setAuthSession(null);
     setCurrentProfile(null);
+    setNewAccountTutorialPending(false);
     setSelectedProfileId(null);
     setViewedProfile(null);
     setUserTripActions(null);
@@ -1625,7 +1663,7 @@ function App() {
       messages: [
         {
           id: "system-1",
-          author: "Tribu Nature",
+          author: "tripeer",
           content: getTripCardType(trip) === "user_project"
             ? `Conversation créée pour demander à rejoindre le projet ${trip.title}.`
             : `Conversation d'intérêt créée pour ${trip.title}. Organisez ensemble les dates, le transport, l'hébergement et les activités.`,
@@ -1781,6 +1819,7 @@ function App() {
             getCreatorProfile={getKnownProfileRecord}
             onViewProfile={openProfile}
             matchProfile={isAuthenticated ? currentUser : null}
+            currentUserId={currentProfile?.id}
           />
         )}
         {page === "my-trips" && (
@@ -1857,6 +1896,7 @@ function App() {
             tribeMemberCount={tribeRequests.accepted.length}
             profileCompletion={profileCompletion}
             onResumeOnboarding={() => go("onboarding")}
+            onReplayAppOnboarding={appOnboarding.reopen}
             isBlocked={blockedUserIds.has(profilePageUser.id)}
             onReportUser={(user) => openReportDialog({ type: "user", label: user.name, reportedUserId: user.id })}
             onBlockUser={(user) => requestUserBlock(user.id, user.name)}
@@ -1865,7 +1905,7 @@ function App() {
         )}
         {page === "prestataires" && <Providers />}
         {page === "securite" && <Safety />}
-        {page === "settings" && <SettingsPage profile={currentProfile} accessToken={authSession?.access_token} blocks={userBlocks} onRequireAuth={() => openAuthModal("Connecte-toi pour gérer ton compte.")} onProfileUpdated={(profile) => setCurrentProfile(profile)} onSignOut={handleSignOut} onUnblock={unblockUserFlow} onDeactivate={deactivateAccountFlow} />}
+        {page === "settings" && <SettingsPage profile={currentProfile} accessToken={authSession?.access_token} blocks={userBlocks} onRequireAuth={() => openAuthModal("Connecte-toi pour gérer ton compte.")} onProfileUpdated={(profile) => setCurrentProfile(profile)} onSignOut={handleSignOut} onUnblock={unblockUserFlow} onDeactivate={deactivateAccountFlow} onReplayAppOnboarding={appOnboarding.reopen} />}
         {page === "cgu" && <LegalPage kind="cgu" />}
         {page === "privacy" && <LegalPage kind="privacy" />}
         {page === "about" && <AboutPage />}
@@ -1882,6 +1922,16 @@ function App() {
         </div>
       )}
       {authModalOpen && <AuthModal prompt={authPrompt} onClose={() => setAuthModalOpen(false)} onAuthenticated={handleAuthSuccess} />}
+      <AppOnboardingTutorial
+        open={appOnboarding.isOpen}
+        mode={appOnboarding.mode}
+        initialStep={appOnboarding.initialStep}
+        onStepViewed={appOnboarding.markStepViewed}
+        onSkip={skipAppOnboarding}
+        onCompleteProfile={completeAppOnboardingToProfile}
+        onExplore={completeAppOnboardingToExplore}
+        onCloseReopen={appOnboarding.closeReopen}
+      />
       {passwordRecoveryOpen && authSession && <PasswordRecoveryDialog accessToken={authSession.access_token} onClose={() => setPasswordRecoveryOpen(false)} />}
       {reportTarget && <ReportDialog target={reportTarget} onCancel={() => setReportTarget(null)} onSubmit={submitReport} />}
       {blockTarget && (
@@ -1951,9 +2001,9 @@ function Header({
   return (
     <header className="sticky top-0 z-50 w-full max-w-[100vw] overflow-x-clip border-b border-forest-100 bg-cream/90 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between">
-        <button className="flex items-center gap-2.5 font-semibold" onClick={() => go("dashboard")} aria-label="Accueil Tribu Nature">
+        <button className="flex items-center gap-2.5 font-semibold" onClick={() => go("dashboard")} aria-label="Accueil tripeer">
           <img className="h-11 w-11 shrink-0 object-contain" src={brandIconUrl} alt="" />
-          <span className="text-sm sm:text-base">Tribu Nature</span>
+          <span className="text-sm sm:text-base">tripeer</span>
         </button>
         <nav className="hidden items-center gap-1 lg:flex">
           {visibleNavItems.map((item) => (
@@ -2140,7 +2190,7 @@ function AuthModal({
       <div className="w-full max-w-md rounded-[1.5rem] bg-white p-5 shadow-soft">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
-            <img className="h-16 w-16 shrink-0 object-contain" src={brandIconUrl} alt="Logo Tribu Nature" />
+            <img className="h-16 w-16 shrink-0 object-contain" src={brandIconUrl} alt="Logo tripeer" />
             <div>
             <p className="pill">{mode === "signup" ? "Créer ton compte" : "Connexion"}</p>
             <h2 className="mt-3 text-2xl font-semibold">Entre dans ta tribu.</h2>
@@ -2497,14 +2547,14 @@ function Landing({
         <div className="container-page relative flex min-h-[720px] items-center py-20">
           <div className="max-w-3xl pt-12 text-white">
             <div className="mb-5 grid h-32 w-32 place-items-center rounded-[1.25rem] bg-white/92 p-2 shadow-xl backdrop-blur">
-              <img className="h-full w-full object-contain" src={brandLogoUrl} alt="Tribu Nature" />
+              <img className="h-full w-full object-contain" src={brandLogoUrl} alt="tripeer" />
             </div>
             <span className="mb-5 inline-flex rounded-full bg-white/18 px-4 py-2 text-sm font-semibold backdrop-blur-md">
               Plateforme sociale intelligente pour micro-aventures nature
             </span>
             <h1 className="text-5xl font-semibold leading-tight sm:text-6xl lg:text-7xl">Pars seul. Trouve ton groupe. Vis ton aventure.</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-white/92">
-              Tribu Nature t'aide à rejoindre des personnes compatibles, découvrir une destination nature, composer des activités locales et générer un planning prêt à vivre.
+              tripeer t'aide à rejoindre des personnes compatibles, découvrir une destination nature, composer des activités locales et générer un planning prêt à vivre.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button className="btn-primary bg-white text-forest-900 hover:bg-forest-50" onClick={() => go("dashboard")}>Voir mes Trips compatibles</button>
@@ -2557,7 +2607,7 @@ function Landing({
           <div>
             <p className="pill">Confiance</p>
             <h2 className="section-title mt-4">Petit groupe, profils vérifiés, rythme adapté.</h2>
-            <p className="mt-4 leading-8 text-forest-700">Tribu Nature n'est pas une app de dating ni une agence qui vend un package fermé. C'est un espace pour composer une aventure avec des personnes compatibles et des prestataires locaux fiables.</p>
+            <p className="mt-4 leading-8 text-forest-700">tripeer n'est pas une app de dating ni une agence qui vend un package fermé. C'est un espace pour composer une aventure avec des personnes compatibles et des prestataires locaux fiables.</p>
           </div>
           <div className="grid gap-3">
             {["Profils publics", "Signalement et blocage", "Groupes limités", "Activités encadrées", "Règles de comportement", "Demandes contrôlées"].map((item) => (
@@ -3410,6 +3460,25 @@ function CreateTripPage({
     setActivitiesWanted((prev) => (prev.includes(value) ? prev : [...prev, value]));
     setCustomActivity("");
   };
+  const addImageSelection = (files: File[]) => {
+    if (files.length === 0) return;
+    const nextFiles = [...imageFiles, ...files];
+    const error = validateImageFiles(nextFiles);
+    if (error) {
+      setPublishError(error);
+      return;
+    }
+    setImageFiles(nextFiles);
+    setImagePreviews((previous) => [...previous, ...files.map((file) => URL.createObjectURL(file))]);
+  };
+  const removeImageSelection = (index: number) => {
+    setImageFiles((previous) => previous.filter((_, itemIndex) => itemIndex !== index));
+    setImagePreviews((previous) => {
+      const removedPreview = previous[index];
+      if (removedPreview) URL.revokeObjectURL(removedPreview);
+      return previous.filter((_, itemIndex) => itemIndex !== index);
+    });
+  };
   const publishTrip = async () => {
     if (isPublishing) return;
     setPublishError("");
@@ -3448,7 +3517,7 @@ function CreateTripPage({
         </div>
         <div className="rounded-[1.25rem] bg-white p-4 shadow-sm">
           <p className="text-sm font-semibold text-forest-700">Proposée par</p>
-          <p className="mt-1 text-xl font-semibold">{proposerName}</p>
+          <p className="mt-1 text-xl font-semibold">Vous</p>
         </div>
       </div>
 
@@ -3507,20 +3576,20 @@ function CreateTripPage({
                     onChange={(event) => {
                       const files = Array.from(event.target.files ?? []);
                       event.target.value = "";
-                      const error = validateImageFiles(files);
-                      if (error) {
-                        setPublishError(error);
-                        return;
-                      }
-                      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
-                      setImageFiles(files);
-                      setImagePreviews(files.map((file) => URL.createObjectURL(file)));
+                      addImageSelection(files);
                     }}
                   />
                 </label>
                 {imagePreviews.length > 0 && (
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {imagePreviews.map((preview, index) => <img className="aspect-square w-full rounded-lg object-cover" src={preview} alt={`Photo ${index + 1}`} key={preview} />)}
+                    {imagePreviews.map((preview, index) => (
+                      <div className="relative" key={preview}>
+                        <img className="aspect-square w-full rounded-lg object-cover" src={preview} alt={`Photo ${index + 1}`} />
+                        <button className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-white/90 text-red-700 shadow-sm" onClick={() => removeImageSelection(index)} aria-label={`Retirer la photo ${index + 1}`}>
+                          <X size={15} />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </label>
@@ -3910,7 +3979,8 @@ function Dashboard({
   onToggleFavorite,
   getCreatorProfile,
   onViewProfile,
-  matchProfile
+  matchProfile,
+  currentUserId
 }: {
   trips: Trip[];
   catalogActivities: MockLocalActivity[];
@@ -3924,17 +3994,20 @@ function Dashboard({
   getCreatorProfile: (profileId?: string | null) => UserProfileRecord | null;
   onViewProfile: (profileId: string) => void;
   matchProfile: UserProfile | null;
+  currentUserId?: string;
 }) {
   const [activeSection, setActiveSection] = useState<"trips" | "explore">("trips");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [openFilter, setOpenFilter] = useState<ResultFilterKey | null>(null);
   const [destinationSearch, setDestinationSearch] = useState("");
+  const filterShellRef = useRef<HTMLElement | null>(null);
   const [filterAnswers, setFilterAnswers] = useState<Record<string, string | string[]>>({
     availability: [],
     destinationZones: []
   });
-  const userProjectTrips = useMemo(() => dashboardTrips.filter((trip) => getTripCardType(trip) === "user_project"), [dashboardTrips]);
-  const catalogTrips = useMemo(() => dashboardTrips.filter((trip) => getTripCardType(trip) === "catalog"), [dashboardTrips]);
+  const proposalTrips = useMemo(() => dashboardTrips.filter((trip) => trip.planning_status !== "confirmed"), [dashboardTrips]);
+  const userProjectTrips = useMemo(() => proposalTrips.filter((trip) => getTripCardType(trip) === "user_project"), [proposalTrips]);
+  const catalogTrips = useMemo(() => proposalTrips.filter((trip) => getTripCardType(trip) === "catalog"), [proposalTrips]);
   const sectionTrips = activeSection === "trips" ? userProjectTrips : catalogTrips;
   const activeFilterTags = useMemo(() => buildActiveResultFilterTags(activeFilters, filterAnswers), [activeFilters, filterAnswers]);
   const filteredTrips = useMemo(() => {
@@ -3963,6 +4036,16 @@ function Dashboard({
     setActiveSection(section);
     setOpenFilter(null);
   };
+  useEffect(() => {
+    if (!openFilter) return;
+    const closePanel = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Node && filterShellRef.current?.contains(target)) return;
+      setOpenFilter(null);
+    };
+    document.addEventListener("pointerdown", closePanel);
+    return () => document.removeEventListener("pointerdown", closePanel);
+  }, [openFilter]);
 
   return (
     <section className="container-page py-6 sm:py-8">
@@ -3994,6 +4077,7 @@ function Dashboard({
         {destinationSearch && <button className="rounded-full p-1 text-forest-500 hover:bg-forest-50" onClick={() => setDestinationSearch("")} aria-label="Effacer la recherche"><X size={17} /></button>}
       </label>
       <ResultFilters
+        rootRef={filterShellRef}
         activeFilters={activeFilterTags}
         filterAnswers={filterAnswers}
         openFilter={openFilter}
@@ -4021,7 +4105,7 @@ function Dashboard({
             </div>
           </div>
         ) : (
-          <TripGrid trips={filteredTrips} catalogActivities={catalogActivities} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} getCreatorProfile={getCreatorProfile} onViewProfile={onViewProfile} matchProfile={matchProfile} />
+          <TripGrid trips={filteredTrips} catalogActivities={catalogActivities} openTrip={openTrip} onTripAction={onTripAction} userTripActions={userTripActions} favoriteTripIds={favoriteTripIds} onToggleFavorite={onToggleFavorite} getCreatorProfile={getCreatorProfile} onViewProfile={onViewProfile} matchProfile={matchProfile} currentUserId={currentUserId} />
         )
       )}
     </section>
@@ -4029,6 +4113,7 @@ function Dashboard({
 }
 
 function ResultFilters({
+  rootRef,
   activeFilters,
   filterAnswers,
   openFilter,
@@ -4040,6 +4125,7 @@ function ResultFilters({
   onToggle,
   onTogglePanel
 }: {
+  rootRef: { current: HTMLElement | null };
   activeFilters: string[];
   filterAnswers: Record<string, string | string[]>;
   openFilter: ResultFilterKey | null;
@@ -4052,7 +4138,7 @@ function ResultFilters({
   onTogglePanel: (filter: ResultFilterKey) => void;
 }) {
   return (
-    <section className="mt-6 rounded-[1.25rem] bg-white p-3 shadow-sm">
+    <section className="mt-6 rounded-[1.25rem] bg-white p-3 shadow-sm" ref={rootRef}>
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         {resultFilterButtons.map((filter) => {
           const active = openFilter === filter.key;
@@ -4112,10 +4198,14 @@ function ResultFilterPanel({
   const departureCity = typeof filterAnswers.departureCity === "string" ? filterAnswers.departureCity : "";
   const [departureText, setDepartureText] = useState(departureCity);
   const [selectedDeparture, setSelectedDeparture] = useState<LocationSuggestion | null>(null);
+  const previousDepartureCity = useRef(departureCity);
 
   useEffect(() => {
-    if (!selectedDeparture && departureCity !== departureText) setDepartureText(departureCity);
-  }, [departureCity, departureText, selectedDeparture]);
+    if (previousDepartureCity.current === departureCity) return;
+    previousDepartureCity.current = departureCity;
+    setDepartureText(departureCity);
+    if (!departureCity) setSelectedDeparture(null);
+  }, [departureCity]);
 
   if (openFilter === "dates") {
     return (
@@ -4382,7 +4472,8 @@ function TripGrid({
   onToggleFavorite,
   getCreatorProfile,
   onViewProfile,
-  matchProfile = null
+  matchProfile = null,
+  currentUserId
 }: {
   trips: Trip[];
   catalogActivities: MockLocalActivity[];
@@ -4394,6 +4485,7 @@ function TripGrid({
   getCreatorProfile?: (profileId?: string | null) => UserProfileRecord | null;
   onViewProfile?: (profileId: string) => void;
   matchProfile?: UserProfile | null;
+  currentUserId?: string | null;
 }) {
   const matchByTripId = useMemo(
     () => new Map(tripList.map((trip) => [trip.id, calculateTripMatch(matchProfile, trip)])),
@@ -4427,9 +4519,10 @@ function TripGrid({
         const creatorUser = isUserProject
           ? profileRecordToUserProfile(creatorProfile ?? {
               ...fallbackProfileRecord(trip.creator_id ?? `creator-${trip.id}`),
-              display_name: trip.creator_name ?? trip.created_by ?? "Membre Tribu"
+              display_name: getTripCreatorDisplayName(trip, currentUserId)
             })
           : null;
+        const creatorDisplayName = getTripCreatorDisplayName(trip, currentUserId);
         return (
         <article className="group relative overflow-hidden rounded-[1.5rem] bg-white shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-xl" key={trip.id}>
           <button
@@ -4476,12 +4569,12 @@ function TripGrid({
                 <img className="h-11 w-11 shrink-0 rounded-full object-cover" src={creatorUser.photo_url} alt={creatorUser.name} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-xs font-semibold text-forest-600">Proposé par</span>
-                  <span className="block truncate font-bold text-forest-900">{creatorUser.name}</span>
+                  <span className="block truncate font-bold text-forest-900">{creatorDisplayName}</span>
                 </span>
                 {trip.creator_id && onViewProfile && <span className="text-xs font-bold text-forest-700">Voir le profil</span>}
               </button>
             ) : (
-              <p className="mb-3 text-sm font-semibold text-forest-700">{getTripContextText(trip)}</p>
+              <p className="mb-3 text-sm font-semibold text-forest-700">{getTripContextText(trip, currentUserId)}</p>
             )}
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm font-semibold text-forest-700">
@@ -4588,6 +4681,38 @@ function getActivityVisualScore(activity: TripCoverActivity) {
   return 60;
 }
 
+type ConversationPreference = {
+  muted?: boolean;
+  hidden?: boolean;
+};
+
+type ConversationActionTarget = {
+  id: string;
+  label: string;
+  kind: "trip" | "direct";
+};
+
+function getConversationPreferenceKey(userId: string) {
+  return `tribu:conversation-preferences:${userId}`;
+}
+
+function loadConversationPreferences(userId: string): Record<string, ConversationPreference> {
+  if (typeof window === "undefined") return {};
+  try {
+    const rawValue = window.localStorage.getItem(getConversationPreferenceKey(userId));
+    if (!rawValue) return {};
+    const parsed = JSON.parse(rawValue) as Record<string, ConversationPreference>;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function storeConversationPreferences(userId: string, preferences: Record<string, ConversationPreference>) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(getConversationPreferenceKey(userId), JSON.stringify(preferences));
+}
+
 function MiniFact({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl bg-forest-50 p-3">
@@ -4679,12 +4804,12 @@ function TripDetail({
       )}
 
       <section className="container-page space-y-10 py-10">
-        <TripTypeSection trip={trip} creatorProfile={creatorProfile} onViewProfile={onViewProfile} />
+        <TripTypeSection trip={trip} creatorProfile={creatorProfile} currentUserId={currentUserId} onViewProfile={onViewProfile} />
         {trip.community && (
           <section className="rounded-[1.5rem] bg-white p-5 shadow-soft sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="pill">Proposée par {trip.created_by ?? "un membre"}</p>
+                <p className="pill">Proposée par {getTripCreatorDisplayName(trip, currentUserId)}</p>
                 <h2 className="mt-3 text-3xl font-semibold">L'esprit du Trip</h2>
                 <p className="mt-3 max-w-3xl leading-7 text-forest-700">{trip.brief ?? trip.description}</p>
               </div>
@@ -4736,14 +4861,17 @@ function TripDetail({
 function TripTypeSection({
   trip,
   creatorProfile,
+  currentUserId,
   onViewProfile
 }: {
   trip: Trip;
   creatorProfile: UserProfileRecord | null;
+  currentUserId?: string;
   onViewProfile: (profileId: string) => void;
 }) {
   const isUserProject = getTripCardType(trip) === "user_project";
   const creatorUser = creatorProfile ? profileRecordToUserProfile(creatorProfile) : null;
+  const creatorDisplayName = getTripCreatorDisplayName(trip, currentUserId);
   if (!isUserProject) {
     return (
       <section className="flex flex-col gap-3 rounded-lg border border-forest-100 bg-white px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
@@ -4781,12 +4909,12 @@ function TripTypeSection({
                 <img className="h-12 w-12 rounded-full object-cover" src={creatorUser.photo_url} alt={creatorUser.name} />
                 <span>
                   <span className="block text-xs text-forest-500">Créé par</span>
-                  <span className="block text-base text-forest-900">{creatorUser.name}</span>
+                  <span className="block text-base text-forest-900">{creatorDisplayName}</span>
                   <span className="block text-xs text-forest-600">{creatorUser.city}</span>
                 </span>
               </button>
             ) : (
-              <span>Créé par : {trip.creator_name ?? trip.created_by ?? "un membre"}</span>
+              <span>Créé par : {creatorDisplayName}</span>
             )
           )}
           {trip.departure_city && <span>Départ : {trip.departure_city}</span>}
@@ -5088,7 +5216,7 @@ function ConversationPage({
           return {
             id: message.id,
             authorId: message.user_id,
-            author: profile?.display_name ?? (message.user_id === currentUser.id ? currentUser.name : "Membre Tribu"),
+            author: profile?.display_name ?? (message.user_id === currentUser.id ? currentUser.name : "Membre tripeer"),
             content: message.body,
             time: formatConversationTime(message.created_at),
             createdAt: message.created_at,
@@ -5408,7 +5536,10 @@ function MessagesPage({
   onBlockUser: (userId: string, name: string) => void;
 }) {
   const [activeMemberId, setActiveMemberId] = useState<string | null>(initialMemberId);
+  const [activeInbox, setActiveInbox] = useState<"groups" | "direct">(initialMemberId ? "direct" : "groups");
   const [inviteTarget, setInviteTarget] = useState<CompatibleTribeProfile | null>(null);
+  const [conversationPreferences, setConversationPreferences] = useState<Record<string, ConversationPreference>>(() => loadConversationPreferences(currentUser.id));
+  const [conversationActionTarget, setConversationActionTarget] = useState<ConversationActionTarget | null>(null);
   const tribeMemberIds = useMemo(() => new Set(
     tribeRequests.accepted.map((request) => request.requester_id === currentUser.id ? request.receiver_id : request.requester_id)
   ), [currentUser.id, tribeRequests.accepted]);
@@ -5419,6 +5550,7 @@ function MessagesPage({
   );
 
   useEffect(() => {
+    if (initialMemberId) setActiveInbox("direct");
     if (initialMemberId && tribePeople.some((member) => member.id === initialMemberId)) {
       setActiveMemberId(initialMemberId);
       return;
@@ -5427,6 +5559,10 @@ function MessagesPage({
       setActiveMemberId(tribePeople[0]?.id ?? null);
     }
   }, [activeMemberId, initialMemberId, tribePeople]);
+
+  useEffect(() => {
+    setConversationPreferences(loadConversationPreferences(currentUser.id));
+  }, [currentUser.id]);
 
   if (!isAuthenticated) {
     return (
@@ -5445,6 +5581,21 @@ function MessagesPage({
     (request.requester_id === currentUser.id && request.receiver_id === selectedMember.id)
     || (request.receiver_id === currentUser.id && request.requester_id === selectedMember.id)
   )) : undefined;
+  const updateConversationPreference = (conversationId: string, updater: (current: ConversationPreference) => ConversationPreference) => {
+    setConversationPreferences((previous) => {
+      const next = { ...previous, [conversationId]: updater(previous[conversationId] ?? {}) };
+      storeConversationPreferences(currentUser.id, next);
+      return next;
+    });
+  };
+  const tripInboxCount = tripConversationSummaries.filter((summary) => !conversationPreferences[summary.conversation.id]?.hidden).length;
+  const directInboxCount = tribePeople.filter((member) => {
+    const connection = tribeRequests.accepted.find((request) => (
+      (request.requester_id === currentUser.id && request.receiver_id === member.id)
+      || (request.receiver_id === currentUser.id && request.requester_id === member.id)
+    ));
+    return connection && !conversationPreferences[connection.id]?.hidden;
+  }).length;
 
   return (
     <section className="container-page py-6 sm:py-10">
@@ -5453,18 +5604,41 @@ function MessagesPage({
         <h1 className="mt-3 text-4xl font-semibold">Tes conversations</h1>
         <p className="mt-2 text-forest-700">Retrouve ici tes discussions privées et toutes les conversations de Trips.</p>
       </div>
-      <TripConversationInbox summaries={tripConversationSummaries} trips={trips} onOpen={onOpenTripConversation} />
-      <div className="mt-8"><h2 className="text-2xl font-semibold">Messages privés</h2></div>
-      {tribePeople.length > 0 ? (
+      <div className="mt-6 flex gap-2 overflow-x-auto rounded-[1.25rem] bg-white p-2 shadow-sm">
+        {[
+          ["groups", `Groupes (${tripInboxCount})`],
+          ["direct", `Messages (${directInboxCount})`]
+        ].map(([key, label]) => (
+          <button
+            className={`shrink-0 rounded-full px-4 py-2.5 text-sm font-bold transition ${activeInbox === key ? "bg-forest-900 text-white" : "bg-forest-50 text-forest-800 hover:bg-forest-100"}`}
+            key={key}
+            onClick={() => setActiveInbox(key as "groups" | "direct")}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {activeInbox === "groups" && (
+        <TripConversationInbox
+          summaries={tripConversationSummaries}
+          trips={trips}
+          preferences={conversationPreferences}
+          onOpen={onOpenTripConversation}
+          onOpenActions={setConversationActionTarget}
+        />
+      )}
+      {activeInbox === "direct" && tribePeople.length > 0 ? (
         <TribeInbox
           people={tribePeople}
           selectedMember={selectedMember}
           selectedConnection={selectedConnection}
           connections={tribeRequests.accepted}
+          preferences={conversationPreferences}
           unreadMessageCounts={unreadMessageCounts}
           currentUser={currentUser}
           accessToken={accessToken}
           onSelectMember={(member) => setActiveMemberId(member.id)}
+          onOpenActions={setConversationActionTarget}
           onConversationRead={onConversationRead}
           onViewProfile={onViewProfile}
           onInvite={setInviteTarget}
@@ -5472,9 +5646,9 @@ function MessagesPage({
           onReport={onReport}
           onBlockUser={onBlockUser}
         />
-      ) : (
+      ) : activeInbox === "direct" ? (
         <EmptyState title="Aucune conversation" text="Ajoute d'abord une personne depuis Tribu. La conversation apparaîtra ici après acceptation." />
-      )}
+      ) : null}
       {inviteTarget && (
         <TribeInviteModal
           member={inviteTarget}
@@ -5486,12 +5660,54 @@ function MessagesPage({
           }}
         />
       )}
+      {conversationActionTarget && (
+        <ConfirmDialog
+          title={conversationActionTarget.label}
+          description="Choisis l'action à appliquer à cette conversation sur cet appareil."
+          confirmLabel={conversationPreferences[conversationActionTarget.id]?.muted ? "Réactiver" : "Mettre en sourdine"}
+          onCancel={() => setConversationActionTarget(null)}
+          onConfirm={() => {
+            updateConversationPreference(conversationActionTarget.id, (current) => ({ ...current, muted: !current.muted }));
+            setConversationActionTarget(null);
+          }}
+        >
+          <button
+            className="mt-3 w-full rounded-full border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700"
+            onClick={() => {
+              updateConversationPreference(conversationActionTarget.id, (current) => ({ ...current, hidden: true }));
+              setConversationActionTarget(null);
+            }}
+          >
+            Supprimer de la liste
+          </button>
+        </ConfirmDialog>
+      )}
     </section>
   );
 }
 
-function TripConversationInbox({ summaries, trips, onOpen }: { summaries: TripConversationSummary[]; trips: Trip[]; onOpen: (trip: Trip, conversationId: string) => void | Promise<void> }) {
-  const rows = summaries.map((summary) => ({ summary, trip: trips.find((trip) => trip.id === summary.conversation.trip_id) })).filter((row): row is { summary: TripConversationSummary; trip: Trip } => Boolean(row.trip));
+function TripConversationInbox({
+  summaries,
+  trips,
+  preferences,
+  onOpen,
+  onOpenActions
+}: {
+  summaries: TripConversationSummary[];
+  trips: Trip[];
+  preferences: Record<string, ConversationPreference>;
+  onOpen: (trip: Trip, conversationId: string) => void | Promise<void>;
+  onOpenActions: (target: ConversationActionTarget) => void;
+}) {
+  const rows = summaries
+    .map((summary) => ({ summary, trip: trips.find((trip) => trip.id === summary.conversation.trip_id) }))
+    .filter((row): row is { summary: TripConversationSummary; trip: Trip } => Boolean(row.trip))
+    .filter(({ summary }) => !preferences[summary.conversation.id]?.hidden)
+    .sort((left, right) => (
+      (right.summary.unreadCount - left.summary.unreadCount)
+      || new Date(right.summary.latestMessage?.created_at ?? right.summary.conversation.created_at ?? 0).getTime()
+      - new Date(left.summary.latestMessage?.created_at ?? left.summary.conversation.created_at ?? 0).getTime()
+    ));
   return (
     <section className="mt-6 overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
       <div className="border-b border-forest-100 p-4">
@@ -5499,14 +5715,19 @@ function TripConversationInbox({ summaries, trips, onOpen }: { summaries: TripCo
         <h2 className="text-2xl font-semibold">Tes groupes</h2>
       </div>
       {rows.length > 0 ? rows.map(({ summary, trip }) => (
-        <button className={`flex w-full items-center gap-3 border-b border-forest-50 p-4 text-left transition last:border-0 hover:bg-forest-50 ${summary.unreadCount > 0 ? "bg-sun/10" : "bg-white"}`} key={summary.conversation.id} onClick={() => onOpen(trip, summary.conversation.id)}>
-          <img className="h-14 w-14 rounded-xl object-cover" src={trip.image_url} alt="" />
-          <span className="min-w-0 flex-1">
-            <span className="block truncate font-bold">{trip.title}</span>
-            <span className="mt-1 block truncate text-sm text-forest-600">{summary.latestMessage?.body || (summary.latestMessage?.image_paths?.length ? "Photo" : "Conversation du groupe")}</span>
-          </span>
-          {summary.unreadCount > 0 && <span className="grid h-7 min-w-7 place-items-center rounded-full bg-sun px-2 text-xs font-bold text-white">{summary.unreadCount}</span>}
-        </button>
+        <article className={`flex items-center gap-3 border-b border-forest-50 p-4 transition last:border-0 hover:bg-forest-50 ${summary.unreadCount > 0 ? "bg-sun/10" : "bg-white"}`} key={summary.conversation.id} onContextMenu={(event) => { event.preventDefault(); onOpenActions({ id: summary.conversation.id, label: trip.title, kind: "trip" }); }}>
+          <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => onOpen(trip, summary.conversation.id)}>
+            <img className="h-14 w-14 rounded-xl object-cover" src={trip.image_url} alt="" />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-bold">{trip.title}</span>
+              <span className="mt-1 block truncate text-sm text-forest-600">{preferences[summary.conversation.id]?.muted ? "Sourdine · " : ""}{summary.latestMessage?.body || (summary.latestMessage?.image_paths?.length ? "Photo" : "Conversation du groupe")}</span>
+            </span>
+            {summary.unreadCount > 0 && !preferences[summary.conversation.id]?.muted && <span className="grid h-7 min-w-7 place-items-center rounded-full bg-sun px-2 text-xs font-bold text-white">{summary.unreadCount}</span>}
+          </button>
+          <button className="rounded-full p-2 text-forest-600 hover:bg-forest-50" onClick={() => onOpenActions({ id: summary.conversation.id, label: trip.title, kind: "trip" })} aria-label={`Options pour ${trip.title}`}>
+            <MoreHorizontal size={18} />
+          </button>
+        </article>
       )) : <p className="p-5 text-sm font-semibold text-forest-600">Tes conversations de Trips apparaîtront ici après avoir rejoint un groupe.</p>}
     </section>
   );
@@ -5564,6 +5785,14 @@ function Community({
     [availableTrips, currentUser, profileUsers, tribeMemberIds]
   );
   const filteredTribePeople = myTribePeople.filter((member) => !normalizedSearch || normalizeUiText(`${member.name} ${member.city}`).includes(normalizedSearch));
+  const suggestedPeopleForTribe = (normalizedSearch
+    ? getCompatiblePeople(
+        currentUser,
+        profileUsers.filter((profile) => profile.id !== currentUser.id && !tribeMemberIds.has(profile.id)),
+        availableTrips
+      ).filter((member) => normalizeUiText(`${member.name} ${member.city}`).includes(normalizedSearch))
+    : filteredPeople
+  ).slice(0, 6);
   const guardSocialAction = (action: () => void) => {
     if (!isAuthenticated) {
       onRequireAuth();
@@ -5609,6 +5838,7 @@ function Community({
       <label className="mt-6 flex items-center gap-3 rounded-[1rem] bg-white px-4 shadow-sm">
         <Search className="text-forest-600" size={20} />
         <input className="min-w-0 flex-1 bg-transparent py-4 outline-none" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Rechercher un membre par nom ou ville" />
+        {searchQuery && <button className="rounded-full p-1 text-forest-500 hover:bg-forest-50" onClick={() => setSearchQuery("")} aria-label="Effacer la recherche"><X size={17} /></button>}
       </label>
 
       <div className="mt-4 flex flex-wrap gap-2 rounded-[1.25rem] bg-white p-2 shadow-sm">
@@ -5650,7 +5880,29 @@ function Community({
               addLabel=""
             />
           )
-          : <EmptyState title="Ta tribu est encore vide" text="Les personnes apparaîtront ici après acceptation d'une demande." />
+          : (
+            <>
+              <EmptyState
+                title={normalizedSearch ? "Aucun membre trouvé dans ta tribu" : "Ta tribu est encore vide"}
+                text={normalizedSearch ? "Voici des profils que tu peux ajouter ou retrouver depuis la découverte." : "Les personnes apparaîtront ici après acceptation d'une demande."}
+              />
+              {suggestedPeopleForTribe.length > 0 && (
+                <section className="mt-8">
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="text-2xl font-semibold">Suggestions</h2>
+                    <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-forest-700 shadow-sm">{suggestedPeopleForTribe.length}</span>
+                  </div>
+                  <TribeProfileGrid
+                    people={suggestedPeopleForTribe}
+                    onViewProfile={onViewProfile}
+                    onInvite={(member) => guardSocialAction(() => setInviteTarget(member))}
+                    onAdd={(member) => guardSocialAction(() => onSendTribeRequest(member))}
+                    addLabel="Ajouter à ma tribu"
+                  />
+                </section>
+              )}
+            </>
+          )
       )}
       {inviteTarget && (
         <TribeInviteModal
@@ -5732,10 +5984,12 @@ function TribeInbox({
   selectedMember,
   selectedConnection,
   connections,
+  preferences,
   unreadMessageCounts,
   currentUser,
   accessToken,
   onSelectMember,
+  onOpenActions,
   onConversationRead,
   onViewProfile,
   onInvite,
@@ -5747,10 +6001,12 @@ function TribeInbox({
   selectedMember: CompatibleTribeProfile | null;
   selectedConnection?: TribeConnection;
   connections: TribeConnection[];
+  preferences: Record<string, ConversationPreference>;
   unreadMessageCounts: Record<string, number>;
   currentUser: UserProfile;
   accessToken?: string;
   onSelectMember: (member: CompatibleTribeProfile) => void;
+  onOpenActions: (target: ConversationActionTarget) => void;
   onConversationRead: (connectionId: string) => void | Promise<void>;
   onViewProfile: (profileId: string) => void;
   onInvite: (member: CompatibleTribeProfile) => void;
@@ -5758,6 +6014,22 @@ function TribeInbox({
   onReport: (target: ReportTarget) => void;
   onBlockUser: (userId: string, name: string) => void;
 }) {
+  const rows = people
+    .map((member) => {
+      const connection = connections.find((item) => (
+        (item.requester_id === currentUser.id && item.receiver_id === member.id)
+        || (item.receiver_id === currentUser.id && item.requester_id === member.id)
+      ));
+      const unreadCount = connection ? unreadMessageCounts[connection.id] ?? 0 : 0;
+      return { member, connection, unreadCount };
+    })
+    .filter(({ connection }) => connection && !preferences[connection.id]?.hidden)
+    .sort((left, right) => (
+      (right.unreadCount - left.unreadCount)
+      || Number(isProfileOnline(right.member.last_seen_at)) - Number(isProfileOnline(left.member.last_seen_at))
+      || left.member.name.localeCompare(right.member.name)
+    ));
+
   return (
     <section className="mt-6 grid gap-4 lg:mt-8 lg:grid-cols-[0.86fr_1.14fr] lg:items-stretch lg:gap-6">
       <div className="flex min-h-0 flex-col overflow-hidden rounded-[1.5rem] bg-white shadow-soft lg:h-full">
@@ -5766,18 +6038,18 @@ function TribeInbox({
           <h2 className="text-2xl font-semibold">Tes amis</h2>
         </div>
         <div className="flex gap-2 overflow-x-auto p-2 lg:block lg:min-h-0 lg:flex-1 lg:overflow-x-hidden lg:overflow-y-auto lg:p-0">
-          {people.map((member) => {
+          {rows.map(({ member, connection, unreadCount }) => {
             const active = selectedMember?.id === member.id;
-            const connection = connections.find((item) => (
-              (item.requester_id === currentUser.id && item.receiver_id === member.id)
-              || (item.receiver_id === currentUser.id && item.requester_id === member.id)
-            ));
-            const unreadCount = connection ? unreadMessageCounts[connection.id] ?? 0 : 0;
+            const muted = connection ? preferences[connection.id]?.muted : false;
             return (
               <article
                 className={`flex min-w-[230px] cursor-pointer items-center gap-3 rounded-[1rem] border border-forest-50 p-3 transition hover:bg-forest-50 lg:min-w-0 lg:rounded-none lg:border-x-0 lg:border-t-0 lg:p-4 ${active ? "bg-forest-50 ring-2 ring-forest-700 lg:ring-0" : unreadCount > 0 ? "border-l-4 border-l-sun bg-sun/10" : "bg-white"}`}
                 key={member.id}
                 onClick={() => onSelectMember(member)}
+                onContextMenu={(event) => {
+                  event.preventDefault();
+                  if (connection) onOpenActions({ id: connection.id, label: member.name, kind: "direct" });
+                }}
               >
                 <span className="relative shrink-0"><img className="h-14 w-14 rounded-full object-cover" src={member.photo_url} alt={member.name} /><span className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${isProfileOnline(member.last_seen_at) ? "bg-emerald-500" : "bg-forest-300"}`} /></span>
                 <div className="min-w-0 flex-1">
@@ -5786,13 +6058,27 @@ function TribeInbox({
                     {member.verified && <BadgeCheck className="shrink-0 text-forest-700" size={16} />}
                   </div>
                   <p className="truncate text-sm text-forest-700">{member.city} · {member.adventure_style}</p>
-                  {unreadCount > 0 ? (
+                  {muted ? (
+                    <p className="mt-1 truncate text-xs font-bold text-forest-600">Sourdine</p>
+                  ) : unreadCount > 0 ? (
                     <p className="mt-1 truncate text-xs font-bold text-forest-900">{unreadCount} nouveau{unreadCount > 1 ? "x" : ""} message{unreadCount > 1 ? "s" : ""}</p>
                   ) : (
                     <p className="mt-1 truncate text-xs font-semibold text-forest-500">{member.compatibilityTags.slice(0, 2).join(" · ")}</p>
                   )}
                 </div>
-                {unreadCount > 0 && <span className="grid h-6 min-w-6 place-items-center rounded-full bg-sun px-1.5 text-xs font-bold text-white">{unreadCount}</span>}
+                {unreadCount > 0 && !muted && <span className="grid h-6 min-w-6 place-items-center rounded-full bg-sun px-1.5 text-xs font-bold text-white">{unreadCount}</span>}
+                {connection && (
+                  <button
+                    className="rounded-full p-2 text-forest-600 hover:bg-forest-100"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onOpenActions({ id: connection.id, label: member.name, kind: "direct" });
+                    }}
+                    aria-label={`Options pour ${member.name}`}
+                  >
+                    <MoreHorizontal size={18} />
+                  </button>
+                )}
                 <button
                   className="hidden rounded-full bg-forest-900 px-4 py-2 text-sm font-semibold text-white lg:block"
                   onClick={(event) => {
@@ -6671,6 +6957,7 @@ function Profile({
   tribeMemberCount,
   profileCompletion,
   onResumeOnboarding,
+  onReplayAppOnboarding,
   isBlocked,
   onReportUser,
   onBlockUser,
@@ -6693,6 +6980,7 @@ function Profile({
   tribeMemberCount: number;
   profileCompletion: ReturnType<typeof calculateProfileCompletion>;
   onResumeOnboarding: () => void;
+  onReplayAppOnboarding: () => void;
   isBlocked: boolean;
   onReportUser: (user: UserProfile) => void;
   onBlockUser: (user: UserProfile) => void;
@@ -6770,6 +7058,7 @@ function Profile({
         travelPreferences={travelPreferences}
         onUpdateTravelPreferences={onUpdateTravelPreferences}
         onUploadAvatar={onUploadAvatar}
+        onReplayAppOnboarding={onReplayAppOnboarding}
       />
 
       {!isOwnProfile && <section className="mt-8 rounded-[2rem] bg-white p-5 shadow-soft sm:p-8">
@@ -6878,7 +7167,7 @@ function profileFormToUpdate(form: ProfileFormState): UserProfileUpdate {
   const pastTrips = Number(form.past_trips);
 
   return {
-    display_name: form.display_name.trim() || "Membre Tribu Nature",
+    display_name: form.display_name.trim() || "Membre tripeer",
     avatar_url: emptyToNull(form.avatar_url),
     city: emptyToNull(form.city),
     bio: emptyToNull(form.bio),
@@ -6926,7 +7215,8 @@ function ProfilePublicCard({
   onUpdateProfile,
   travelPreferences,
   onUpdateTravelPreferences,
-  onUploadAvatar
+  onUploadAvatar,
+  onReplayAppOnboarding
 }: {
   profileRecord: UserProfileRecord;
   profileUser: UserProfile;
@@ -6937,6 +7227,7 @@ function ProfilePublicCard({
   travelPreferences: TravelPreferences | null;
   onUpdateTravelPreferences: (updates: TravelPreferencesUpdate) => Promise<TravelPreferences>;
   onUploadAvatar: (file: File) => Promise<UserProfileRecord>;
+  onReplayAppOnboarding: () => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState<ProfileFormState>(() => profileRecordToForm(profileRecord, travelPreferences));
@@ -7073,9 +7364,14 @@ function ProfilePublicCard({
           <p className="mt-4 leading-7 text-forest-700">{profileUser.bio}</p>
           <TagList tags={[profileUser.verified ? "profil vérifié" : "profil à vérifier", profileUser.physical_level, profileUser.budget_range]} />
           {isOwnProfile && (
-            <button className="btn-primary mt-5" onClick={() => setIsEditing((value) => !value)}>
-              {isEditing ? "Fermer l'édition" : "Modifier mon profil"}
-            </button>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <button className="btn-primary" onClick={() => setIsEditing((value) => !value)}>
+                {isEditing ? "Fermer l'édition" : "Modifier mon profil"}
+              </button>
+              <button className="btn-secondary" onClick={onReplayAppOnboarding}>
+                Revoir la présentation
+              </button>
+            </div>
           )}
           {feedback && <p className="mt-3 rounded-lg bg-forest-50 px-3 py-2 text-sm font-semibold text-forest-800">{feedback}</p>}
         </div>
@@ -7293,7 +7589,7 @@ function Safety() {
       <div className="mx-auto max-w-4xl text-center">
         <p className="pill">Sécurité</p>
         <h1 className="mt-4 text-4xl font-semibold">Une aventure collective, pas une app de dating.</h1>
-        <p className="mt-4 leading-8 text-forest-700">Tribu Nature aide à composer une aventure et à connecter des personnes, destinations et prestataires. L'app ne vend pas de package fermé et ne remplace pas les professionnels quand une activité l'exige.</p>
+        <p className="mt-4 leading-8 text-forest-700">tripeer aide à composer une aventure et à connecter des personnes, destinations et prestataires. L'app ne vend pas de package fermé et ne remplace pas les professionnels quand une activité l'exige.</p>
       </div>
       <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {[
@@ -7317,7 +7613,7 @@ function Safety() {
   );
 }
 
-function SettingsPage({ profile, accessToken, blocks, onRequireAuth, onProfileUpdated, onSignOut, onUnblock, onDeactivate }: { profile: UserProfileRecord | null; accessToken?: string; blocks: UserBlock[]; onRequireAuth: () => void; onProfileUpdated: (profile: UserProfileRecord) => void; onSignOut: () => void | Promise<void>; onUnblock: (blockedId: string) => void | Promise<void>; onDeactivate: () => void | Promise<void> }) {
+function SettingsPage({ profile, accessToken, blocks, onRequireAuth, onProfileUpdated, onSignOut, onUnblock, onDeactivate, onReplayAppOnboarding }: { profile: UserProfileRecord | null; accessToken?: string; blocks: UserBlock[]; onRequireAuth: () => void; onProfileUpdated: (profile: UserProfileRecord) => void; onSignOut: () => void | Promise<void>; onUnblock: (blockedId: string) => void | Promise<void>; onDeactivate: () => void | Promise<void>; onReplayAppOnboarding: () => void }) {
   const [language, setLanguage] = useState(profile?.preferred_language ?? "fr");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -7370,7 +7666,7 @@ function SettingsPage({ profile, accessToken, blocks, onRequireAuth, onProfileUp
       const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
       const link = document.createElement("a");
       link.href = url;
-      link.download = `tribu-nature-export-${new Date().toISOString().slice(0, 10)}.json`;
+      link.download = `tripeer-export-${new Date().toISOString().slice(0, 10)}.json`;
       link.click();
       URL.revokeObjectURL(url);
       setFeedback("Export préparé.");
@@ -7388,6 +7684,7 @@ function SettingsPage({ profile, accessToken, blocks, onRequireAuth, onProfileUp
         <Panel title="Langue"><label className="grid gap-2 text-sm font-bold">Langue préférée<select className="rounded-lg border border-forest-100 bg-forest-50 p-3" value={language} onChange={(event) => setLanguage(event.target.value)}><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="ar">العربية</option></select></label><button className="btn-primary mt-4" disabled={saving} onClick={saveLanguage}><Languages className="mr-2 inline" size={17} />Enregistrer</button></Panel>
         <Panel title="Changer de mot de passe"><div className="grid gap-3"><input className="rounded-lg border border-forest-100 bg-forest-50 p-3" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Nouveau mot de passe" /><input className="rounded-lg border border-forest-100 bg-forest-50 p-3" type="password" value={passwordConfirmation} onChange={(event) => setPasswordConfirmation(event.target.value)} placeholder="Confirmer le mot de passe" /><button className="btn-primary" disabled={saving} onClick={changePassword}>Modifier le mot de passe</button></div></Panel>
         <Panel title="Données et session"><div className="grid gap-3"><button className="btn-secondary" disabled={saving} onClick={downloadData}>Exporter mes données</button><button className="btn-secondary inline-flex items-center justify-center gap-2" onClick={onSignOut}><LogOut size={17} />Déconnexion</button></div></Panel>
+        <Panel title="Présentation"><div className="grid gap-3"><p className="text-sm leading-6 text-forest-700">Relance le tutoriel visuel sans modifier ton statut d'onboarding.</p><button className="btn-secondary" onClick={onReplayAppOnboarding}>Revoir la présentation de l'application</button></div></Panel>
         <Panel title="Utilisateurs bloqués">{blocks.length > 0 ? <div className="grid gap-2">{blocks.map((block, index) => <div className="flex items-center justify-between gap-3 rounded-lg bg-forest-50 p-3" key={block.id}><span className="text-sm font-semibold">Utilisateur bloqué {index + 1}</span><button className="rounded-full bg-white px-3 py-2 text-xs font-bold" onClick={() => onUnblock(block.blocked_id)}>Débloquer</button></div>)}</div> : <p className="text-sm text-forest-700">Aucun utilisateur bloqué.</p>}</Panel>
       </div>
       <section className="mt-6 rounded-[1.5rem] border border-red-200 bg-white p-5 shadow-sm">
@@ -7410,9 +7707,9 @@ function LegalPage({ kind }: { kind: "cgu" | "privacy" }) {
     ["Prestataires", "L'hébergement technique et l'authentification reposent actuellement sur Supabase. Des services cartographiques et de contenu peuvent également être sollicités."],
     ["Tes droits", "Tu peux demander l'accès, la rectification, l'effacement, la limitation ou la portabilité via la page Nous contacter. Tu peux aussi saisir la CNIL." ]
   ] : [
-    ["Objet", "Tribu Nature est une beta sociale qui permet de proposer, découvrir et organiser des idées de voyage entre membres."],
+    ["Objet", "tripeer est une beta sociale qui permet de proposer, découvrir et organiser des idées de voyage entre membres."],
     ["Compte", "Tu dois fournir des informations exactes, protéger ton mot de passe et utiliser un pseudo ou un nom public respectueux."],
-    ["Trips et réservations", "Les membres organisent les dates, transports, hébergements et activités. Tribu Nature n'est pas une agence de voyages et aucune réservation n'est conclue automatiquement dans l'app."],
+    ["Trips et réservations", "Les membres organisent les dates, transports, hébergements et activités. tripeer n'est pas une agence de voyages et aucune réservation n'est conclue automatiquement dans l'app."],
     ["Comportement", "Harcèlement, discrimination, fraude, contenu illicite ou dangereux et usurpation d'identité sont interdits. Un compte ou un contenu peut être modéré."],
     ["Contenus", "Tu restes responsable des textes et photos publiés et confirmes disposer des droits nécessaires pour les partager avec le groupe."],
     ["Sécurité", "Chaque membre doit vérifier les conditions météo, son niveau, les assurances et l'encadrement professionnel requis avant une activité."],
@@ -7430,7 +7727,7 @@ function AboutPage() {
         <div className="max-w-5xl">
           <p className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-bold backdrop-blur">À propos</p>
           <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">Faire passer une envie de voyage du « peut-être » au « on y va ».</h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg sm:leading-8">Tribu Nature est née d'une idée simple : beaucoup de personnes veulent partir, mais pas forcément seules. Nous créons le cadre qui permet de trouver le bon groupe et de commencer.</p>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg sm:leading-8">tripeer est née d'une idée simple : beaucoup de personnes veulent partir, mais pas forcément seules. Nous créons le cadre qui permet de trouver le bon groupe et de commencer.</p>
           <div className="mt-10 grid gap-3 md:grid-cols-3">
             <AboutValue eyebrow="Mission" title="Créer le bon groupe" text="Réunir des profils compatibles autour d'un projet concret et humain." />
             <AboutValue eyebrow="Produit" title="Des Trips réelles" text="Passer d'une idée de destination à une organisation construite ensemble." />
@@ -7821,7 +8118,8 @@ function ConfirmDialog({
   confirmLabel,
   danger = false,
   onCancel,
-  onConfirm
+  onConfirm,
+  children
 }: {
   title: string;
   description: string;
@@ -7829,6 +8127,7 @@ function ConfirmDialog({
   danger?: boolean;
   onCancel: () => void;
   onConfirm: () => void | Promise<void>;
+  children?: React.ReactNode;
 }) {
   const [isConfirming, setIsConfirming] = useState(false);
   return (
@@ -7853,6 +8152,7 @@ function ConfirmDialog({
             {isConfirming ? "Confirmation..." : confirmLabel}
           </button>
         </div>
+        {children}
       </div>
     </div>
   );
@@ -7862,7 +8162,7 @@ function MobileBottomNav({ page, go, onCreateTrip }: { page: Page; go: (page: Pa
   const items: Array<{ page: Page; label: string; icon: typeof Home }> = [
     { page: "dashboard", label: "Destination", icon: Compass },
     { page: "my-trips", label: "Mes Trips", icon: CalendarDays },
-    { page: "communaute", label: "Tribu", icon: Users },
+    { page: "messages", label: "Messages", icon: MessageCircle },
     { page: "profil", label: "Profil", icon: UserRound }
   ];
 
@@ -7899,9 +8199,9 @@ function Footer({ go }: { go: (page: Page) => void }) {
     <footer className="hidden border-t border-forest-100 bg-white lg:block">
       <div className="container-page grid gap-6 py-8 sm:grid-cols-[1fr_auto] sm:items-center">
         <div className="flex items-center gap-4">
-          <img className="h-20 w-20 shrink-0 object-contain" src={brandLogoUrl} alt="Tribu Nature" />
+          <img className="h-20 w-20 shrink-0 object-contain" src={brandLogoUrl} alt="tripeer" />
           <div>
-            <p className="font-semibold">Tribu Nature</p>
+            <p className="font-semibold">tripeer</p>
             <p className="mt-1 text-sm text-forest-700">Une plateforme sociale intelligente qui transforme une envie individuelle de nature en aventure collective organisée.</p>
           </div>
         </div>
