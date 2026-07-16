@@ -213,7 +213,7 @@ export function AppOnboardingTutorial({
       <div className="relative mx-auto flex min-h-dvh max-w-6xl flex-col px-4 py-4 sm:px-6 lg:py-8">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/55">tripeer</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/55">Tripeer</p>
             <div className="mt-2 h-1.5 w-40 overflow-hidden rounded-full bg-white/15">
               <div className="h-full rounded-full bg-sun transition-all duration-500" style={{ width: `${progress}%` }} />
             </div>

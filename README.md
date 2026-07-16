@@ -1,4 +1,4 @@
-# tripeer
+# Tripeer
 
 MVP React + TypeScript + Tailwind CSS d'une plateforme sociale intelligente dédiée aux micro-aventures nature.
 

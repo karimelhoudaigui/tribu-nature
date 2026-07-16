@@ -1,4 +1,4 @@
-# Plan de test beta - parcours sociaux tripeer
+# Plan de test beta - parcours sociaux Tripeer
 
 Objectif : verifier que les parcours principaux fonctionnent avec de vrais comptes, de vraies donnees Supabase, et restent visibles apres rafraichissement.
 

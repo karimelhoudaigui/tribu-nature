@@ -20,20 +20,20 @@ export function hasPexelsSearchConfig() {
   return Boolean(supabaseUrl && supabaseAnonKey);
 }
 
-export async function searchPexelsActivityPhotos(query: string, signal?: AbortSignal, perPage = 4): Promise<PexelsActivityPhoto[]> {
-  const normalizedQuery = query.trim().replace(/\s+/g, " ");
+export function getCachedPexelsActivityPhotos(query: string, perPage = 4): PexelsActivityPhoto[] {
+  const normalizedQuery = normalizePexelsQuery(query);
   if (!normalizedQuery || !hasPexelsSearchConfig()) return [];
-  const resultLimit = Math.max(1, Math.min(perPage, 4));
+  const resultLimit = getPexelsResultLimit(perPage);
+  return readCachedPhotos(normalizedQuery, resultLimit);
+}
 
-  const cacheKey = normalizedQuery.toLocaleLowerCase("fr-FR");
-  const memoryResult = memoryCache.get(cacheKey);
-  if (memoryResult && memoryResult.length >= resultLimit) return memoryResult.slice(0, resultLimit);
+export async function searchPexelsActivityPhotos(query: string, signal?: AbortSignal, perPage = 4): Promise<PexelsActivityPhoto[]> {
+  const normalizedQuery = normalizePexelsQuery(query);
+  if (!normalizedQuery || !hasPexelsSearchConfig()) return [];
+  const resultLimit = getPexelsResultLimit(perPage);
 
-  const storedResult = readStoredPhotos(cacheKey);
-  if (storedResult && storedResult.length >= resultLimit) {
-    memoryCache.set(cacheKey, storedResult);
-    return storedResult.slice(0, resultLimit);
-  }
+  const cachedResult = readCachedPhotos(normalizedQuery, resultLimit);
+  if (cachedResult.length >= resultLimit) return cachedResult;
 
   const response = await fetch(`${supabaseUrl}/functions/v1/pexels-search?query=${encodeURIComponent(normalizedQuery)}&per_page=${resultLimit}`, {
     headers: {
@@ -50,18 +50,46 @@ export async function searchPexelsActivityPhotos(query: string, signal?: AbortSi
 
   const payload = await response.json() as PexelsSearchResponse;
   const photos = Array.isArray(payload.photos) ? payload.photos.slice(0, resultLimit) : [];
+  const cacheKey = getPexelsCacheKey(normalizedQuery);
   memoryCache.set(cacheKey, photos);
   storePhotos(cacheKey, photos);
   return photos;
 }
 
+function normalizePexelsQuery(query: string) {
+  return query.trim().replace(/\s+/g, " ");
+}
+
+function getPexelsResultLimit(perPage: number) {
+  return Math.max(1, Math.min(perPage, 4));
+}
+
+function readCachedPhotos(normalizedQuery: string, resultLimit: number) {
+  const cacheKey = getPexelsCacheKey(normalizedQuery);
+  const memoryResult = memoryCache.get(cacheKey);
+  if (memoryResult && memoryResult.length >= resultLimit) return memoryResult.slice(0, resultLimit);
+
+  const storedResult = readStoredPhotos(cacheKey);
+  if (storedResult && storedResult.length >= resultLimit) {
+    memoryCache.set(cacheKey, storedResult);
+    return storedResult.slice(0, resultLimit);
+  }
+
+  return [];
+}
+
+function getPexelsCacheKey(normalizedQuery: string) {
+  return normalizedQuery.toLocaleLowerCase("fr-FR");
+}
+
 function readStoredPhotos(cacheKey: string) {
   try {
-    const rawValue = localStorage.getItem(getStorageKey(cacheKey));
+    if (typeof window === "undefined") return null;
+    const rawValue = window.localStorage.getItem(getStorageKey(cacheKey));
     if (!rawValue) return null;
     const parsed = JSON.parse(rawValue) as { expiresAt: number; photos: PexelsActivityPhoto[] };
     if (parsed.expiresAt <= Date.now() || !Array.isArray(parsed.photos)) {
-      localStorage.removeItem(getStorageKey(cacheKey));
+      window.localStorage.removeItem(getStorageKey(cacheKey));
       return null;
     }
     return parsed.photos;
@@ -72,7 +100,8 @@ function readStoredPhotos(cacheKey: string) {
 
 function storePhotos(cacheKey: string, photos: PexelsActivityPhoto[]) {
   try {
-    localStorage.setItem(getStorageKey(cacheKey), JSON.stringify({ expiresAt: Date.now() + cacheDurationMs, photos }));
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(getStorageKey(cacheKey), JSON.stringify({ expiresAt: Date.now() + cacheDurationMs, photos }));
   } catch {
     // Le cache navigateur est facultatif, notamment en navigation privée.
   }

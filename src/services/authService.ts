@@ -323,7 +323,7 @@ export async function touchPresence(accessToken: string): Promise<string> {
 export async function upsertCurrentProfile(session: AuthSession, displayName?: string): Promise<UserProfileRecord> {
   ensureAuthConfig();
 
-  const fallbackName = session.user.user_metadata?.display_name ?? session.user.user_metadata?.name ?? session.user.email?.split("@")[0] ?? "Membre tripeer";
+  const fallbackName = session.user.user_metadata?.display_name ?? session.user.user_metadata?.name ?? session.user.email?.split("@")[0] ?? "Membre Tripeer";
   const row = {
     id: session.user.id,
     email: session.user.email ?? null,

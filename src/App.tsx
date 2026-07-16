@@ -148,7 +148,7 @@ import {
 } from "./services/mediaService";
 import { sendContactMessage } from "./services/contactService";
 import { calculateGroupMatch, calculateTripMatch, calculateUserMatch, type MatchResult, type TripMatchResult } from "./services/matchService";
-import { searchPexelsActivityPhotos, type PexelsActivityPhoto } from "./services/pexelsService";
+import { getCachedPexelsActivityPhotos, searchPexelsActivityPhotos, type PexelsActivityPhoto } from "./services/pexelsService";
 import { getActivityImageRotation } from "./services/tripActivityMediaService";
 import {
   getTravelPreferences,
@@ -193,7 +193,6 @@ type Conversation = {
   }[];
 };
 
-const brandIconUrl = `${import.meta.env.BASE_URL}brand/tripeer-icon.png`;
 const brandLogoUrl = `${import.meta.env.BASE_URL}brand/tripeer-logo-display.png`;
 
 const navItems: { page: Page; label: string }[] = [
@@ -529,7 +528,7 @@ function profileRecordToUserProfile(profile: UserProfileRecord, travelPreference
     age_range: profile.age_range ?? "Membre",
     city: profile.city ?? "Ville à préciser",
     photo_url: avatarUrl ?? getFallbackAvatar(profile.display_name),
-    bio: profile.bio ?? "Profil tripeer en construction.",
+    bio: profile.bio ?? "Profil Tripeer en construction.",
     verified: Boolean(profile.verified),
     physical_level: profile.physical_level ?? "À préciser",
     budget_range: profile.budget_range ?? "À préciser",
@@ -547,7 +546,7 @@ function fallbackProfileRecord(profileId: string): UserProfileRecord {
   return {
     id: profileId,
     email: null,
-    display_name: "Profil tripeer",
+    display_name: "Profil Tripeer",
     avatar_url: null,
     city: null,
     bio: "Ce profil est en cours de chargement. Les informations publiques apparaîtront ici dès qu'elles seront disponibles.",
@@ -717,7 +716,7 @@ function App() {
   const [viewedProfile, setViewedProfile] = useState<UserProfileRecord | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authPrompt, setAuthPrompt] = useState("Connecte-toi pour accéder aux actions sociales de tripeer.");
+  const [authPrompt, setAuthPrompt] = useState("Connecte-toi pour accéder aux actions sociales de Tripeer.");
   const [userTripActions, setUserTripActions] = useState<UserTripActions | null>(null);
   const [favoriteTripIds, setFavoriteTripIds] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
@@ -1663,7 +1662,7 @@ function App() {
       messages: [
         {
           id: "system-1",
-          author: "tripeer",
+          author: "Tripeer",
           content: getTripCardType(trip) === "user_project"
             ? `Conversation créée pour demander à rejoindre le projet ${trip.title}.`
             : `Conversation d'intérêt créée pour ${trip.title}. Organisez ensemble les dates, le transport, l'hébergement et les activités.`,
@@ -2001,9 +2000,9 @@ function Header({
   return (
     <header className="sticky top-0 z-50 w-full max-w-[100vw] overflow-x-clip border-b border-forest-100 bg-cream/90 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between">
-        <button className="flex items-center gap-2.5 font-semibold" onClick={() => go("dashboard")} aria-label="Accueil tripeer">
-          <img className="h-11 w-11 shrink-0 object-contain" src={brandIconUrl} alt="" />
-          <span className="text-sm sm:text-base">tripeer</span>
+        <button className="flex items-center gap-2.5 font-semibold" onClick={() => go("dashboard")} aria-label="Accueil Tripeer">
+          <img className="h-9 w-16 shrink-0 object-contain mix-blend-multiply" src={brandLogoUrl} alt="" />
+          <span className="text-sm sm:text-base">Tripeer</span>
         </button>
         <nav className="hidden items-center gap-1 lg:flex">
           {visibleNavItems.map((item) => (
@@ -2190,7 +2189,7 @@ function AuthModal({
       <div className="w-full max-w-md rounded-[1.5rem] bg-white p-5 shadow-soft">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
-            <img className="h-16 w-16 shrink-0 object-contain" src={brandIconUrl} alt="Logo tripeer" />
+            <img className="h-14 w-20 shrink-0 object-contain mix-blend-multiply" src={brandLogoUrl} alt="Logo Tripeer" />
             <div>
             <p className="pill">{mode === "signup" ? "Créer ton compte" : "Connexion"}</p>
             <h2 className="mt-3 text-2xl font-semibold">Entre dans ta tribu.</h2>
@@ -2547,14 +2546,14 @@ function Landing({
         <div className="container-page relative flex min-h-[720px] items-center py-20">
           <div className="max-w-3xl pt-12 text-white">
             <div className="mb-5 grid h-32 w-32 place-items-center rounded-[1.25rem] bg-white/92 p-2 shadow-xl backdrop-blur">
-              <img className="h-full w-full object-contain" src={brandLogoUrl} alt="tripeer" />
+              <img className="h-full w-full object-contain" src={brandLogoUrl} alt="Tripeer" />
             </div>
             <span className="mb-5 inline-flex rounded-full bg-white/18 px-4 py-2 text-sm font-semibold backdrop-blur-md">
               Plateforme sociale intelligente pour micro-aventures nature
             </span>
             <h1 className="text-5xl font-semibold leading-tight sm:text-6xl lg:text-7xl">Pars seul. Trouve ton groupe. Vis ton aventure.</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-white/92">
-              tripeer t'aide à rejoindre des personnes compatibles, découvrir une destination nature, composer des activités locales et générer un planning prêt à vivre.
+              Tripeer t'aide à rejoindre des personnes compatibles, découvrir une destination nature, composer des activités locales et générer un planning prêt à vivre.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button className="btn-primary bg-white text-forest-900 hover:bg-forest-50" onClick={() => go("dashboard")}>Voir mes Trips compatibles</button>
@@ -2607,7 +2606,7 @@ function Landing({
           <div>
             <p className="pill">Confiance</p>
             <h2 className="section-title mt-4">Petit groupe, profils vérifiés, rythme adapté.</h2>
-            <p className="mt-4 leading-8 text-forest-700">tripeer n'est pas une app de dating ni une agence qui vend un package fermé. C'est un espace pour composer une aventure avec des personnes compatibles et des prestataires locaux fiables.</p>
+            <p className="mt-4 leading-8 text-forest-700">Tripeer n'est pas une app de dating ni une agence qui vend un package fermé. C'est un espace pour composer une aventure avec des personnes compatibles et des prestataires locaux fiables.</p>
           </div>
           <div className="grid gap-3">
             {["Profils publics", "Signalement et blocage", "Groupes limités", "Activités encadrées", "Règles de comportement", "Demandes contrôlées"].map((item) => (
@@ -4609,17 +4608,30 @@ type TripCoverActivity = Pick<MockLocalActivity, "name" | "category">;
 
 function TripCardCover({ trip, activity }: { trip: Trip; activity: TripCoverActivity | null }) {
   const imageRef = useRef<HTMLImageElement>(null);
-  const [photo, setPhoto] = useState<PexelsActivityPhoto | null>(null);
+  const pexelsQuery = activity && getTripCardType(trip) === "catalog" ? buildPexelsActivityQuery(activity, trip.destination) : "";
+  const cachedPhoto = pexelsQuery ? getCachedPexelsActivityPhotos(pexelsQuery, 1)[0] ?? null : null;
+  const [photoState, setPhotoState] = useState<{ query: string; photo: PexelsActivityPhoto } | null>(() => (
+    cachedPhoto ? { query: pexelsQuery, photo: cachedPhoto } : null
+  ));
+  const photo = photoState?.query === pexelsQuery ? photoState.photo : cachedPhoto;
 
   useEffect(() => {
-    if (!activity || getTripCardType(trip) !== "catalog") return;
+    if (!pexelsQuery) {
+      setPhotoState(null);
+      return;
+    }
+    const currentCachedPhoto = getCachedPexelsActivityPhotos(pexelsQuery, 1)[0] ?? null;
+    if (currentCachedPhoto) {
+      setPhotoState({ query: pexelsQuery, photo: currentCachedPhoto });
+      return;
+    }
     const imageElement = imageRef.current;
     if (!imageElement) return;
     const controller = new AbortController();
     const loadCover = () => {
-      void searchPexelsActivityPhotos(buildPexelsActivityQuery(activity, trip.destination), controller.signal, 1)
+      void searchPexelsActivityPhotos(pexelsQuery, controller.signal, 1)
         .then(([result]) => {
-          if (!controller.signal.aborted && result) setPhoto(result);
+          if (!controller.signal.aborted && result) setPhotoState({ query: pexelsQuery, photo: result });
         })
         .catch(() => {
           // La photo catalogue d'origine reste disponible si Pexels ne répond pas.
@@ -4640,7 +4652,7 @@ function TripCardCover({ trip, activity }: { trip: Trip; activity: TripCoverActi
       observer.disconnect();
       controller.abort();
     };
-  }, [activity?.category, activity?.name, trip.destination, trip.id]);
+  }, [pexelsQuery]);
 
   return (
     <>
@@ -4931,17 +4943,31 @@ function TripTypeSection({
   );
 }
 
+function getCachedActivityPhotoMap(activities: Array<Activity | MockLocalActivity>, destination: string, usePexels: boolean) {
+  if (!usePexels) return {};
+
+  return activities.slice(0, 8).reduce<Record<string, PexelsActivityPhoto[]>>((photosByActivity, activity) => {
+    const photos = getCachedPexelsActivityPhotos(buildPexelsActivityQuery(activity, destination));
+    if (photos.length) photosByActivity[activity.id] = photos;
+    return photosByActivity;
+  }, {});
+}
+
 function ActivitiesSection({ activities: tripActivities, destination, usePexels }: { activities: Array<Activity | MockLocalActivity>; destination: string; usePexels: boolean }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [pexelsPhotos, setPexelsPhotos] = useState<Record<string, PexelsActivityPhoto[]>>({});
   const activitySearchKey = tripActivities.map((activity) => `${activity.id}:${activity.name}`).join("|");
+  const [pexelsPhotos, setPexelsPhotos] = useState<Record<string, PexelsActivityPhoto[]>>(() => (
+    getCachedActivityPhotoMap(tripActivities, destination, usePexels)
+  ));
 
   useEffect(() => {
     const controller = new AbortController();
-    setPexelsPhotos({});
+    const cachedPhotos = getCachedActivityPhotoMap(tripActivities, destination, usePexels);
+    setPexelsPhotos(cachedPhotos);
     if (!usePexels) return () => controller.abort();
     tripActivities.slice(0, 8).forEach((activity) => {
+      if (cachedPhotos[activity.id]?.length) return;
       const query = buildPexelsActivityQuery(activity, destination);
       void searchPexelsActivityPhotos(query, controller.signal)
         .then((photos) => {
@@ -5216,7 +5242,7 @@ function ConversationPage({
           return {
             id: message.id,
             authorId: message.user_id,
-            author: profile?.display_name ?? (message.user_id === currentUser.id ? currentUser.name : "Membre tripeer"),
+            author: profile?.display_name ?? (message.user_id === currentUser.id ? currentUser.name : "Membre Tripeer"),
             content: message.body,
             time: formatConversationTime(message.created_at),
             createdAt: message.created_at,
@@ -7167,7 +7193,7 @@ function profileFormToUpdate(form: ProfileFormState): UserProfileUpdate {
   const pastTrips = Number(form.past_trips);
 
   return {
-    display_name: form.display_name.trim() || "Membre tripeer",
+    display_name: form.display_name.trim() || "Membre Tripeer",
     avatar_url: emptyToNull(form.avatar_url),
     city: emptyToNull(form.city),
     bio: emptyToNull(form.bio),
@@ -7589,7 +7615,7 @@ function Safety() {
       <div className="mx-auto max-w-4xl text-center">
         <p className="pill">Sécurité</p>
         <h1 className="mt-4 text-4xl font-semibold">Une aventure collective, pas une app de dating.</h1>
-        <p className="mt-4 leading-8 text-forest-700">tripeer aide à composer une aventure et à connecter des personnes, destinations et prestataires. L'app ne vend pas de package fermé et ne remplace pas les professionnels quand une activité l'exige.</p>
+        <p className="mt-4 leading-8 text-forest-700">Tripeer aide à composer une aventure et à connecter des personnes, destinations et prestataires. L'app ne vend pas de package fermé et ne remplace pas les professionnels quand une activité l'exige.</p>
       </div>
       <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {[
@@ -7707,9 +7733,9 @@ function LegalPage({ kind }: { kind: "cgu" | "privacy" }) {
     ["Prestataires", "L'hébergement technique et l'authentification reposent actuellement sur Supabase. Des services cartographiques et de contenu peuvent également être sollicités."],
     ["Tes droits", "Tu peux demander l'accès, la rectification, l'effacement, la limitation ou la portabilité via la page Nous contacter. Tu peux aussi saisir la CNIL." ]
   ] : [
-    ["Objet", "tripeer est une beta sociale qui permet de proposer, découvrir et organiser des idées de voyage entre membres."],
+    ["Objet", "Tripeer est une beta sociale qui permet de proposer, découvrir et organiser des idées de voyage entre membres."],
     ["Compte", "Tu dois fournir des informations exactes, protéger ton mot de passe et utiliser un pseudo ou un nom public respectueux."],
-    ["Trips et réservations", "Les membres organisent les dates, transports, hébergements et activités. tripeer n'est pas une agence de voyages et aucune réservation n'est conclue automatiquement dans l'app."],
+    ["Trips et réservations", "Les membres organisent les dates, transports, hébergements et activités. Tripeer n'est pas une agence de voyages et aucune réservation n'est conclue automatiquement dans l'app."],
     ["Comportement", "Harcèlement, discrimination, fraude, contenu illicite ou dangereux et usurpation d'identité sont interdits. Un compte ou un contenu peut être modéré."],
     ["Contenus", "Tu restes responsable des textes et photos publiés et confirmes disposer des droits nécessaires pour les partager avec le groupe."],
     ["Sécurité", "Chaque membre doit vérifier les conditions météo, son niveau, les assurances et l'encadrement professionnel requis avant une activité."],
@@ -7727,7 +7753,7 @@ function AboutPage() {
         <div className="max-w-5xl">
           <p className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-bold backdrop-blur">À propos</p>
           <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">Faire passer une envie de voyage du « peut-être » au « on y va ».</h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg sm:leading-8">tripeer est née d'une idée simple : beaucoup de personnes veulent partir, mais pas forcément seules. Nous créons le cadre qui permet de trouver le bon groupe et de commencer.</p>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg sm:leading-8">Tripeer est née d'une idée simple : beaucoup de personnes veulent partir, mais pas forcément seules. Nous créons le cadre qui permet de trouver le bon groupe et de commencer.</p>
           <div className="mt-10 grid gap-3 md:grid-cols-3">
             <AboutValue eyebrow="Mission" title="Créer le bon groupe" text="Réunir des profils compatibles autour d'un projet concret et humain." />
             <AboutValue eyebrow="Produit" title="Des Trips réelles" text="Passer d'une idée de destination à une organisation construite ensemble." />
@@ -8199,9 +8225,9 @@ function Footer({ go }: { go: (page: Page) => void }) {
     <footer className="hidden border-t border-forest-100 bg-white lg:block">
       <div className="container-page grid gap-6 py-8 sm:grid-cols-[1fr_auto] sm:items-center">
         <div className="flex items-center gap-4">
-          <img className="h-20 w-20 shrink-0 object-contain" src={brandLogoUrl} alt="tripeer" />
+          <img className="h-16 w-24 shrink-0 object-contain mix-blend-multiply" src={brandLogoUrl} alt="Tripeer" />
           <div>
-            <p className="font-semibold">tripeer</p>
+            <p className="font-semibold">Tripeer</p>
             <p className="mt-1 text-sm text-forest-700">Une plateforme sociale intelligente qui transforme une envie individuelle de nature en aventure collective organisée.</p>
           </div>
         </div>
