@@ -27,6 +27,8 @@
 
 .app-onboarding-card-flow {
   animation: app-onboarding-card-flow 12s ease-in-out infinite alternate;
+  width: max-content;
+  max-width: none;
 }
 
 .app-onboarding-phone-scroll {
@@ -38,13 +40,28 @@
   transform-origin: left center;
 }
 
+.app-onboarding-scroll {
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-onboarding-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.app-onboarding-visual {
+  height: clamp(15rem, 44dvh, 24rem);
+  max-height: calc(100dvh - 13.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
 @keyframes app-onboarding-card-flow {
   0% {
     transform: translateX(0);
   }
 
   100% {
-    transform: translateX(-38%);
+    transform: translateX(-34%);
   }
 }
 
@@ -54,7 +71,7 @@
   }
 
   100% {
-    transform: translateY(-34%);
+    transform: translateY(-26%);
   }
 }
 
@@ -79,9 +96,21 @@
   }
 }
 
+@media (max-width: 360px) {
+  .app-onboarding-visual {
+    height: clamp(13rem, 38dvh, 18rem);
+    max-height: calc(100dvh - 14rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+}
+
 @media (min-width: 640px) {
   .conversation-shell {
     height: clamp(38rem, calc(100dvh - 7rem), 50rem);
+  }
+
+  .app-onboarding-visual {
+    height: clamp(24rem, 58dvh, 31rem);
+    max-height: none;
   }
 }
 
