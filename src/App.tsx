@@ -147,7 +147,7 @@ import {
   uploadTripImages,
   validateImageFiles
 } from "./services/mediaService";
-import { sendContactMessage } from "./services/contactService";
+import { CONTACT_RECIPIENT_EMAIL, sendContactMessage } from "./services/contactService";
 import { calculateGroupMatch, calculateTripMatch, calculateUserMatch, type MatchResult, type TripMatchResult } from "./services/matchService";
 import { getCachedPexelsActivityPhotos, searchPexelsActivityPhotos, type PexelsActivityPhoto } from "./services/pexelsService";
 import { getActivityImageRotation } from "./services/tripActivityMediaService";
@@ -1353,17 +1353,25 @@ function App() {
     if (!session) return;
 
     const alreadyFavorite = favoriteTripIds.includes(trip.id);
+    setFavoriteTripIds((prev) => (
+      alreadyFavorite
+        ? prev.filter((id) => id !== trip.id)
+        : Array.from(new Set([...prev, trip.id]))
+    ));
     try {
       if (alreadyFavorite) {
         await removeTripFromFavorites(trip.id, session.user.id, session.access_token);
-        setFavoriteTripIds((prev) => prev.filter((id) => id !== trip.id));
         setSocialNotice("Trip retiré de tes favoris.");
       } else {
         await addTripToFavorites(trip.id, session.user.id, session.access_token);
-        setFavoriteTripIds((prev) => Array.from(new Set([...prev, trip.id])));
-        setSocialNotice("Trip ajouté à tes favoris.");
+        setSocialNotice("Trip ajouté à tes favoris et visible dans Mes Trips intéressés.");
       }
     } catch (error) {
+      setFavoriteTripIds((prev) => (
+        alreadyFavorite
+          ? Array.from(new Set([...prev, trip.id]))
+          : prev.filter((id) => id !== trip.id)
+      ));
       console.error("Favori impossible.", error);
       setSocialNotice(error instanceof Error ? error.message : "Impossible de modifier ce favori.");
     }
@@ -7768,53 +7776,282 @@ function AboutPage() {
   );
 }
 
+const contactRequestTypes = ["Problème", "Suggestion", "Question", "Autre"] as const;
+type ContactRequestType = typeof contactRequestTypes[number];
+
 function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | null; accessToken?: string }) {
   const [email, setEmail] = useState(profile?.email ?? "");
   const [subject, setSubject] = useState("");
+  const [requestType, setRequestType] = useState<ContactRequestType>("Problème");
   const [body, setBody] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState("");
   const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+    if (profile?.email && !email) setEmail(profile.email);
+  }, [email, profile?.email]);
+
+  const validate = () => {
+    const errors: Record<string, string> = {};
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errors.email = "Indique une adresse email valide.";
+    if (!subject.trim()) errors.subject = "Ajoute un sujet pour nous aider à comprendre ta demande.";
+    if (!body.trim()) errors.body = "Explique-nous ce qu'il s'est passé ou ce que tu aimerais améliorer.";
+    if (body.length > 1000) errors.body = "Ton message doit rester sous 1000 caractères.";
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const resetForm = () => {
+    setSubject("");
+    setRequestType("Problème");
+    setBody("");
+    setFieldErrors({});
+    setFeedback("");
+    setSent(false);
+  };
+
   return (
-    <VideoPageBackground source="videos/contact-background.m4v" label="Une personne contemple une cascade au cœur de la nature">
-      <section className="container-page flex min-h-[calc(100vh-8rem)] items-center py-10 text-white lg:py-14">
-        <div className="w-full max-w-5xl">
+    <main className="bg-[#F7F8F5] text-[#17231E]">
+      <section className="relative isolate min-h-[340px] overflow-hidden bg-[#0B2F26] sm:min-h-[390px] lg:min-h-[420px]">
+        <video className="absolute inset-0 -z-20 h-full w-full object-cover object-center opacity-55 saturate-75 blur-[1px] motion-reduce:hidden" autoPlay loop muted playsInline preload="metadata" aria-label="Une cascade dans un paysage naturel">
+          <source src={`${import.meta.env.BASE_URL}videos/contact-background.m4v`} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#0B2F26]/92 via-[#123F32]/82 to-[#0B2F26]/68" />
+        <div className="container-page flex min-h-[340px] items-center py-12 text-white sm:min-h-[390px] lg:min-h-[420px]">
           <div className="max-w-3xl">
-            <p className="inline-flex rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-bold backdrop-blur">Nous contacter</p>
-            <h1 className="mt-5 text-4xl font-semibold leading-tight sm:text-5xl">Parlons de ton expérience.</h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">Une question, une idée ou un problème pendant la beta ? Écris-nous directement. Chaque retour nous aide à rendre les prochains départs plus simples.</p>
+            <span className="inline-flex rounded-full border border-white/20 bg-white/12 px-4 py-2 text-sm font-bold text-white shadow-sm backdrop-blur">
+              À ton écoute
+            </span>
+            <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+              Aide-nous à construire une meilleure façon de partir
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/86 sm:text-lg">
+              Une idée, une difficulté ou une suggestion ? Chaque retour nous aide à rendre les prochaines aventures plus simples et plus humaines.
+            </p>
+            <p className="mt-4 text-sm font-semibold text-white/75">Ton email nous permettra de te répondre avec le bon contexte.</p>
           </div>
-          <div className="mt-8 grid gap-3 md:grid-cols-3">
-            <AboutValue eyebrow="Écoute" title="Chaque retour compte" text="Signale un problème ou partage ce qui pourrait rendre ton parcours plus simple." />
-            <AboutValue eyebrow="Aide" title="Une réponse humaine" text="Nous lisons les messages de la beta et revenons vers toi avec une réponse adaptée." />
-            <AboutValue eyebrow="Produit" title="Construire ensemble" text="Tes idées nous aident à prioriser les améliorations réellement utiles à la communauté." />
-          </div>
-        <form
-          className="mt-8 grid gap-4 rounded-lg bg-white/95 p-5 text-forest-900 shadow-2xl backdrop-blur sm:p-7 lg:max-w-3xl"
-          onSubmit={async (event) => {
-            event.preventDefault();
-            if (!email.includes("@") || !subject.trim() || !body.trim()) { setFeedback("Complète tous les champs."); return; }
-            setSending(true);
-            try {
-              await sendContactMessage({ userId: profile?.id, email, subject, body }, accessToken);
-              setSubject("");
-              setBody("");
-              setFeedback("Message envoyé. Merci pour ton retour.");
-            } catch (error) {
-              setFeedback(error instanceof Error ? error.message : "Message impossible à envoyer.");
-            } finally {
-              setSending(false);
-            }
-          }}
-        >
-          <label className="grid gap-2 text-sm font-bold">Email<input className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal outline-none focus:ring-2 focus:ring-forest-600" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" /></label>
-          <label className="grid gap-2 text-sm font-bold">Sujet<input className="rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal outline-none focus:ring-2 focus:ring-forest-600" value={subject} onChange={(event) => setSubject(event.target.value)} /></label>
-          <label className="grid gap-2 text-sm font-bold">Message<textarea className="min-h-36 resize-y rounded-lg border border-forest-100 bg-forest-50 p-3 font-normal outline-none focus:ring-2 focus:ring-forest-600" value={body} onChange={(event) => setBody(event.target.value)} /></label>
-          <button className="btn-primary" disabled={sending} type="submit"><Mail className="mr-2 inline" size={18} />{sending ? "Envoi..." : "Envoyer"}</button>
-          {feedback && <p className="rounded-lg bg-forest-50 p-3 text-sm font-semibold">{feedback}</p>}
-        </form>
         </div>
       </section>
-    </VideoPageBackground>
+
+      <section className="container-page -mt-10 relative z-10">
+        <div className="grid gap-4 md:grid-cols-3">
+          <ContactCommitmentCard
+            icon={<MessageCircle size={22} />}
+            title="Chaque retour compte"
+            text="Signale un problème ou partage une idée pour améliorer ton expérience."
+          />
+          <ContactCommitmentCard
+            icon={<HeartHandshake size={22} />}
+            title="Une réponse humaine"
+            text="Chaque message est lu par notre équipe et reçoit une réponse adaptée."
+          />
+          <ContactCommitmentCard
+            icon={<Sparkles size={22} />}
+            title="Construisons ensemble"
+            text="Tes suggestions nous aident à prioriser les améliorations utiles à la communauté."
+          />
+        </div>
+      </section>
+
+      <section className="container-page py-12 sm:py-16">
+        <div className="grid gap-6 lg:grid-cols-[0.38fr_0.62fr] lg:items-start">
+          <aside className="rounded-[1.5rem] bg-[#0B2F26] p-6 text-white shadow-soft sm:p-8">
+            <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase text-white/80">
+              Bêta Tribu Nature
+            </span>
+            <h2 className="mt-5 text-3xl font-semibold leading-tight">Parlons de ton expérience</h2>
+            <p className="mt-4 text-sm leading-7 text-white/78">
+              Les retours servent réellement à améliorer le produit : parcours, sécurité, matching, conversations et création de Trips.
+            </p>
+            <div className="mt-6 grid gap-3">
+              <ContactCheckItem text="Problème technique" />
+              <ContactCheckItem text="Suggestion de fonctionnalité" />
+              <ContactCheckItem text="Retour sur l'expérience utilisateur" />
+            </div>
+            <p className="mt-7 rounded-2xl border border-white/12 bg-white/8 p-4 text-sm leading-6 text-white/72">
+              Pour les urgences liées à un voyage, utilise les outils de sécurité de l'application.
+            </p>
+          </aside>
+
+          <section className="rounded-[1.5rem] border border-[#DCE6DF] bg-white p-5 shadow-soft sm:p-8">
+            {sent ? (
+              <div className="grid min-h-[430px] place-items-center text-center">
+                <div className="max-w-md">
+                  <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#EAF2ED] text-[#123F32]">
+                    <CheckCircle2 size={30} />
+                  </span>
+                  <h2 className="mt-5 text-3xl font-semibold">Merci pour ton retour</h2>
+                  <p className="mt-3 text-sm leading-6 text-[#64716A]">
+                    Ton message a bien été envoyé. Nous reviendrons vers toi rapidement.
+                  </p>
+                  <button className="mt-7 inline-flex h-12 items-center justify-center rounded-[14px] border border-[#DCE6DF] px-5 text-sm font-bold text-[#123F32] transition hover:border-[#123F32] hover:bg-[#EAF2ED]" onClick={resetForm}>
+                    Envoyer un autre message
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form
+                className="grid gap-5"
+                noValidate
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  setFeedback("");
+                  if (!validate()) return;
+                  setSending(true);
+                  try {
+                    await sendContactMessage({ userId: profile?.id, email, subject, body, requestType }, accessToken);
+                    setSent(true);
+                    setSubject("");
+                    setBody("");
+                  } catch (error) {
+                    setFeedback(error instanceof Error ? error.message : "Message impossible à envoyer.");
+                  } finally {
+                    setSending(false);
+                  }
+                }}
+              >
+                <div>
+                  <p className="text-sm font-bold uppercase text-[#64716A]">Retours utilisateurs</p>
+                  <h2 className="mt-2 text-3xl font-semibold">Écris-nous simplement</h2>
+                  <p className="mt-2 text-sm leading-6 text-[#64716A]">
+                    Les messages sont centralisés pour l'équipe Tripeer et orientés vers {CONTACT_RECIPIENT_EMAIL}.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <ContactTextField
+                    id="contact-email"
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={setEmail}
+                    autoComplete="email"
+                    error={fieldErrors.email}
+                  />
+                  <ContactTextField
+                    id="contact-subject"
+                    label="Sujet"
+                    value={subject}
+                    onChange={setSubject}
+                    placeholder="Ex. Je n'arrive pas à rejoindre un trip"
+                    error={fieldErrors.subject}
+                  />
+                </div>
+
+                <fieldset className="grid gap-2">
+                  <legend className="text-sm font-bold text-[#17231E]">Type de demande</legend>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {contactRequestTypes.map((type) => (
+                      <button
+                        className={`h-12 rounded-[14px] border px-3 text-sm font-bold transition focus:outline-none focus:ring-4 focus:ring-[#EAF2ED] ${requestType === type ? "border-[#123F32] bg-[#123F32] text-white" : "border-[#DCE6DF] bg-white text-[#123F32] hover:border-[#123F32]"}`}
+                        key={type}
+                        type="button"
+                        onClick={() => setRequestType(type)}
+                        aria-pressed={requestType === type}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <div className="grid gap-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <label className="text-sm font-bold text-[#17231E]" htmlFor="contact-message">Message</label>
+                    <span className={`text-xs font-semibold ${body.length > 1000 ? "text-red-700" : "text-[#64716A]"}`}>{body.length} / 1000</span>
+                  </div>
+                  <textarea
+                    id="contact-message"
+                    className={`min-h-40 resize-y rounded-[14px] border bg-white px-4 py-3 text-sm leading-6 text-[#17231E] outline-none transition placeholder:text-[#8A9690] focus:border-[#123F32] focus:ring-4 focus:ring-[#EAF2ED] ${fieldErrors.body ? "border-red-300" : "border-[#DCE6DF]"}`}
+                    value={body}
+                    onChange={(event) => setBody(event.target.value.slice(0, 1100))}
+                    placeholder="Explique-nous ce qu'il s'est passé ou ce que tu aimerais améliorer..."
+                    aria-describedby={fieldErrors.body ? "contact-message-error" : undefined}
+                    aria-invalid={Boolean(fieldErrors.body)}
+                  />
+                  {fieldErrors.body && <p className="text-sm font-semibold text-red-700" id="contact-message-error">{fieldErrors.body}</p>}
+                </div>
+
+                {feedback && (
+                  <p className="rounded-[14px] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" role="alert">
+                    {feedback}
+                  </p>
+                )}
+
+                <button
+                  className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-[14px] bg-[#0B2F26] px-5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#123F32] focus:outline-none focus:ring-4 focus:ring-[#EAF2ED] disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:hover:translate-y-0"
+                  disabled={sending}
+                  type="submit"
+                >
+                  {sending ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white motion-reduce:animate-none" aria-hidden /> : <Send size={18} />}
+                  {sending ? "Envoi en cours..." : "Envoyer mon message"}
+                </button>
+              </form>
+            )}
+          </section>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function ContactCommitmentCard({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <article className="rounded-[1.5rem] border border-[#DCE6DF] bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-[#123F32]/35 motion-reduce:hover:translate-y-0 sm:p-6">
+      <span className="grid h-12 w-12 place-items-center rounded-full bg-[#EAF2ED] text-[#123F32]">{icon}</span>
+      <h2 className="mt-4 text-xl font-semibold text-[#17231E]">{title}</h2>
+      <p className="mt-2 text-sm leading-6 text-[#64716A]">{text}</p>
+    </article>
+  );
+}
+
+function ContactCheckItem({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-3 text-sm font-semibold text-white/88">
+      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/10 text-[#D8A94E]"><CheckCircle2 size={16} /></span>
+      <span>{text}</span>
+    </div>
+  );
+}
+
+function ContactTextField({
+  id,
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
+  autoComplete,
+  error
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  placeholder?: string;
+  autoComplete?: string;
+  error?: string;
+}) {
+  const errorId = `${id}-error`;
+  return (
+    <div className="grid gap-2">
+      <label className="text-sm font-bold text-[#17231E]" htmlFor={id}>{label}</label>
+      <input
+        id={id}
+        className={`min-h-[52px] rounded-[14px] border bg-white px-4 text-sm text-[#17231E] outline-none transition placeholder:text-[#8A9690] focus:border-[#123F32] focus:ring-4 focus:ring-[#EAF2ED] ${error ? "border-red-300" : "border-[#DCE6DF]"}`}
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        aria-describedby={error ? errorId : undefined}
+        aria-invalid={Boolean(error)}
+      />
+      {error && <p className="text-sm font-semibold text-red-700" id={errorId}>{error}</p>}
+    </div>
   );
 }
 

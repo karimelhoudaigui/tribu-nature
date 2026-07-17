@@ -1,8 +1,9 @@
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export const CONTACT_RECIPIENT_EMAIL = "elhoudaiguikarim91@gmail.com";
 
 export async function sendContactMessage(
-  payload: { userId?: string; email: string; subject: string; body: string },
+  payload: { userId?: string; email: string; subject: string; body: string; requestType?: string },
   accessToken?: string
 ) {
   if (!supabaseUrl || !supabaseAnonKey) throw new Error("Le formulaire de contact est indisponible.");
@@ -17,8 +18,13 @@ export async function sendContactMessage(
     body: JSON.stringify({
       user_id: payload.userId ?? null,
       email: payload.email.trim(),
-      subject: payload.subject.trim(),
-      body: payload.body.trim()
+      subject: `[${payload.requestType ?? "Contact"}] ${payload.subject.trim()}`.slice(0, 180),
+      body: [
+        `Destinataire: ${CONTACT_RECIPIENT_EMAIL}`,
+        `Type de demande: ${payload.requestType ?? "Contact"}`,
+        "",
+        payload.body.trim()
+      ].join("\n")
     })
   });
 
