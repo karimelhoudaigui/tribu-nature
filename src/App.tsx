@@ -45,6 +45,7 @@ import {
   X
 } from "lucide-react";
 import { activities, destination, providers, trips as localTrips, mockLocalActivities as localActivities } from "./data";
+import { sourceDisplayName } from "./activityReferences";
 import {
   getCurrentProfile,
   getPasswordRecoverySessionFromUrl,
@@ -5129,7 +5130,9 @@ function getTripActivities(trip: Trip, catalogActivities: MockLocalActivity[]): 
         description: "Activité proposée par le membre. L'app pourra l'enrichir via le Local Activity Graph.",
         image: assignedImages[0] ?? trip.image_url,
         images: assignedImages,
-        source: "mock" as const
+        source: "mock" as const,
+        origin: "user" as const,
+        proposed_by: trip.creator_name ?? "le groupe"
       };
     });
   }
@@ -7873,8 +7876,9 @@ function ActivityCard({ activity, pexelsPhotos }: { activity: Activity | MockLoc
         image: activity.image,
         images: activity.images ?? [activity.image],
         mapUrl: activity.lat && activity.lng ? `https://www.google.com/maps/search/?api=1&query=${activity.lat},${activity.lng}` : "",
-        referenceUrl: activity.external_url ?? "",
-        referenceLabel: activity.external_url ? referenceLabel(activity.source) : ""
+        referenceUrl: activity.origin === "verified_public" && activity.reference?.verificationStatus === "verified" ? activity.reference.url : "",
+        referenceLabel: activity.origin === "verified_public" && activity.reference ? sourceDisplayName(activity.reference.source) : "",
+        originLabel: activity.origin === "verified_public" && activity.reference ? `Source vérifiée · ${sourceDisplayName(activity.reference.source)}` : activity.origin === "user" ? `Proposé par ${activity.proposed_by ?? "le groupe"}` : "Suggestion Tripeer"
       }
     : {
         name: activity.name,
@@ -7892,7 +7896,8 @@ function ActivityCard({ activity, pexelsPhotos }: { activity: Activity | MockLoc
         images: [],
         mapUrl: `https://www.google.com/maps/search/?api=1&query=${activity.lat},${activity.lng}`,
         referenceUrl: "",
-        referenceLabel: ""
+        referenceLabel: "",
+        originLabel: "Suggestion Tripeer"
       };
   const photos = getActivityPhotos(display.name, display.category, display.image, display.images, pexelsPhotos);
   const highlights = getActivityHighlights(display);
@@ -7930,6 +7935,10 @@ function ActivityCard({ activity, pexelsPhotos }: { activity: Activity | MockLoc
         </div>
 
         <div className="mt-4 flex min-h-8 flex-wrap gap-x-4 gap-y-2 text-xs font-bold text-forest-700">
+          <span className={`inline-flex items-center gap-1.5 ${display.referenceUrl ? "text-forest-800" : "text-forest-600"}`}>
+            {display.referenceUrl ? <ShieldCheck size={16} /> : <Sparkles size={16} />}
+            {display.originLabel}
+          </span>
           {highlights.map((highlight) => (
             <span className="inline-flex items-center gap-1.5" key={highlight.label}>
               {highlight.weather ? <CloudSun size={16} /> : <CheckCircle2 size={16} />}
@@ -7948,15 +7957,15 @@ function ActivityCard({ activity, pexelsPhotos }: { activity: Activity | MockLoc
             )}
             {display.referenceUrl && (
               <a
-                aria-label={display.referenceLabel}
+                aria-label={`Voir la source ${display.referenceLabel} de ${display.name}`}
                 className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-forest-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-forest-800"
                 href={display.referenceUrl}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 title={display.referenceLabel}
               >
                 <ExternalLink size={17} />
-                Référence
+                Voir la référence
               </a>
             )}
           </div>
@@ -8074,13 +8083,6 @@ function getActivityPhotos(name: string, category: string, primaryImage: string,
     pexelsUrl: photo.pexelsUrl
   }));
   return [...apiPhotos, ...fallbackPhotos].filter((photo, index, allPhotos) => allPhotos.findIndex((candidate) => candidate.src === photo.src) === index).slice(0, 4);
-}
-
-function referenceLabel(source?: MockLocalActivity["source"]) {
-  if (source === "openstreetmap") return "Voir la fiche OpenStreetMap";
-  if (source === "google_places") return "Voir le site";
-  if (source === "datatourisme") return "Voir la fiche tourisme";
-  return "Voir une référence";
 }
 
 function MemberCard({ member }: { member: UserProfile }) {

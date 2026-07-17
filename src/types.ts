@@ -5,6 +5,21 @@ export type TripCreatedByType = "platform" | "user";
 export type TripPlanningStatus = "idea" | "forming_group" | "planned" | "confirmed" | "cancelled";
 export type TripVisibility = "public" | "private" | "unlisted";
 export type TripModerationStatus = "approved" | "pending" | "rejected";
+export type ActivitySource = "official" | "datatourisme" | "openstreetmap" | "google_places";
+export type ActivityOrigin = "verified_public" | "tripeer_suggestion" | "user";
+
+export type ActivityReference = {
+  source: ActivitySource;
+  url: string;
+  externalId?: string;
+  canonicalName: string;
+  latitude?: number;
+  longitude?: number;
+  municipality?: string;
+  verifiedAt: string;
+  verificationStatus: "verified";
+  confidence: "high";
+};
 
 export type TravelPreferences = {
   user_id: string;
@@ -193,6 +208,9 @@ export type MockLocalActivity = {
   images?: string[];
   source?: "mock" | "openstreetmap" | "google_places" | "datatourisme";
   external_url?: string;
+  origin?: ActivityOrigin;
+  reference?: ActivityReference;
+  proposed_by?: string;
 };
 
 export type MockMember = {

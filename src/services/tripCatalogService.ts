@@ -1,4 +1,5 @@
 import { mockLocalActivities, trips } from "../data";
+import { withActivityReference } from "../activityReferences";
 import type { MockLocalActivity, Trip } from "../types";
 
 export type CatalogSource = "local" | "supabase";
@@ -156,7 +157,7 @@ export async function loadTripCatalog(accessToken?: string): Promise<TripCatalog
 
     return {
       trips: remoteTrips.map(mapTripRow),
-      activities: remoteActivities.map(mapActivityRow),
+      activities: remoteActivities.map((activity) => withActivityReference(mapActivityRow(activity))),
       source: "supabase"
     };
   } catch (error) {

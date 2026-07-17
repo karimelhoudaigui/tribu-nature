@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "validate:references": "node --experimental-strip-types scripts/validate-activity-references.ts",
+    "typecheck": "tsc -b",
     "build": "tsc -b && vite build",
     "test": "node --test tests/*.test.mjs",
     "test:flows": "node scripts/applyBetaMigration.mjs && node --test tests/supabase-social-flows.test.mjs",

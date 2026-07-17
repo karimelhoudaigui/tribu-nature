@@ -14,6 +14,7 @@ import type {
   Vote
 } from "./types";
 import { excelActivities, excelTrips } from "./excelCatalog";
+import { applyActivityReferenceDefaults } from "./activityReferences";
 
 const baseTrips: Trip[] = [
   {
@@ -284,9 +285,7 @@ const baseMockLocalActivities: MockLocalActivity[] = [
     booking_required: false,
     group_friendly: true,
     description: "Une boucle accessible pour respirer et découvrir la vallée sans pression sportive.",
-    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80",
-    source: "mock",
-    external_url: "https://www.openstreetmap.org/#map=14/42.979/-0.590"
+    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80"
   },
   {
     id: "aspe-ferme",
@@ -304,9 +303,7 @@ const baseMockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Rencontre avec un producteur et dégustation de fromage local.",
-    image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80",
-    source: "mock",
-    external_url: "https://www.google.com/search?q=fromagerie+vall%C3%A9e+d%27aspe"
+    image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80"
   },
   {
     id: "aspe-diner",
@@ -324,9 +321,7 @@ const baseMockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Un dîner simple et chaleureux pour créer du lien dans le groupe.",
-    image: "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80",
-    source: "mock",
-    external_url: "https://www.google.com/search?q=restaurant+b%C3%A9arnais+vall%C3%A9e+d%27aspe"
+    image: "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=900&q=80"
   },
   {
     id: "aspe-rafting",
@@ -344,9 +339,7 @@ const baseMockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Une sortie dynamique mais accessible, encadrée par un professionnel.",
-    image: "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=900&q=80",
-    source: "mock",
-    external_url: "https://www.google.com/search?q=rafting+vall%C3%A9e+d%27aspe"
+    image: "https://images.unsplash.com/photo-1508166466920-f65aa51f727c?auto=format&fit=crop&w=900&q=80"
   },
   {
     id: "aspe-cheval",
@@ -364,9 +357,7 @@ const baseMockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Un plan B doux si le groupe préfère éviter l'eau vive.",
-    image: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&w=900&q=80",
-    source: "mock",
-    external_url: "https://www.google.com/search?q=balade+%C3%A0+cheval+vall%C3%A9e+d%27aspe"
+    image: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?auto=format&fit=crop&w=900&q=80"
   },
   {
     id: "pb-marche",
@@ -384,9 +375,7 @@ const baseMockLocalActivities: MockLocalActivity[] = [
     booking_required: false,
     group_friendly: true,
     description: "Village, produits locaux et rythme doux.",
-    image: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80",
-    source: "mock",
-    external_url: "https://www.google.com/search?q=march%C3%A9+local+pays+basque+int%C3%A9rieur"
+    image: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=900&q=80"
   },
   {
     id: "dordogne-canoe",
@@ -404,9 +393,7 @@ const baseMockLocalActivities: MockLocalActivity[] = [
     booking_required: true,
     group_friendly: true,
     description: "Une activité accessible pour donner de l'énergie au week-end.",
-    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
-    source: "mock",
-    external_url: "https://www.google.com/search?q=cano%C3%AB+dordogne"
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"
   },
   {
     id: "fontainebleau-rochers",
@@ -424,13 +411,11 @@ const baseMockLocalActivities: MockLocalActivity[] = [
     booking_required: false,
     group_friendly: true,
     description: "Une sortie simple depuis Paris, parfaite pour une première rencontre.",
-    image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80",
-    source: "mock",
-    external_url: "https://www.openstreetmap.org/#map=13/48.404/2.701"
+    image: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80"
   }
 ];
 
-export const mockLocalActivities: MockLocalActivity[] = [...baseMockLocalActivities, ...excelActivities];
+export const mockLocalActivities: MockLocalActivity[] = applyActivityReferenceDefaults([...baseMockLocalActivities, ...excelActivities]);
 
 export const mockMembers: MockMember[] = [
   {
