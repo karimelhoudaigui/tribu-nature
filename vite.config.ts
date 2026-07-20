@@ -5,5 +5,5 @@ const env = (globalThis as { process?: { env?: Record<string, string | undefined
 
 export default defineConfig({
   plugins: [react()],
-  base: env.GITHUB_PAGES === "true" ? "/tribu-nature/" : "/",
+  base: env.GITHUB_PAGES === "true" && env.CUSTOM_DOMAIN !== "true" ? "/tribu-nature/" : "/",
 });
