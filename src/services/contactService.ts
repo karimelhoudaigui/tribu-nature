@@ -2,6 +2,17 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, "");
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const CONTACT_RECIPIENT_EMAIL = "elhoudaiguikarim91@gmail.com";
 
+export function buildContactMailtoUrl(payload: { email: string; subject: string; body: string; requestType?: string }) {
+  const subject = `[${payload.requestType ?? "Contact"}] ${payload.subject.trim()}`.slice(0, 180);
+  const body = [
+    `Email de reponse: ${payload.email.trim()}`,
+    `Type de demande: ${payload.requestType ?? "Contact"}`,
+    "",
+    payload.body.trim()
+  ].join("\n");
+  return `mailto:${CONTACT_RECIPIENT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 export async function sendContactMessage(
   payload: { userId?: string; email: string; subject: string; body: string; requestType?: string },
   accessToken?: string

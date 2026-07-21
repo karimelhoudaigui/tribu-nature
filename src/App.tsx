@@ -147,7 +147,7 @@ import {
   uploadTripImages,
   validateImageFiles
 } from "./services/mediaService";
-import { CONTACT_RECIPIENT_EMAIL, sendContactMessage } from "./services/contactService";
+import { CONTACT_RECIPIENT_EMAIL, buildContactMailtoUrl, sendContactMessage } from "./services/contactService";
 import { calculateGroupMatch, calculateTripMatch, calculateUserMatch, type MatchResult, type TripMatchResult } from "./services/matchService";
 import { getCachedPexelsActivityPhotos, searchPexelsActivityPhotos, type PexelsActivityPhoto } from "./services/pexelsService";
 import { getActivityImageRotation } from "./services/tripActivityMediaService";
@@ -7788,6 +7788,7 @@ function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | nu
   const [feedback, setFeedback] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [lastMailtoUrl, setLastMailtoUrl] = useState("");
 
   useEffect(() => {
     if (profile?.email && !email) setEmail(profile.email);
@@ -7810,6 +7811,7 @@ function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | nu
     setFieldErrors({});
     setFeedback("");
     setSent(false);
+    setLastMailtoUrl("");
   };
 
   return (
@@ -7884,11 +7886,18 @@ function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | nu
                   </span>
                   <h2 className="mt-5 text-3xl font-semibold">Merci pour ton retour</h2>
                   <p className="mt-3 text-sm leading-6 text-[#64716A]">
-                    Ton message a bien été envoyé. Nous reviendrons vers toi rapidement.
+                    Ta messagerie s'est ouverte avec un email prérempli pour {CONTACT_RECIPIENT_EMAIL}. Envoie-le pour que nous le recevions directement.
                   </p>
-                  <button className="mt-7 inline-flex h-12 items-center justify-center rounded-[14px] border border-[#DCE6DF] px-5 text-sm font-bold text-[#123F32] transition hover:border-[#123F32] hover:bg-[#EAF2ED]" onClick={resetForm}>
-                    Envoyer un autre message
-                  </button>
+                  <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+                    {lastMailtoUrl && (
+                      <a className="inline-flex h-12 items-center justify-center rounded-[14px] bg-[#0B2F26] px-5 text-sm font-bold text-white transition hover:bg-[#123F32]" href={lastMailtoUrl}>
+                        Rouvrir l'email
+                      </a>
+                    )}
+                    <button className="inline-flex h-12 items-center justify-center rounded-[14px] border border-[#DCE6DF] px-5 text-sm font-bold text-[#123F32] transition hover:border-[#123F32] hover:bg-[#EAF2ED]" onClick={resetForm}>
+                      Envoyer un autre message
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -7900,13 +7909,21 @@ function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | nu
                   setFeedback("");
                   if (!validate()) return;
                   setSending(true);
+                  const contactPayload = { userId: profile?.id, email, subject, body, requestType };
+                  const mailtoUrl = buildContactMailtoUrl(contactPayload);
+                  setLastMailtoUrl(mailtoUrl);
                   try {
-                    await sendContactMessage({ userId: profile?.id, email, subject, body, requestType }, accessToken);
+                    await sendContactMessage(contactPayload, accessToken);
                     setSent(true);
                     setSubject("");
                     setBody("");
+                    window.location.href = mailtoUrl;
                   } catch (error) {
-                    setFeedback(error instanceof Error ? error.message : "Message impossible à envoyer.");
+                    window.location.href = mailtoUrl;
+                    setSent(true);
+                    setSubject("");
+                    setBody("");
+                    console.warn(error);
                   } finally {
                     setSending(false);
                   }
@@ -7916,7 +7933,7 @@ function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | nu
                   <p className="text-sm font-bold uppercase text-[#64716A]">Retours utilisateurs</p>
                   <h2 className="mt-2 text-3xl font-semibold">Écris-nous simplement</h2>
                   <p className="mt-2 text-sm leading-6 text-[#64716A]">
-                    Les messages sont centralisés pour l'équipe Tripeer et orientés vers {CONTACT_RECIPIENT_EMAIL}.
+                    Ton message est préparé directement pour {CONTACT_RECIPIENT_EMAIL}. Une copie est aussi centralisée côté Tripeer quand Supabase est disponible.
                   </p>
                 </div>
 
@@ -7986,7 +8003,7 @@ function ContactPage({ profile, accessToken }: { profile: UserProfileRecord | nu
                   type="submit"
                 >
                   {sending ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white motion-reduce:animate-none" aria-hidden /> : <Send size={18} />}
-                  {sending ? "Envoi en cours..." : "Envoyer mon message"}
+                  {sending ? "Préparation en cours..." : "Ouvrir l'email"}
                 </button>
               </form>
             )}
